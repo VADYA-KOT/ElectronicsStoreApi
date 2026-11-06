@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Административная панель Electronics Store.">
+    <title>Управление магазином — Electronics Store</title>
+    <link rel="stylesheet" href="style.css">
+    <script type="module" src="admin.js"></script>
+</head>
+<body class="admin-page">
+    <div class="utility-bar">
+        <div class="container utility-bar__inner">
+            <div class="utility-links">
+                <a href="index.html">Главная</a>
+                <a href="product.html">Каталог</a>
+            </div>
+            <div class="utility-info">
+                <span>Electronics Store</span>
+                <span>Управление магазином</span>
+            </div>
+        </div>
+    </div>
+
+    <header class="site-header">
+        <div class="container main-header">
+            <a href="index.html" class="brand" aria-label="Electronics Store — главная">
+                <span class="brand-mark">E</span>
+                <span class="brand-name">
+                    <strong>ELECTRONICS</strong>
+                    <small>STORE / ADMIN</small>
+                </span>
+            </a>
+            <nav class="header-actions" aria-label="Навигация">
+                <a href="index.html"><span class="nav-icon">⌂</span><span>Главная</span></a>
+                <a href="product.html"><span class="nav-icon">▦</span><span>Каталог</span></a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="admin-main">
+        <section id="admin-access-card" class="admin-access-card" hidden>
+            <span class="eyebrow">ДОСТУП ОГРАНИЧЕН</span>
+            <h1>Требуется вход администратора</h1>
+            <p id="admin-access-message">Войдите в аккаунт с ролью Admin, чтобы управлять товарами.</p>
+            <div class="admin-header-actions">
+                <a class="admin-link-button" href="product.html#auth-section">Перейти ко входу</a>
+                <a class="admin-link-button admin-link-button--secondary" href="index.html">На главную</a>
+            </div>
+        </section>
+
+        <div id="admin-app" hidden>
+            <div class="admin-page-header">
+                <div>
+                    <span class="eyebrow">ELECTRONICS STORE / CONTROL PANEL</span>
+                    <h1>Управление магазином</h1>
+                    <p>Товары, цены, скидки, остатки, категории и фотографии.</p>
+                </div>
+                <div class="admin-header-actions">
+                    <a class="admin-link-button admin-link-button--secondary" href="product.html">Открыть каталог</a>
+                    <button id="admin-logout-button" class="admin-button admin-button--secondary" type="button">Выйти</button>
+                </div>
+            </div>
+
+            <div id="admin-message" class="admin-notice" role="status" aria-live="polite"></div>
+
+            <div class="admin-stats" aria-label="Статистика каталога">
+                <article class="admin-stat-card">
+                    <span>Всего товаров</span>
+                    <strong id="stat-products">—</strong>
+                </article>
+                <article class="admin-stat-card">
+                    <span>Есть в наличии</span>
+                    <strong id="stat-in-stock">—</strong>
+                </article>
+                <article class="admin-stat-card">
+                    <span>Товары со скидкой</span>
+                    <strong id="stat-discounts">—</strong>
+                </article>
+            </div>
+
+            <section class="admin-section" id="product-editor-section">
+                <div class="admin-section-heading">
+                    <div>
+                        <span class="eyebrow">КАТАЛОГ</span>
+                        <h2 id="product-form-title">Добавить товар</h2>
+                        <p>Цена — текущая. Старую цену указывайте только при реальной скидке.</p>
+                    </div>
+                </div>
+
+                <form id="product-form">
+                    <div class="admin-form-grid">
+                        <div class="admin-field admin-field--full">
+                            <label for="product-name">Название товара *</label>
+                            <input id="product-name" name="name" type="text" maxlength="200" required autocomplete="off">
+                        </div>
+
+                        <div class="admin-field">
+                            <label for="product-price">Текущая цена, BYN *</label>
+                            <input id="product-price" name="price" type="number" min="0.01" max="99999999.99" step="0.01" required>
+                        </div>
+                        <div class="admin-field">
+                            <label for="product-old-price">Старая цена, BYN</label>
+                            <input id="product-old-price" name="oldPrice" type="number" min="0.01" max="99999999.99" step="0.01" placeholder="Необязательно">
+                            <small>Должна быть выше текущей цены.</small>
+                        </div>
+
+                        <div class="admin-field">
+                            <label for="product-quantity">Количество на складе *</label>
+                            <input id="product-quantity" name="quantity" type="number" min="0" max="2147483647" step="1" value="0" required>
+                        </div>
+                        <div class="admin-field">
+                            <label for="product-category">Категория</label>
+                            <select id="product-category" name="categoryId">
+                                <option value="">Без категории</option>
+                            </select>
+                        </div>
+
+                        <div class="admin-field admin-field--full">
+                            <label for="product-description">Описание</label>
+                            <textarea id="product-description" name="description" rows="4" maxlength="4000" placeholder="Характеристики и описание товара"></textarea>
+                        </div>
+
+                        <div class="admin-field admin-field--full">
+                            <label for="product-image">Фотография товара</label>
+                            <div class="admin-image-control">
+                                <div id="image-preview" class="admin-image-preview">Предпросмотр изображения</div>
+                                <div>
+                                    <input id="product-image" name="image" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">
+                                    <small>JPG, PNG или WebP. Максимальный размер — 5 МБ.</small>
+                                    <div class="admin-image-actions">
+                                        <button id="remove-product-image" class="admin-button admin-button--secondary admin-button--small" type="button" hidden>Удалить текущую фотографию</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="admin-form-actions">
+                        <button id="save-product-button" class="admin-button" type="submit">Сохранить товар</button>
+                        <button id="cancel-edit-button" class="admin-button admin-button--secondary" type="button" hidden>Отменить редактирование</button>
+                    </div>
+                </form>
+            </section>
+
+            <section class="admin-section" id="products-management-section">
+                <div class="admin-section-heading">
+                    <div>
+                        <span class="eyebrow">УПРАВЛЕНИЕ</span>
+                        <h2>Товары магазина</h2>
+                        <p>Редактируйте карточки, цены и остатки. Таблица прокручивается по горизонтали на узких экранах.</p>
+                    </div>
+                    <button id="refresh-products-button" class="admin-button admin-button--secondary" type="button">Обновить</button>
+                </div>
+
+                <div class="admin-table-toolbar">
+                    <div class="admin-field">
+                        <label for="admin-product-search">Поиск по названию или категории</label>
+                        <input id="admin-product-search" type="search" placeholder="Начните вводить название товара">
+                    </div>
+                </div>
+
+                <div class="admin-table-wrap">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th scope="col">Фото</th>
+                                <th scope="col">Товар</th>
+                                <th scope="col">Категория</th>
+                                <th scope="col">Цена</th>
+                                <th scope="col">Остаток</th>
+                                <th scope="col">Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-products-body">
+                            <tr><td class="admin-table-empty" colspan="6">Загрузка товаров...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="admin-section" id="categories-management-section">
+                <div class="admin-section-heading">
+                    <div>
+                        <span class="eyebrow">СТРУКТУРА КАТАЛОГА</span>
+                        <h2>Категории</h2>
+                        <p>Создание, переименование и удаление категорий. Категории доступны в форме товара.</p>
+                    </div>
+                </div>
+
+                <form id="category-form" class="admin-category-form">
+                    <div class="admin-field">
+                        <label for="category-name">Название новой категории *</label>
+                        <input id="category-name" name="name" type="text" maxlength="100" required placeholder="Например, Мониторы">
+                    </div>
+                    <button class="admin-button" type="submit">Добавить категорию</button>
+                </form>
+
+                <div id="admin-category-list" class="admin-category-list"></div>
+            </section>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container footer-bottom">
+            <p>© 2026 Electronics Store</p>
+            <p>Административная панель</p>
+        </div>
+    </footer>
+</body>
+</html>

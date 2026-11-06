@@ -47,9 +47,12 @@ services:
       Jwt__Key: ${JWT_KEY}
     ports:
       - "8081:8080"
+    volumes:
+      - electronics-store-product-images:/app/ProductImages
     depends_on:
       migrate:
         condition: service_completed_successfully
 
 volumes:
   electronics-store-db:
+  electronics-store-product-images:

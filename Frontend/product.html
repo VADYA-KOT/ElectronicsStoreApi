@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Каталог электроники Electronics Store: товары, сравнение и оформление заказов.">
+    <title>Каталог товаров — Electronics Store</title>
+
+    <link rel="stylesheet" href="style.css">
+    <script type="module" src="script.js"></script>
+</head>
+
+<body>
+
+    <header>
+        <h1>Каталог товаров</h1>
+
+        <nav aria-label="Навигация">
+            <a href="index.html">Вернуться на главную</a>
+        </nav>
+    </header>
+
+    <main>
+
+        <!-- Авторизация -->
+        <section id="auth-section">
+            <h2>Аккаунт</h2>
+
+            <p id="auth-status" aria-live="polite">
+                Вы не авторизованы.
+            </p>
+
+            <form id="login-form">
+                <div>
+                    <label for="username">Логин</label>
+                    <input
+                        type="text"
+                        id="username"
+                        name="username"
+                        minlength="3"
+                        maxlength="40"
+                        pattern="[a-zA-Z0-9._-]+"
+                        autocomplete="username"
+                        required
+                    >
+                </div>
+
+                <div>
+                    <label for="password">Пароль</label>
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        minlength="12"
+                        maxlength="128"
+                        autocomplete="current-password"
+                        required
+                    >
+                </div>
+
+                <button type="submit">Войти</button>
+            </form>
+
+            <button type="button" id="logout-button" hidden>
+                Выйти из аккаунта
+            </button>
+
+            <p id="auth-message" role="status" aria-live="polite"></p>
+        </section>
+
+        <!-- Каталог -->
+        <section id="catalog-section">
+            <h2>Товары каталога</h2>
+
+            <div class="products-list" id="products-list">
+                <p>Загрузка товаров...</p>
+            </div>
+        </section>
+
+        <!-- Корзина -->
+        <section id="cart-section">
+            <h2>Корзина</h2>
+
+            <div id="cart-items">
+                <p>Корзина пуста.</p>
+            </div>
+
+            <p id="cart-total">Итого: 0.00 BYN</p>
+
+            <button type="button" id="checkout-button" disabled>
+                Войдите, чтобы оформить заказ
+            </button>
+        </section>
+
+        <!-- Результат оформления и предупреждения о наличии -->
+        <section
+            id="order-result"
+            aria-live="polite"
+            aria-atomic="true"
+        ></section>
+
+        <!-- Сравнение товаров -->
+        <section id="comparison-section">
+
+            <div class="comparison-heading">
+                <div>
+                    <h2>Сравнение товаров</h2>
+                    <p>
+                        Добавляйте товары одной категории, чтобы сравнить их цены,
+                        наличие и характеристики.
+                    </p>
+                </div>
+
+                <button
+                    type="button"
+                    id="clear-comparison-button"
+                    class="comparison-clear-button"
+                    hidden
+                >
+                    Очистить сравнение
+                </button>
+            </div>
+
+            <p id="comparison-status" role="status" aria-live="polite">
+                Вы пока не выбрали товары. Нажмите «Сравнить» в карточке товара.
+            </p>
+
+            <div
+                id="comparison-table-wrap"
+                class="comparison-table-wrap"
+                hidden
+            >
+                <table class="comparison-table">
+                    <thead id="comparison-table-head"></thead>
+                    <tbody id="product-table-body"></tbody>
+                </table>
+            </div>
+
+        </section>
+
+        <!-- Инструкция -->
+        <section id="checkout-instructions">
+            <h2>Как оформить заказ</h2>
+
+            <ol>
+                <li>Войти в аккаунт.</li>
+                <li>Выбрать товар.</li>
+                <li>Добавить товар в корзину.</li>
+                <li>Нажать «Оформить заказ».</li>
+                <li>При необходимости подтвердить корректировку корзины.</li>
+                <li>Получить подтверждение заказа.</li>
+            </ol>
+        </section>
+
+    </main>
+
+    <footer>
+        <p>Эмуляция интернет-магазина</p>
+    </footer>
+
+</body>
+</html>

@@ -23,7 +23,7 @@ jobs:
           dotnet-version: '10.0.x'
 
       - name: Restore dependencies
-        run: dotnet restore ElectronicsStoreApiPractice.slnx
+        run: dotnet restore ElectronicsStoreApi.slnx
 
       - name: Run tests
-        run: dotnet test ElectronicsStoreApiPractice.slnx --configuration Release --no-restore
+        run: dotnet test ElectronicsStoreApi.slnx --configuration Release --no-restore

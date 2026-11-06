@@ -26,3 +26,9 @@
 # Локальная конфигурация разработки
 **/appsettings.Development.json
 appsettings.*.Local.json
+
+# Local VS Code settings
+.vscode/
+
+# Uploaded product images
+/ElectronicsStoreApi/ProductImages/

@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="description" content="Electronics Store — магазин электроники, компьютеров, смартфонов и аксессуаров.">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Electronics Store — Магазин электроники</title>
+    <link rel="stylesheet" href="style.css">
+    <script type="module" src="script.js"></script>
+</head>
+<body>
+    <div class="utility-bar">
+        <div class="container utility-bar__inner">
+            <div class="utility-links">
+                <a href="#about">О магазине</a>
+                <a href="#advantages">Покупателям</a>
+                <a href="#footer">Контакты</a>
+            </div>
+            <div class="utility-info">
+                <span>Electronics Store</span>
+                <span>Магазин современной электроники</span>
+            </div>
+        </div>
+    </div>
+
+    <header class="site-header">
+        <div class="container main-header">
+            <a href="index.html" class="brand" aria-label="Electronics Store — главная">
+                <span class="brand-mark">E</span>
+                <span class="brand-name">
+                    <strong>ELECTRONICS</strong>
+                    <small>STORE</small>
+                </span>
+            </a>
+
+            <nav class="header-actions" aria-label="Основная навигация">
+                <a href="product.html"><span class="nav-icon">▦</span><span>Каталог</span></a>
+                <a href="product.html#product-table-body"><span class="nav-icon">⇄</span><span>Сравнение</span></a>
+                <a href="product.html#cart-items"><span class="nav-icon">🛒</span><span>Корзина</span></a>
+                <a href="product.html#auth-section"><span class="nav-icon">♙</span><span>Аккаунт</span></a>
+                <a id="admin-panel-link" href="admin.html" hidden><span class="nav-icon">⚙</span><span>Управление</span></a>
+            </nav>
+        </div>
+
+        <div class="main-nav-wrap">
+            <nav class="container main-nav" aria-label="Категории магазина">
+                <a href="product.html">Все товары</a>
+                <a href="product.html?category=smartphones">Смартфоны</a>
+                <a href="product.html?category=laptops">Ноутбуки</a>
+                <a href="product.html?category=accessories">Аксессуары</a>
+                <a href="product.html?inStock=true">В наличии</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="hero">
+            <div class="hero-content">
+                <span class="eyebrow">ELECTRONICS STORE</span>
+                <h1>Технологии для работы,<span>дома и жизни</span></h1>
+                <p>Выбирайте электронику, сравнивайте характеристики и оформляйте покупки в одном месте.</p>
+                <div class="hero-actions">
+                    <a href="product.html" class="button-link button-primary">Перейти в каталог</a>
+                    <a href="#categories" class="button-link button-secondary">Популярные категории</a>
+                </div>
+                <div class="hero-note">
+                    <span class="hero-note__line"></span>
+                    <span>Удобный каталог и понятное оформление заказов</span>
+                </div>
+            </div>
+            <!-- Изображение техники является фоном всего hero-блока и не выглядит отдельной вставленной картинкой. -->
+        </section>
+
+        <section class="search-section" id="search">
+            <div class="section-heading">
+                <div><span class="eyebrow">БЫСТРЫЙ ПОИСК</span><h2>Найдите нужный товар</h2></div>
+                <a href="product.html" class="text-link">Весь каталог →</a>
+            </div>
+            <form id="product-search-form" class="search-form">
+                <div class="search-field search-field--main">
+                    <label for="product-search">Название товара</label>
+                    <input type="search" id="product-search" name="search" placeholder="Например, ноутбук или смартфон">
+                </div>
+                <div class="search-field">
+                    <label for="product-category">Категория</label>
+                    <select id="product-category" name="category">
+                        <option value="all">Все категории</option>
+                        <option value="laptops">Ноутбуки</option>
+                        <option value="smartphones">Смартфоны</option>
+                        <option value="accessories">Аксессуары</option>
+                    </select>
+                </div>
+                <div class="search-options">
+                    <label class="checkbox-control"><input type="checkbox" name="inStock" value="true"><span>Только в наличии</span></label>
+                    <div class="sort-options">
+                        <span>Сортировка:</span>
+                        <label><input type="radio" name="sort" value="price-asc" checked><span>Сначала дешевле</span></label>
+                        <label><input type="radio" name="sort" value="price-desc"><span>Сначала дороже</span></label>
+                    </div>
+                </div>
+                <button type="submit" class="button-primary search-button">Найти товары</button>
+            </form>
+        </section>
+
+        <section class="content-section" id="categories">
+            <div class="section-heading">
+                <div><span class="eyebrow">КАТАЛОГ</span><h2>Популярные категории</h2><p>Выберите интересующее направление</p></div>
+                <a href="product.html" class="text-link">Все товары →</a>
+            </div>
+            <div class="category-grid">
+                <a href="product.html?category=smartphones" class="category-card category-card--smartphones">
+                    <div class="category-card__visual"><span class="category-number">01</span><div class="phone-illustration"></div></div>
+                    <div class="category-card__info"><h3>Смартфоны</h3><span>Перейти к товарам →</span></div>
+                </a>
+                <a href="product.html?category=laptops" class="category-card category-card--laptops">
+                    <div class="category-card__visual"><span class="category-number">02</span><div class="laptop-illustration"><div></div></div></div>
+                    <div class="category-card__info"><h3>Ноутбуки</h3><span>Перейти к товарам →</span></div>
+                </a>
+                <a href="product.html?category=accessories" class="category-card category-card--accessories">
+                    <div class="category-card__visual"><span class="category-number">03</span><div class="accessory-illustration"><span></span><span></span><span></span></div></div>
+                    <div class="category-card__info"><h3>Аксессуары</h3><span>Перейти к товарам →</span></div>
+                </a>
+            </div>
+        </section>
+
+        <section class="content-section" id="advantages">
+            <div class="section-heading">
+                <div><span class="eyebrow">ELECTRONICS STORE</span><h2>Покупки без лишних сложностей</h2></div>
+            </div>
+            <div class="advantages-grid">
+                <article class="advantage-card">
+                    <span class="advantage-icon">%</span>
+                    <h3>Выгодные цены</h3>
+                    <p>Доступная стоимость популярной техники.</p>
+                </article>
+                <article class="advantage-card">
+                    <span class="advantage-icon">✓</span>
+                    <h3>Гарантия качества</h3>
+                    <p>Понятные условия гарантии на товары.</p>
+                </article>
+                <article class="advantage-card">
+                    <span class="advantage-icon">➜</span>
+                    <h3>Быстрая доставка</h3>
+                    <p>Доставка по Беларуси.</p>
+                </article>
+            </div>
+        </section>
+
+        <section class="catalog-promo" id="about">
+            <div>
+                <span class="eyebrow">СПЕЦИАЛЬНЫЕ ПРЕДЛОЖЕНИЯ</span>
+                <h2>Низкие цены на популярную технику</h2>
+                <p>Больше возможностей с Electronics Store: выбирайте нужные устройства и находите выгодные предложения в каталоге.</p>
+                <a href="product.html" class="button-link button-light">Перейти в каталог →</a>
+            </div>
+            <div class="promo-decoration" aria-hidden="true">
+                <span>%</span>
+                <small>ВЫГОДНЫЕ ПРЕДЛОЖЕНИЯ</small>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer" id="footer">
+        <div class="container footer-content">
+            <div class="footer-brand">
+                <a href="index.html" class="brand"><span class="brand-mark">E</span><span class="brand-name"><strong>ELECTRONICS</strong><small>STORE</small></span></a>
+                <p>Магазин современной электроники. Удобный выбор и оформление заказов.</p>
+            </div>
+            <div class="footer-column"><h3>Покупателям</h3><a href="product.html">Каталог товаров</a><a href="product.html#cart-items">Корзина</a><a href="product.html#auth-section">Аккаунт</a></div>
+            <div class="footer-column"><h3>Категории</h3><a href="product.html?category=smartphones">Смартфоны</a><a href="product.html?category=laptops">Ноутбуки</a><a href="product.html?category=accessories">Аксессуары</a></div>
+        </div>
+        <div class="container footer-bottom"><p>© 2026 Electronics Store</p><p>Эмуляция интернет-магазина</p></div>
+    </footer>
+
+    <script>
+        (() => {
+            const link = document.querySelector("#admin-panel-link");
+            const token = sessionStorage.getItem("electronicsStoreAccessToken");
+            if (!link || !token) return;
+
+            try {
+                const part = token.split(".")[1];
+                const base64 = part.replace(/-/g, "+").replace(/_/g, "/").padEnd(Math.ceil(part.length / 4) * 4, "=");
+                const payload = JSON.parse(atob(base64));
+                const roleKeys = ["role", "roles", "http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
+                const roles = roleKeys.flatMap(key => Array.isArray(payload[key]) ? payload[key] : payload[key] ? [payload[key]] : []);
+                link.hidden = !roles.some(role => String(role).toLowerCase() === "admin");
+            } catch {
+                link.hidden = true;
+            }
+        })();
+    </script>
+</body>
+</html>
