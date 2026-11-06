@@ -1,9 +1,12 @@
-# ElectronicsStoreApiPractice
+# Electronics Store
 
-A REST API for managing an electronics store, built with C# and ASP.NET Core. It provides product and category management, JWT-based authentication, role-based authorization, PostgreSQL persistence, request validation, and automated tests.
+A web application simulating an online electronics store. The system provides product catalog management, category management, user authentication, order creation, inventory management, and product image uploads.
+
+The application consists of an ASP.NET Core Web API backend, a PostgreSQL database, and a web-based frontend.
 
 ## Technologies
 
+### Backend
 - C#
 - .NET 10
 - ASP.NET Core Web API
@@ -11,54 +14,159 @@ A REST API for managing an electronics store, built with C# and ASP.NET Core. It
 - PostgreSQL
 - Npgsql
 - JWT Bearer Authentication
-- Docker and Docker Compose
+- Role-based Authorization
+
+### Frontend
+- HTML5
+- CSS3
+- JavaScript
+
+### Infrastructure and Testing
+- Docker
+- Docker Compose
 - xUnit
-- ASP.NET Core integration testing
+- ASP.NET Core Integration Testing
+- EF Core Migrations
+- GitHub Actions
 
 ## Features
 
-### Products
+### Product Management
 - Create, retrieve, update, and delete products.
 - Retrieve products by ID or category.
 - Search products by name.
-- Filter by category, price range, maximum quantity, and stock availability.
-- Sort by supported fields in ascending or descending order.
-- Paginate results.
-- Validate incoming data and category references.
+- Filter products by category, price range, and stock availability.
+- Sort products by supported fields: ID, name, price, and quantity.
+- Paginate product listings.
+- Manage product prices, previous prices, quantities, descriptions, and images.
+- Validate product data and category references.
 
-### Categories
-- Retrieve all categories or a category by ID.
-- Create categories with input validation.
-- Return category information, including product counts.
+### Category Management
+- Create, retrieve, update, and delete categories.
+- Retrieve category information, including product counts.
+- Manage category-specific product specifications through the API.
+- Create, update, retrieve, and delete category specifications.
 
-### Authentication and authorization
-- Register users and authenticate with a username and password.
+### Authentication and Authorization
+- Register new users and authenticate with a username and password.
 - Hash passwords using ASP.NET Core Identity password-hashing services.
 - Issue JWT access tokens.
 - Validate token signatures, issuer, audience, and expiration.
-- Restrict protected operations by user role.
+- Implement role-based authorization.
+- Restrict product, category, and image management operations to administrators.
 
-### Database and validation
-- Use Entity Framework Core to access PostgreSQL.
-- Manage database schema changes through migrations.
-- Enforce database constraints for positive product prices and non-negative quantities.
-- Use request DTOs and response DTOs to separate API contracts from database entities.
+Newly registered users receive the `User` role. Administrative role assignment is not exposed through public registration.
 
-### Testing
-- Unit tests for product service behaviour and request validation.
-- Integration tests for HTTP endpoints, authentication, authorization, filtering, sorting, and pagination.
+### Order Processing
+- Create orders containing multiple products.
+- Associate orders with authenticated users.
+- Validate product availability and requested quantities.
+- Calculate order totals using current product prices.
+- Decrease inventory quantities after successful order creation.
+- Save orders and inventory changes within a database transaction.
+- Use Serializable transaction isolation to handle concurrent stock changes.
+- Return information about products with insufficient stock.
 
-The automated tests use an isolated EF Core InMemory database where configured. This does not replace testing against a real PostgreSQL instance.
+The current API supports order creation. Order history management, status transitions, and payment processing are not included.
 
-## Getting started
+### Product Image Management
+- Upload and replace product images.
+- Delete product images.
+- Support JPEG, PNG, and WebP formats.
+- Limit image size to 5 MB.
+- Validate file signatures.
+- Generate unique filenames.
+- Store image references in PostgreSQL and image files in persistent file storage.
 
-### Option 1: Run with Docker Compose
+Image management operations require the administrator role.
 
-Prerequisites:
-- Docker Desktop with Docker Compose.
-- The .NET 10 SDK and the EF Core CLI if you need to apply migrations from the host machine.
+### Frontend
+- Product catalog.
+- Product details page.
+- Shopping cart with browser-based persistence using localStorage.
+- User authentication.
+- Order submission through the backend API.
+- Administrative dashboard.
+- Product and category management.
+- Product image previews and uploads.
+- Catalog statistics and product search.
 
-Create a file named `.env` in the repository root. Do not commit this file:
+### Database and Data Integrity
+- PostgreSQL persistence through Entity Framework Core.
+- Database schema management using EF Core migrations.
+- Database constraints for product prices and quantities.
+- Relationships between products, categories, users, orders, and order items.
+- Request and response DTOs separating API contracts from database entities.
+
+## Project Structure
+
+```text
+ElectronicsStoreApiPractice/
+│
+├── ElectronicsStoreApi/
+│   ├── Controllers/
+│   ├── Data/
+│   ├── DTOs/
+│   │   ├── Requests/
+│   │   └── Response/
+│   ├── Migrations/
+│   ├── Models/
+│   ├── Services/
+│   ├── ProductImages/
+│   ├── Program.cs
+│   └── appsettings.json
+│
+├── ElectronicsStoreApi.Tests/
+│   ├── Services/
+│   │   └── ProductImageServiceTests.cs
+│   ├── CategoriesAuthorizationIntegrationTests.cs
+│   ├── CreateProductRequestTests.cs
+│   ├── OrderServiceAvailabilityTests.cs
+│   ├── OrderServiceTests.cs
+│   ├── OrderServiceTransactionTests.cs
+│   ├── ProductImagesControllerIntegrationTests.cs
+│   ├── ProductServiceTests.cs
+│   ├── ProductsApiIntegrationTests.cs
+│   ├── ProductsFilteringIntegrationTests.cs
+│   └── TestApplicationFactory.cs
+│
+├── Frontend/
+│   ├── images/
+│   ├── admin.html
+│   ├── admin.js
+│   ├── cart.js
+│   ├── index.html
+│   ├── product.html
+│   ├── script.js
+│   └── style.css
+│
+├── .github/
+│   └── workflows/
+│       └── dotnet-tests.yml
+│
+├── Dockerfile
+├── compose.yaml
+├── .gitignore
+├── .env.example
+└── ElectronicsStoreApi.slnx
+```
+
+## Getting Started
+
+### Requirements
+
+- Docker Desktop
+- Docker Compose
+
+For local development:
+- .NET 10 SDK
+- PostgreSQL
+- EF Core CLI
+- Visual Studio or another .NET-compatible development environment
+
+### Running with Docker Compose
+
+Create a `.env` file in the repository root:
 
 ```dotenv
 POSTGRES_DB=electronics_store
@@ -69,94 +177,103 @@ JWT_AUDIENCE=ElectronicsStoreApiPracticeClient
 JWT_KEY=replace_with_a_base64_encoded_key
 ```
 
-The JWT key must be valid Base64 and decode to a sufficiently long random key. You can generate a 32-byte key in PowerShell:
+Generate a secure JWT signing key using PowerShell:
 
 ```powershell
 [Convert]::ToBase64String([Security.Cryptography.RandomNumberGenerator]::GetBytes(32))
 ```
 
-Copy the generated value into `JWT_KEY` in `.env`. Use your own local database password. Never publish real credentials or signing keys.
+Use your own database password and generated signing key. Never commit `.env` or real credentials to source control.
 
-Build and start the containers from the repository root:
+Build and start the application:
 
 ```powershell
 docker compose up -d --build
-docker compose ps
-docker compose logs api
 ```
 
-The API is exposed at `http://localhost:8081`. PostgreSQL is exposed to the host at port `5435`; inside the Compose network, the API connects to the database service using host `db` and port `5432`.
-
-#### Database migrations
-
-Docker Compose runs a dedicated `migrate` service after PostgreSQL becomes healthy. The service applies Entity Framework Core migrations and exits; the API starts only if the migration service completes successfully. You do not need to run `dotnet ef database update` manually when starting the stack with Compose.
-
-The migration service uses the .NET SDK image and the EF Core CLI version matching the project's EF Core tools package. It receives the database connection string and JWT configuration through environment variables, just like the API. Keep the `.env` file local and never commit real credentials or signing keys.
-
-To inspect the migration service:
+Check the running services:
 
 ```powershell
-docker compose logs migrate
 docker compose ps -a
 ```
 
-If a migration fails, the API will not start. Review the migration logs, correct the reported configuration or migration issue, and rerun:
+The application is available at:
+
+- Frontend: http://localhost:8081
+- Backend API: http://localhost:8081
+- PostgreSQL: localhost:5435
+
+The API connects to PostgreSQL through the Docker Compose network using the database service hostname `db` and port `5432`.
+
+### Database Migrations
+
+Docker Compose includes a dedicated migration service.
+
+The service:
+
+1. Waits for PostgreSQL to become healthy.
+2. Applies pending EF Core migrations.
+3. Exits after successful completion.
+4. Allows the API service to start after migrations complete successfully.
+
+There is no need to apply migrations manually when starting the application through Docker Compose.
+
+Inspect migration logs:
 
 ```powershell
-docker compose up -d --build
+docker compose logs migrate
 ```
 
-Useful commands:
+### Useful Docker Commands
 
 ```powershell
-docker compose ps
+docker compose ps -a
 docker compose logs api
 docker compose logs db
+docker compose logs migrate
+docker compose restart api
 docker compose down
 ```
 
-The named database volume preserves PostgreSQL data when containers are stopped or removed with `docker compose down`. **Do not run `docker compose down -v` unless you intentionally want to delete the database volume and its data.**
+PostgreSQL data and uploaded product images are stored in persistent Docker volumes.
 
-### Option 2: Run locally
+Running `docker compose down` does not remove named volumes. Avoid `docker compose down -v` unless you intentionally want to delete persistent database and image data.
 
-Prerequisites:
-- .NET 10 SDK
-- PostgreSQL
-- Visual Studio or another .NET-compatible development environment
+## Running Locally
 
-#### Configuration
-
-Configure the following settings using .NET User Secrets or environment variables:
+Configure the following settings through .NET User Secrets or environment variables:
 
 - `ConnectionStrings:DefaultConnection` — PostgreSQL connection string.
 - `Jwt:Issuer` — expected token issuer.
 - `Jwt:Audience` — expected token audience.
-- `Jwt:Key` — Base64-encoded symmetric signing key.
+- `Jwt:Key` — Base64-encoded JWT signing key.
 
-Do not commit database passwords, signing keys, or other secrets to source control.
+Restore dependencies:
 
-#### Database setup
+```powershell
+dotnet restore ElectronicsStoreApi.slnx
+```
 
-1. Create a PostgreSQL database.
-2. Configure the connection string and JWT settings.
-3. Apply the existing EF Core migrations using the Package Manager Console with the API project selected:
+Apply database migrations:
 
-   `Update-Database`
+```powershell
+dotnet ef database update --project .\ElectronicsStoreApi\ElectronicsStoreApi.csproj --startup-project .\ElectronicsStoreApi\ElectronicsStoreApi.csproj
+```
 
-#### Run the application
+Run the API:
 
-Open the solution in Visual Studio, select the API project as the startup project, and run it.
+```powershell
+dotnet run --project .\ElectronicsStoreApi\ElectronicsStoreApi.csproj
+```
 
-The local HTTP and HTTPS addresses depend on the launch profile configured for the application.
+The local HTTP and HTTPS addresses depend on the configured launch profile.
 
-The OpenAPI document is available in the Development environment at the application's `/openapi/v1.json` endpoint.
+## API Endpoints
 
-## API endpoints
-
-| Method | Endpoint | Purpose |
+| Method | Endpoint | Description |
 |---|---|---|
-| POST | `/api/auth/register` | Register an account |
-| POST | `/api/auth/login` | Authenticate and obtain a token |
+| POST | `/api/auth/register` | Register a user |
+| POST | `/api/auth/login` | Authenticate and obtain a JWT |
 | GET | `/api/products` | List, search, filter, sort, and paginate products |
 | GET | `/api/products/{id}` | Retrieve a product |
 | GET | `/api/products/by-category/{categoryId}` | Retrieve products by category |
@@ -166,9 +283,53 @@ The OpenAPI document is available in the Development environment at the applicat
 | GET | `/api/categories` | List categories |
 | GET | `/api/categories/{id}` | Retrieve a category |
 | POST | `/api/categories` | Create a category |
+| PUT | `/api/categories/{id}` | Update a category |
+| DELETE | `/api/categories/{id}` | Delete a category |
+| GET | `/api/categories/{categoryId}/specifications` | List category specifications |
+| POST | `/api/categories/{categoryId}/specifications` | Create a category specification |
+| PUT | `/api/categories/{categoryId}/specifications/{specificationId}` | Update a category specification |
+| DELETE | `/api/categories/{categoryId}/specifications/{specificationId}` | Delete a category specification |
+| POST | `/api/orders` | Create an order |
+| POST | `/api/products/{productId}/image` | Upload or replace a product image |
+| DELETE | `/api/products/{productId}/image` | Delete a product image |
 
-Protected product-management and category-creation endpoints require the appropriate authorization role.
+Product, category, image, and category specification write operations require the administrator role. Order creation requires authentication. Public catalog and category retrieval endpoints do not require authentication.
 
-## Project status
+## Testing
 
-The API combines product and category management, authentication and authorization, database persistence, validation, containerization, and automated testing in a single backend service.
+The solution includes automated unit and integration tests implemented with xUnit.
+
+Test coverage includes:
+- Product service behaviour and request validation.
+- Product API endpoints.
+- Product filtering and pagination.
+- Category authorization.
+- Order availability validation.
+- Order transaction handling.
+- Product image validation and upload endpoints.
+- Product image service behaviour.
+
+Run the test suite:
+
+```powershell
+dotnet test ElectronicsStoreApi.slnx --configuration Release
+```
+
+The tests use isolated EF Core InMemory databases where configured. This does not replace testing against a real PostgreSQL instance.
+
+The current test suite contains 69 tests, all passing.
+
+GitHub Actions runs automated tests when changes are pushed to the `main` branch or submitted through a pull request.
+
+## Architecture
+
+The application follows a layered structure:
+
+- **Controllers** handle HTTP requests and responses.
+- **Services** contain application and business logic.
+- **DTOs** define request and response contracts.
+- **Models** represent application entities.
+- **Data** contains the Entity Framework Core database context.
+- **Migrations** manage database schema changes.
+
+The backend exposes REST API endpoints consumed by the frontend. PostgreSQL stores application data, while uploaded product images are stored in persistent file storage.
