@@ -1,0 +1,250 @@
+
+<div class="admin-orders-page">
+
+  <!-- HEADER -->
+  <header class="admin-header">
+    <a class="admin-brand" routerLink="/">
+      Electronics Store
+    </a>
+
+    <div class="admin-header-right">
+      <span class="admin-role">ADMIN PANEL</span>
+
+      <a
+        class="admin-back-link"
+        routerLink="/admin/products"
+      >
+        Управление товарами
+      </a>
+
+      <a
+        class="admin-back-link"
+        routerLink="/admin/categories"
+      >
+        Управление категориями
+      </a>
+
+      <a class="admin-back-link" routerLink="/">
+        ← Вернуться в магазин
+      </a>
+    </div>
+  </header>
+
+  <main class="admin-content">
+
+    <!-- PAGE TITLE -->
+    <section class="admin-page-title">
+      <div>
+        <span class="admin-eyebrow">MANAGEMENT</span>
+        <h1>Управление заказами</h1>
+        <p>
+          Просмотр заказов и управление их статусами.
+        </p>
+      </div>
+
+      <button
+        class="refresh-button"
+        type="button"
+        [disabled]="isLoading()"
+        (click)="loadOrders()"
+      >
+        ↻ Обновить
+      </button>
+    </section>
+
+    <!-- NOTIFICATIONS -->
+    @if (successMessage()) {
+      <div class="admin-success-message" role="status">
+        {{ successMessage() }}
+      </div>
+    }
+
+    @if (errorMessage()) {
+      <div class="admin-error-message" role="alert">
+        {{ errorMessage() }}
+
+        <button
+          type="button"
+          class="retry-button"
+          (click)="loadOrders()"
+        >
+          Повторить
+        </button>
+      </div>
+    }
+
+    <!-- FILTERS -->
+    <section class="admin-filters">
+      <label class="admin-filter-field">
+        <span>Фильтр по статусу</span>
+
+        <select
+          [value]="statusFilter()"
+          (change)="onStatusFilterChange($event)"
+        >
+          <option value="All">Все заказы</option>
+          <option value="Pending">Ожидают обработки</option>
+          <option value="Processing">В обработке</option>
+          <option value="Shipped">Отправлены</option>
+          <option value="Completed">Выполнены</option>
+          <option value="Cancelled">Отменены</option>
+        </select>
+      </label>
+
+      <div class="admin-order-count">
+        Всего заказов: <strong>{{ orders().length }}</strong>
+      </div>
+    </section>
+
+    <!-- LOADING -->
+    @if (isLoading()) {
+      <div class="admin-loading">
+        <div class="admin-spinner"></div>
+        <p>Загружаем заказы...</p>
+      </div>
+    }
+
+    <!-- EMPTY -->
+    @else if (!errorMessage() && filteredOrders().length === 0) {
+      <section class="admin-empty">
+        <h2>Заказы не найдены</h2>
+        <p>
+          Для выбранного фильтра нет заказов.
+        </p>
+      </section>
+    }
+
+    <!-- ORDERS -->
+    @else if (!errorMessage()) {
+      <section class="admin-orders-list">
+
+        @for (order of filteredOrders(); track order.id) {
+          <article class="admin-order-card">
+
+            <!-- ORDER HEADER -->
+            <div class="admin-order-header">
+
+              <div class="admin-order-main">
+                <span class="admin-order-number">
+                  Заказ №{{ order.id }}
+                </span>
+
+                <span class="admin-order-date">
+                  {{ formatDate(order.createdAtUtc) }}
+                </span>
+              </div>
+
+              <div class="admin-order-summary">
+
+                <span
+                  class="admin-status-badge"
+                  [class.pending]="getStatusClass(order.status) === 'pending'"
+                  [class.processing]="getStatusClass(order.status) === 'processing'"
+                  [class.shipped]="getStatusClass(order.status) === 'shipped'"
+                  [class.completed]="getStatusClass(order.status) === 'completed'"
+                  [class.cancelled]="getStatusClass(order.status) === 'cancelled'"
+                  [class.default-status]="getStatusClass(order.status) === 'default-status'"
+                >
+                  {{ getStatusLabel(order.status) }}
+                </span>
+
+                <strong class="admin-order-total">
+                  {{ formatPrice(order.totalAmount) }}
+                </strong>
+
+              </div>
+            </div>
+
+            <!-- ORDER ITEMS -->
+            <div class="admin-order-items">
+
+              <div class="admin-items-heading">
+                Состав заказа
+                <span>{{ order.items.length }} позиций</span>
+              </div>
+
+              @for (item of order.items; track $index) {
+                <div class="admin-order-item">
+
+                  <div class="admin-item-information">
+                    <strong>{{ item.productName }}</strong>
+
+                    @if (item.productId === null) {
+                      <span class="admin-deleted-product">
+                        Товар удалён из каталога
+                      </span>
+                    }
+
+                    <span class="admin-item-description">
+                      {{ formatPrice(item.unitPrice) }}
+                      × {{ item.quantity }} шт.
+                    </span>
+                  </div>
+
+                  <strong class="admin-item-total">
+                    {{ formatPrice(item.lineTotal) }}
+                  </strong>
+
+                </div>
+              }
+
+            </div>
+
+            <!-- STATUS MANAGEMENT -->
+            <div class="admin-order-actions">
+
+              @if (getAvailableStatuses(order.status).length > 0) {
+
+                <label class="admin-status-select">
+                  <span>Изменить статус</span>
+
+                  <select
+                    [value]="selectedStatuses()[order.id] ?? ''"
+                    [disabled]="isUpdating(order.id)"
+                    (change)="onStatusSelectionChange(order.id, $event)"
+                  >
+                    <option value="">Выберите действие</option>
+
+                    @for (
+                      status of getAvailableStatuses(order.status);
+                      track status
+                    ) {
+                      <option [value]="status">
+                        {{ getStatusLabel(status) }}
+                      </option>
+                    }
+                  </select>
+                </label>
+
+                <button
+                  class="admin-update-button"
+                  type="button"
+                  [disabled]="
+                    !selectedStatuses()[order.id] ||
+                    isUpdating(order.id)
+                  "
+                  (click)="updateStatus(order)"
+                >
+                  @if (isUpdating(order.id)) {
+                    Сохраняем...
+                  } @else {
+                    Применить
+                  }
+                </button>
+
+              } @else {
+                <span class="admin-terminal-status">
+                  Изменение статуса недоступно
+                </span>
+              }
+
+            </div>
+
+          </article>
+        }
+
+      </section>
+    }
+
+  </main>
+</div>

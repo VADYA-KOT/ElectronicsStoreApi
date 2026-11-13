@@ -11,6 +11,14 @@ using Npgsql;
 
 namespace ElectronicsStoreApi.Services;
 
+public enum ChangePasswordStatus
+{
+    Success,
+    UserNotFound,
+    InvalidCurrentPassword,
+    NewPasswordSameAsCurrent
+}
+
 public class AuthService
 {
     private readonly StoreDbContext _context;
@@ -27,6 +35,7 @@ public class AuthService
         _configuration = configuration;
     }
 
+    // Регистрация пользователя.
     public async Task<bool> RegisterAsync(RegisterRequest request)
     {
         string username = request.Username.Trim();
@@ -66,6 +75,7 @@ public class AuthService
         }
     }
 
+    // Вход пользователя.
     public async Task<AuthTokenResponse?> LoginAsync(LoginRequest request)
     {
         string normalizedUsername =
@@ -101,6 +111,76 @@ public class AuthService
         return CreateToken(user);
     }
 
+    // Получение профиля пользователя по ID.
+    public async Task<UserProfileResponse?> GetProfileAsync(int userId)
+    {
+        if (userId <= 0)
+        {
+            return null;
+        }
+
+        return await _context.AppUsers
+            .AsNoTracking()
+            .Where(user => user.Id == userId)
+            .Select(user => new UserProfileResponse
+            {
+                Id = user.Id,
+                Username = user.Username,
+                Role = user.Role,
+                CreatedAtUtc = user.CreatedAtUtc
+            })
+            .SingleOrDefaultAsync();
+    }
+
+    // Изменение пароля пользователя.
+    public async Task<ChangePasswordStatus> ChangePasswordAsync(
+        int userId,
+        ChangePasswordRequest request)
+    {
+        var user = await _context.AppUsers
+            .SingleOrDefaultAsync(user => user.Id == userId);
+
+        if (user is null)
+        {
+            return ChangePasswordStatus.UserNotFound;
+        }
+
+        // Проверяем текущий пароль.
+        var currentPasswordVerification =
+            _passwordHasher.VerifyHashedPassword(
+                user,
+                user.PasswordHash,
+                request.CurrentPassword);
+
+        if (currentPasswordVerification ==
+            PasswordVerificationResult.Failed)
+        {
+            return ChangePasswordStatus.InvalidCurrentPassword;
+        }
+
+        // Не разрешаем установить прежний пароль повторно.
+        var newPasswordVerification =
+            _passwordHasher.VerifyHashedPassword(
+                user,
+                user.PasswordHash,
+                request.NewPassword);
+
+        if (newPasswordVerification !=
+            PasswordVerificationResult.Failed)
+        {
+            return ChangePasswordStatus.NewPasswordSameAsCurrent;
+        }
+
+        // Сохраняем новый хеш пароля.
+        user.PasswordHash =
+            _passwordHasher.HashPassword(user, request.NewPassword);
+
+        await _context.SaveChangesAsync();
+
+        return ChangePasswordStatus.Success;
+    }
+
+    // Создание JWT.
     private AuthTokenResponse CreateToken(AppUser user)
     {
         string issuer = _configuration["Jwt:Issuer"]

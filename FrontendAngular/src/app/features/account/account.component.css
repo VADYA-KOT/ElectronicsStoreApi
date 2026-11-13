@@ -1,0 +1,575 @@
+
+:host {
+  display: block;
+}
+
+/* ========================================
+   ACCOUNT PAGE
+======================================== */
+
+.account-page {
+  width: min(calc(100% - 40px), 1100px);
+  margin: 40px auto 60px;
+  color: var(--color-text);
+}
+
+/* ========================================
+   ACCOUNT CARD
+======================================== */
+
+.account-card {
+  width: 100%;
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 36px;
+
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+
+  box-shadow:
+    0 10px 35px rgba(15, 23, 42, 0.045),
+    0 2px 8px rgba(15, 23, 42, 0.025);
+}
+
+/* ========================================
+   HEADER
+======================================== */
+
+.account-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+
+  margin-bottom: 32px;
+  padding-bottom: 25px;
+
+  border-bottom: 1px solid var(--color-border);
+}
+
+.account-subtitle {
+  margin: 0 0 9px;
+
+  color: var(--color-turquoise-hover);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.account-header h1 {
+  margin: 0;
+
+  color: var(--color-graphite);
+  font-size: 29px;
+  font-weight: 800;
+  letter-spacing: -0.8px;
+  line-height: 1.25;
+}
+
+/* ========================================
+   LOGOUT BUTTON
+======================================== */
+
+.logout-button {
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+  padding: 0 16px;
+
+  color: var(--color-text-secondary);
+  background: var(--color-surface-secondary);
+
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-small);
+
+  font-size: 13px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    color var(--transition-fast),
+    background var(--transition-fast),
+    border-color var(--transition-fast);
+}
+
+.logout-button:hover {
+  color: var(--color-danger);
+  background: var(--color-danger-bg);
+  border-color: #fecaca;
+}
+
+/* ========================================
+   PROFILE INFORMATION
+======================================== */
+
+.profile-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.profile-field {
+  min-width: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+
+  padding: 19px 0;
+
+  border-bottom: 1px solid var(--color-border);
+}
+
+.profile-field:last-child {
+  border-bottom: none;
+}
+
+.profile-field span {
+  color: var(--color-text-secondary);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.profile-field strong {
+  min-width: 0;
+
+  color: var(--color-graphite);
+  font-size: 14px;
+  font-weight: 650;
+
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+/* ========================================
+   ACCOUNT NAVIGATION
+======================================== */
+
+.account-navigation {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+
+  margin-top: 28px;
+}
+
+.catalog-link,
+.orders-link {
+  min-height: 44px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  padding: 0 19px;
+
+  border-radius: var(--radius-medium);
+
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+
+  transition:
+    transform var(--transition-fast),
+    color var(--transition-fast),
+    background var(--transition-fast),
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
+
+  box-sizing: border-box;
+}
+
+/* Catalog */
+
+.catalog-link {
+  color: var(--color-text-inverse);
+  background: var(--gradient-brand);
+  border: 1px solid transparent;
+
+  box-shadow: 0 5px 13px rgba(37, 99, 235, 0.15);
+}
+
+.catalog-link:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.04);
+  box-shadow: 0 8px 19px rgba(37, 99, 235, 0.21);
+}
+
+/* Orders */
+
+.orders-link {
+  color: var(--color-blue-hover);
+  background: var(--color-surface-blue);
+  border: 1px solid #c7dcfa;
+}
+
+.orders-link:hover {
+  transform: translateY(-2px);
+  color: var(--color-turquoise-hover);
+  background: var(--color-turquoise-light);
+  border-color: #a8e5e1;
+}
+
+/* ========================================
+   SECURITY SECTION
+======================================== */
+
+.security-section {
+  margin-top: 38px;
+  padding-top: 30px;
+
+  border-top: 1px solid var(--color-border);
+}
+
+.security-heading {
+  margin-bottom: 25px;
+}
+
+.security-heading h2 {
+  margin: 0 0 9px;
+
+  color: var(--color-graphite);
+  font-size: 21px;
+  font-weight: 750;
+  letter-spacing: -0.4px;
+}
+
+.security-heading p {
+  max-width: 530px;
+  margin: 0;
+
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+/* ========================================
+   PASSWORD FORM
+======================================== */
+
+.password-form {
+  display: flex;
+  flex-direction: column;
+  gap: 19px;
+}
+
+.password-field {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+
+  color: var(--color-text);
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.password-field input {
+  width: 100%;
+  min-height: 46px;
+  padding: 11px 13px;
+
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-small);
+
+  outline: none;
+  background: var(--color-surface);
+  color: var(--color-text);
+
+  font-family: inherit;
+  font-size: 14px;
+
+  box-sizing: border-box;
+
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast),
+    background var(--transition-fast);
+}
+
+.password-field input::placeholder {
+  color: var(--color-text-muted);
+  font-weight: 400;
+}
+
+.password-field input:hover:not(:focus) {
+  border-color: #aebed0;
+}
+
+.password-field input:focus {
+  border-color: var(--color-turquoise);
+  box-shadow: 0 0 0 3px rgba(32, 184, 178, 0.13);
+}
+
+.password-field input:disabled {
+  background: var(--color-surface-secondary);
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* ========================================
+   CHANGE PASSWORD BUTTON
+======================================== */
+
+.change-password-button {
+  width: 100%;
+  min-height: 47px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 11px 20px;
+
+  border: none;
+  border-radius: var(--radius-medium);
+
+  background: var(--gradient-brand);
+  color: var(--color-text-inverse);
+
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.4;
+  text-align: center;
+
+  cursor: pointer;
+  appearance: none;
+  box-sizing: border-box;
+
+  box-shadow: 0 5px 14px rgba(37, 99, 235, 0.16);
+
+  transition:
+    transform var(--transition-fast),
+    box-shadow var(--transition-fast),
+    filter var(--transition-fast);
+}
+
+.change-password-button span {
+  display: inline-block;
+  color: var(--color-text-inverse);
+  visibility: visible;
+  opacity: 1;
+}
+
+.change-password-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  filter: brightness(1.04);
+  box-shadow: 0 8px 19px rgba(37, 99, 235, 0.23);
+}
+
+.change-password-button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.change-password-button:disabled {
+  background: #cbd5e1;
+  color: #64748b;
+  box-shadow: none;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.change-password-button:disabled span {
+  color: #64748b;
+}
+
+/* ========================================
+   PASSWORD MESSAGES
+======================================== */
+
+.password-error,
+.password-success {
+  padding: 13px 15px;
+
+  border: 1px solid transparent;
+  border-radius: var(--radius-small);
+
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.password-error {
+  border-color: #fecaca;
+  background: var(--color-danger-bg);
+  color: #991b1b;
+}
+
+.password-success {
+  border-color: #bbf7d0;
+  background: var(--color-success-bg);
+  color: #166534;
+}
+
+/* ========================================
+   LOADING AND ERRORS
+======================================== */
+
+.status-message {
+  padding: 20px 0;
+
+  color: var(--color-text-secondary);
+  font-size: 14px;
+}
+
+.error-message {
+  padding: 16px;
+
+  border: 1px solid #fecaca;
+  border-radius: var(--radius-medium);
+
+  color: #991b1b;
+  background: var(--color-danger-bg);
+
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+/* ========================================
+   RESPONSIVE — TABLET
+======================================== */
+
+@media (max-width: 700px) {
+  .account-page {
+    width: calc(100% - 32px);
+    margin: 25px auto 40px;
+    padding: 0;
+  }
+
+  .account-card {
+    padding: 27px;
+  }
+
+  .account-header h1 {
+    font-size: 26px;
+  }
+}
+
+/* ========================================
+   RESPONSIVE — MOBILE
+======================================== */
+
+@media (max-width: 480px) {
+  .account-page {
+    width: calc(100% - 24px);
+    margin: 16px auto 30px;
+  }
+
+  .account-card {
+    padding: 21px 18px;
+    border-radius: var(--radius-large);
+  }
+
+  .account-header {
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 23px;
+    padding-bottom: 20px;
+  }
+
+  .account-header h1 {
+    font-size: 23px;
+  }
+
+  .account-subtitle {
+    font-size: 10px;
+  }
+
+  .logout-button {
+    min-height: 36px;
+    padding: 0 11px;
+    font-size: 12px;
+  }
+
+  .profile-field {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 7px;
+    padding: 16px 0;
+  }
+
+  .profile-field span,
+  .profile-field strong {
+    font-size: 13px;
+    text-align: left;
+  }
+
+  .account-navigation {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .catalog-link,
+  .orders-link {
+    width: 100%;
+  }
+
+  .security-section {
+    margin-top: 30px;
+    padding-top: 25px;
+  }
+
+  .security-heading {
+    margin-bottom: 20px;
+  }
+
+  .security-heading h2 {
+    font-size: 19px;
+  }
+
+  .security-heading p {
+    font-size: 12px;
+  }
+
+  .password-form {
+    gap: 16px;
+  }
+
+  .password-field input {
+    min-height: 45px;
+  }
+}
+
+/* ========================================
+   SMALL PHONES
+======================================== */
+
+@media (max-width: 350px) {
+  .account-card {
+    padding: 19px 14px;
+  }
+
+  .account-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .logout-button {
+    align-self: flex-start;
+  }
+}
+
+/* ========================================
+   REDUCED MOTION
+======================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .logout-button,
+  .catalog-link,
+  .orders-link,
+  .password-field input,
+  .change-password-button {
+    transition: none;
+  }
+
+  .catalog-link:hover,
+  .orders-link:hover,
+  .change-password-button:hover {
+    transform: none;
+  }
+}

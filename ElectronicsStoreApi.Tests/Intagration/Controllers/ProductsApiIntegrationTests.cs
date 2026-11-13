@@ -344,4 +344,322 @@ public class ProductsApiIntegrationTests
         return client;
     }
 
+
+    // ==================================================
+    // ИНТЕГРАЦИОННЫЕ ТЕСТЫ ХАРАКТЕРИСТИК ТОВАРОВ
+    // ==================================================
+
+    [Fact]
+    public async Task CreateProduct_WithSpecifications_ReturnsCreatedAndSpecificationMetadata()
+    {
+        using var factory = new TestApplicationFactory();
+
+        var data = await CreateProductSpecificationCategoryAsync(factory);
+
+        using var client = await CreateAuthenticatedClientAsync(factory);
+
+        var request = new
+        {
+            name = "Specification Laptop",
+            price = 2500,
+            quantity = 5,
+            categoryId = data.CategoryId,
+            specifications = new[]
+            {
+                new
+                {
+                    categorySpecificationId = data.RamId,
+                    value = " 16 ГБ "
+                }
+            }
+        };
+
+        var response = await client.PostAsJsonAsync(
+            "/api/products",
+            request);
+
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+
+        var created =
+            await response.Content.ReadFromJsonAsync<ProductResponse>();
+
+        Assert.NotNull(created);
+
+        var createdSpecification =
+            Assert.Single(created.Specifications);
+
+        Assert.Equal(data.RamId, createdSpecification.CategorySpecificationId);
+        Assert.Equal("ram", createdSpecification.Code);
+        Assert.Equal("Оперативная память", createdSpecification.Name);
+        Assert.Equal("ГБ", createdSpecification.Unit);
+        Assert.Equal("16 ГБ", createdSpecification.Value);
+
+        // Дополнительно проверяем получение сохранённого товара через GET.
+        var getResponse = await client.GetAsync(
+            $"/api/products/{created.Id}");
+
+        Assert.Equal(HttpStatusCode.OK, getResponse.StatusCode);
+
+        var loaded =
+            await getResponse.Content.ReadFromJsonAsync<ProductResponse>();
+
+        Assert.NotNull(loaded);
+
+        var loadedSpecification =
+            Assert.Single(loaded.Specifications);
+
+        Assert.Equal("ram", loadedSpecification.Code);
+        Assert.Equal("16 ГБ", loadedSpecification.Value);
+    }
+
+    [Fact]
+    public async Task CreateProduct_WithForeignCategorySpecification_ReturnsBadRequest()
+    {
+        using var factory = new TestApplicationFactory();
+
+        var localData =
+            await CreateProductSpecificationCategoryAsync(factory);
+
+        var foreignData =
+            await CreateProductSpecificationCategoryAsync(factory);
+
+        using var client = await CreateAuthenticatedClientAsync(factory);
+
+        var request = new
+        {
+            name = "Invalid Specification Laptop",
+            price = 2500,
+            quantity = 5,
+            categoryId = localData.CategoryId,
+            specifications = new[]
+            {
+                new
+                {
+                    categorySpecificationId = foreignData.RamId,
+                    value = "16 ГБ"
+                }
+            }
+        };
+
+        var response = await client.PostAsJsonAsync(
+            "/api/products",
+            request);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+
+        using var scope = factory.Services.CreateScope();
+
+        var context =
+            scope.ServiceProvider.GetRequiredService<StoreDbContext>();
+
+        Assert.False(await context.Products.AnyAsync());
+    }
+
+    [Fact]
+    public async Task UpdateProduct_WithSpecifications_ReplacesExistingSpecifications()
+    {
+        using var factory = new TestApplicationFactory();
+
+        var data = await CreateProductSpecificationCategoryAsync(factory);
+
+        using var client = await CreateAuthenticatedClientAsync(factory);
+
+        int productId = await CreateProductWithSpecificationsAsync(
+            client,
+            data.CategoryId,
+            data.RamId,
+            "16 ГБ");
+
+        var request = new
+        {
+            name = "Updated Specification Laptop",
+            price = 2800,
+            quantity = 7,
+            categoryId = data.CategoryId,
+            specifications = new[]
+            {
+                new
+                {
+                    categorySpecificationId = data.StorageId,
+                    value = "512 ГБ"
+                }
+            }
+        };
+
+        var updateResponse = await client.PutAsJsonAsync(
+            $"/api/products/{productId}",
+            request);
+
+        Assert.Equal(
+            HttpStatusCode.NoContent,
+            updateResponse.StatusCode);
+
+        var getResponse = await client.GetAsync(
+            $"/api/products/{productId}");
+
+        Assert.Equal(HttpStatusCode.OK, getResponse.StatusCode);
+
+        var product =
+            await getResponse.Content.ReadFromJsonAsync<ProductResponse>();
+
+        Assert.NotNull(product);
+
+        Assert.Equal("Updated Specification Laptop", product.Name);
+
+        var specification =
+            Assert.Single(product.Specifications);
+
+        Assert.Equal(data.StorageId, specification.CategorySpecificationId);
+        Assert.Equal("storage", specification.Code);
+        Assert.Equal("512 ГБ", specification.Value);
+    }
+
+    [Fact]
+    public async Task UpdateProduct_WithForeignCategorySpecification_ReturnsBadRequestAndPreservesData()
+    {
+        using var factory = new TestApplicationFactory();
+
+        var localData =
+            await CreateProductSpecificationCategoryAsync(factory);
+
+        var foreignData =
+            await CreateProductSpecificationCategoryAsync(factory);
+
+        using var client = await CreateAuthenticatedClientAsync(factory);
+
+        int productId = await CreateProductWithSpecificationsAsync(
+            client,
+            localData.CategoryId,
+            localData.RamId,
+            "16 ГБ");
+
+        var request = new
+        {
+            name = "This Change Must Not Be Saved",
+            price = 3000,
+            quantity = 10,
+            categoryId = localData.CategoryId,
+            specifications = new[]
+            {
+                new
+                {
+                    categorySpecificationId = foreignData.RamId,
+                    value = "32 ГБ"
+                }
+            }
+        };
+
+        var updateResponse = await client.PutAsJsonAsync(
+            $"/api/products/{productId}",
+            request);
+
+        Assert.Equal(
+            HttpStatusCode.BadRequest,
+            updateResponse.StatusCode);
+
+        // Проверяем, что прежние данные не изменились.
+        var getResponse = await client.GetAsync(
+            $"/api/products/{productId}");
+
+        Assert.Equal(HttpStatusCode.OK, getResponse.StatusCode);
+
+        var product =
+            await getResponse.Content.ReadFromJsonAsync<ProductResponse>();
+
+        Assert.NotNull(product);
+
+        Assert.Equal("Integration Mouse", product.Name);
+        Assert.Equal(2500m, product.Price);
+        Assert.Equal(5, product.Quantity);
+
+        var specification =
+            Assert.Single(product.Specifications);
+
+        Assert.Equal(localData.RamId, specification.CategorySpecificationId);
+        Assert.Equal("ram", specification.Code);
+        Assert.Equal("16 ГБ", specification.Value);
+    }
+
+    private static async Task<(
+        int CategoryId,
+        int RamId,
+        int StorageId)> CreateProductSpecificationCategoryAsync(
+            TestApplicationFactory factory)
+    {
+        using var scope = factory.Services.CreateScope();
+
+        var context =
+            scope.ServiceProvider.GetRequiredService<StoreDbContext>();
+
+        var category = new Category
+        {
+            Name = $"TestSpecs_{Guid.NewGuid():N}"
+        };
+
+        context.Categories.Add(category);
+
+        await context.SaveChangesAsync();
+
+        var ram = new CategorySpecification
+        {
+            CategoryId = category.Id,
+            Code = "ram",
+            Name = "Оперативная память",
+            Unit = "ГБ",
+            SortOrder = 10
+        };
+
+        var storage = new CategorySpecification
+        {
+            CategoryId = category.Id,
+            Code = "storage",
+            Name = "Накопитель",
+            Unit = "ГБ",
+            SortOrder = 20
+        };
+
+        context.CategorySpecifications.AddRange(ram, storage);
+
+        await context.SaveChangesAsync();
+
+        return (category.Id, ram.Id, storage.Id);
+    }
+
+    private static async Task<int> CreateProductWithSpecificationsAsync(
+        HttpClient client,
+        int categoryId,
+        int specificationId,
+        string value)
+    {
+        var request = new
+        {
+            name = "Integration Mouse",
+            price = 2500,
+            quantity = 5,
+            categoryId,
+            description = "Integration test",
+            specifications = new[]
+            {
+                new
+                {
+                    categorySpecificationId = specificationId,
+                    value
+                }
+            }
+        };
+
+        var response = await client.PostAsJsonAsync(
+            "/api/products",
+            request);
+
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+
+        var product =
+            await response.Content.ReadFromJsonAsync<ProductResponse>();
+
+        Assert.NotNull(product);
+
+        return product.Id;
+    }
+
 }

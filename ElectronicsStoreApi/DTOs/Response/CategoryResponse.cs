@@ -1,4 +1,4 @@
-﻿namespace ElectronicsStoreApi.DTOs.Response;
+namespace ElectronicsStoreApi.DTOs.Response;
 
 public class CategoryResponse
 {
@@ -7,4 +7,6 @@ public class CategoryResponse
     public string Name { get; set; } = string.Empty;
 
     public int ProductCount { get; set; }
+
+    public string? ImageUrl { get; set; }
 }

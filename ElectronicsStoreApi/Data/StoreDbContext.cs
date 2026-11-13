@@ -45,6 +45,10 @@ public class StoreDbContext : DbContext
             .HasMaxLength(100)
             .IsRequired();
 
+        category.Property(c => c.ImageUrl)
+            .HasColumnName("image_url")
+            .HasMaxLength(500);
+
         category.HasIndex(c => c.Name)
             .IsUnique();
 

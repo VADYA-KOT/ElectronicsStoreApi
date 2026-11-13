@@ -24,7 +24,7 @@ public class ProductImagesController : ControllerBase
         ProductImageService.MaxFileSize + 64 * 1024)]
     public async Task<IActionResult> Upload(
         int productId,
-        [FromForm] IFormFile? file,
+        IFormFile? file,
         CancellationToken cancellationToken)
     {
         var result = await _imageService.UploadAsync(

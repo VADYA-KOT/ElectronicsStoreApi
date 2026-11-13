@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace ElectronicsStoreApi.Models;
 
@@ -8,6 +8,9 @@ public class Category
 
     [MaxLength(100)]
     public string Name { get; set; } = string.Empty;
+
+    [MaxLength(500)]
+    public string? ImageUrl { get; set; }
 
     public List<Product> Products { get; set; } = new();
 

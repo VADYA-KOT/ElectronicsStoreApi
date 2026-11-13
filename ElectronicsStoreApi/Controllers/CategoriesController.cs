@@ -1,4 +1,3 @@
-﻿
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
@@ -6,6 +5,7 @@ using ElectronicsStoreApi.DTOs.Requests;
 using ElectronicsStoreApi.DTOs.Response;
 using ElectronicsStoreApi.Data;
 using ElectronicsStoreApi.Models;
+using ElectronicsStoreApi.Services;
 
 namespace ElectronicsStoreApi.Controllers;
 
@@ -14,10 +14,14 @@ namespace ElectronicsStoreApi.Controllers;
 public class CategoriesController : ControllerBase
 {
     private readonly StoreDbContext _context;
+    private readonly CategoryImageService _categoryImageService;
 
-    public CategoriesController(StoreDbContext context)
+    public CategoriesController(
+        StoreDbContext context,
+        CategoryImageService categoryImageService)
     {
         _context = context;
+        _categoryImageService = categoryImageService;
     }
 
     // Получение всех категорий.
@@ -31,7 +35,8 @@ public class CategoriesController : ControllerBase
             {
                 Id = c.Id,
                 Name = c.Name,
-                ProductCount = c.Products.Count()
+                ProductCount = c.Products.Count(),
+                ImageUrl = c.ImageUrl
             })
             .ToListAsync();
 
@@ -49,11 +54,12 @@ public class CategoriesController : ControllerBase
             {
                 Id = c.Id,
                 Name = c.Name,
-                ProductCount = c.Products.Count()
+                ProductCount = c.Products.Count(),
+                ImageUrl = c.ImageUrl
             })
             .FirstOrDefaultAsync();
 
-        if (category == null)
+        if (category is null)
         {
             return NotFound(new
             {
@@ -97,14 +103,14 @@ public class CategoriesController : ControllerBase
         };
 
         _context.Categories.Add(category);
-
         await _context.SaveChangesAsync();
 
         var response = new CategoryResponse
         {
             Id = category.Id,
             Name = category.Name,
-            ProductCount = 0
+            ProductCount = 0,
+            ImageUrl = category.ImageUrl
         };
 
         return CreatedAtAction(
@@ -123,7 +129,7 @@ public class CategoriesController : ControllerBase
         var category = await _context.Categories
             .FirstOrDefaultAsync(c => c.Id == id);
 
-        if (category == null)
+        if (category is null)
         {
             return NotFound(new
             {
@@ -153,7 +159,6 @@ public class CategoriesController : ControllerBase
         }
 
         category.Name = name;
-
         await _context.SaveChangesAsync();
 
         int productCount = await _context.Products
@@ -163,7 +168,8 @@ public class CategoriesController : ControllerBase
         {
             Id = category.Id,
             Name = category.Name,
-            ProductCount = productCount
+            ProductCount = productCount,
+            ImageUrl = category.ImageUrl
         };
 
         return Ok(response);
@@ -177,7 +183,7 @@ public class CategoriesController : ControllerBase
         var category = await _context.Categories
             .FirstOrDefaultAsync(c => c.Id == id);
 
-        if (category == null)
+        if (category is null)
         {
             return NotFound(new
             {
@@ -196,9 +202,13 @@ public class CategoriesController : ControllerBase
             });
         }
 
-        _context.Categories.Remove(category);
+        string? imageUrl = category.ImageUrl;
 
+        _context.Categories.Remove(category);
         await _context.SaveChangesAsync();
+
+        // Файл удаляется только после успешного удаления категории из БД.
+        _categoryImageService.DeleteStoredImage(imageUrl);
 
         return NoContent();
     }

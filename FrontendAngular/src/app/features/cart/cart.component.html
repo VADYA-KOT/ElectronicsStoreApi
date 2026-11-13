@@ -1,0 +1,233 @@
+<div class="cart-page">
+
+  <!-- CART HEADER -->
+  <header class="cart-page-header">
+    <a class="cart-brand" routerLink="/">
+      Electronics Store
+    </a>
+
+    <a class="continue-shopping" routerLink="/">
+      ← Продолжить покупки
+    </a>
+  </header>
+
+  <main>
+    <div class="cart-title-row">
+      <div>
+        <h1>Корзина</h1>
+        <p>
+          Товаров в корзине: {{ totalQuantity() }}
+        </p>
+      </div>
+
+      @if (items().length > 0) {
+        <button
+          class="clear-cart-button"
+          type="button"
+          [disabled]="isSubmitting()"
+          (click)="clearCart()"
+        >
+          Очистить корзину
+        </button>
+      }
+    </div>
+
+    @if (notice()) {
+      <div class="cart-notice" role="status">
+        {{ notice() }}
+      </div>
+    }
+
+    @if (items().length === 0) {
+
+      <!-- EMPTY CART -->
+      <section class="empty-cart">
+        <div class="empty-cart-icon">
+          <svg
+            viewBox="0 0 24 24"
+            width="64"
+            height="64"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M3 3h2l2.4 12.2a2 2 0 0 0 2 1.6h8.8a2 2 0 0 0 2-1.6L22 8H6"/>
+            <circle cx="10" cy="20" r="1"/>
+            <circle cx="18" cy="20" r="1"/>
+          </svg>
+        </div>
+
+        <h2>Ваша корзина пока пуста</h2>
+
+        <p>
+          Добавьте товары из каталога, чтобы оформить покупку.
+        </p>
+
+        <a class="cart-primary-button" routerLink="/">
+          Перейти в каталог
+        </a>
+      </section>
+
+    } @else {
+
+      <!-- CART CONTENT -->
+      <div class="cart-layout">
+
+        <section class="cart-items">
+
+          @for (item of items(); track item.product.id) {
+            <article class="cart-item">
+
+              <!-- PRODUCT IMAGE -->
+              <a
+                class="cart-item-image"
+                [routerLink]="['/products', item.product.id]"
+              >
+                @if (item.product.imageUrl) {
+                  <img
+                    [src]="getImageUrl(item.product.imageUrl) ?? ''"
+                    [alt]="item.product.name"
+                  />
+                } @else {
+                  <div class="cart-image-placeholder">
+                    Нет изображения
+                  </div>
+                }
+              </a>
+
+              <!-- PRODUCT INFORMATION -->
+              <div class="cart-item-information">
+
+                <a
+                  class="cart-item-name"
+                  [routerLink]="['/products', item.product.id]"
+                >
+                  {{ item.product.name }}
+                </a>
+
+                <span class="cart-item-category">
+                  {{ item.product.categoryName ?? 'Без категории' }}
+                </span>
+
+                <strong class="cart-item-price">
+                  {{ formatPrice(item.product.price) }}
+                </strong>
+
+                @if (item.product.quantity === 0) {
+                  <span class="cart-stock-warning">
+                    Сейчас нет в наличии. Удалите товар или дождитесь пополнения.
+                  </span>
+                } @else if (item.quantity > item.product.quantity) {
+                  <span class="cart-stock-warning">
+                    В корзине больше товара, чем доступно на текущий момент.
+                    Уменьшите количество до {{ item.product.quantity }} шт.
+                  </span>
+                }
+
+                <!-- QUANTITY CONTROLS -->
+                <div class="cart-item-controls">
+
+                  <div class="quantity-control">
+                    <button
+                      type="button"
+                      aria-label="Уменьшить количество"
+                      [disabled]="isSubmitting()"
+                      (click)="decrease(item)"
+                    >
+                      −
+                    </button>
+
+                    <span>{{ item.quantity }}</span>
+
+                    <button
+                      type="button"
+                      aria-label="Увеличить количество"
+                      [disabled]="
+                        isSubmitting() ||
+                        item.product.quantity <= item.quantity
+                      "
+                      (click)="increase(item)"
+                    >
+                      +
+                    </button>
+                  </div>
+
+                  <button
+                    class="remove-item-button"
+                    type="button"
+                    [disabled]="isSubmitting()"
+                    (click)="remove(item.product.id)"
+                  >
+                    Удалить
+                  </button>
+                </div>
+              </div>
+
+              <!-- LINE TOTAL -->
+              <div class="cart-item-total">
+                <strong>
+                  {{ formatPrice(item.product.price * item.quantity) }}
+                </strong>
+              </div>
+            </article>
+          }
+
+        </section>
+
+        <!-- ORDER SUMMARY -->
+        <aside class="cart-summary">
+          <h2>Ваш заказ</h2>
+
+          <div class="summary-row">
+            <span>Количество товаров</span>
+            <strong>{{ totalQuantity() }}</strong>
+          </div>
+
+          <div class="summary-row">
+            <span>Стоимость товаров</span>
+            <strong>{{ formatPrice(totalPrice()) }}</strong>
+          </div>
+
+          <div class="summary-divider"></div>
+
+          <div class="summary-total">
+            <span>Итого</span>
+            <strong>{{ formatPrice(totalPrice()) }}</strong>
+          </div>
+
+          <button
+            class="checkout-placeholder-button"
+            type="button"
+            [disabled]="isSubmitting()"
+            (click)="checkout()"
+          >
+            @if (isSubmitting()) {
+              Оформляем заказ...
+            } @else if (isAuthenticated()) {
+              Оформить заказ
+            } @else {
+              Войти для оформления
+            }
+          </button>
+
+          <p class="checkout-note">
+            @if (isAuthenticated()) {
+              После оформления сервер проверит наличие товаров
+              и сохранит заказ в базе данных.
+            } @else {
+              Для оформления заказа необходимо войти в аккаунт.
+            }
+          </p>
+
+          <a class="continue-shopping" routerLink="/">
+            Продолжить покупки
+          </a>
+        </aside>
+
+      </div>
+    }
+  </main>
+</div>

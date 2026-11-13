@@ -1,0 +1,156 @@
+
+<div class="product-details-page">
+
+  <a class="back-link" routerLink="/">
+    ← Вернуться в каталог
+  </a>
+
+  @if (isLoading()) {
+    <div class="details-state">
+      <div class="loading-message">
+        Загружаем информацию о товаре...
+      </div>
+    </div>
+  } @else if (errorMessage()) {
+    <div class="details-state">
+      <div class="error-message">
+        <p>{{ errorMessage() }}</p>
+
+        <a class="back-button" routerLink="/">
+          Вернуться в каталог
+        </a>
+      </div>
+    </div>
+  } @else if (product(); as item) {
+
+    <!-- BREADCRUMBS -->
+    <nav class="breadcrumbs" aria-label="Навигация">
+      <a routerLink="/">Главная</a>
+      <span>/</span>
+      <span>{{ item.categoryName ?? 'Без категории' }}</span>
+      <span>/</span>
+      <span>{{ item.name }}</span>
+    </nav>
+
+    <!-- PRODUCT INFORMATION -->
+    <section class="product-detail-card">
+
+      <!-- IMAGE -->
+      <div class="detail-image-panel">
+        @if (item.imageUrl) {
+          <img
+            [src]="getImageUrl(item.imageUrl) ?? ''"
+            [alt]="item.name"
+          />
+        } @else {
+          <div class="detail-image-placeholder">
+            Фотография товара скоро появится
+          </div>
+        }
+      </div>
+
+      <!-- MAIN INFORMATION -->
+      <div class="detail-information">
+
+        <span class="detail-category">
+          {{ item.categoryName ?? 'Без категории' }}
+        </span>
+
+        <h1>{{ item.name }}</h1>
+
+        <div class="detail-price-block">
+          <strong class="detail-price">
+            {{ formatPrice(item.price) }}
+          </strong>
+
+          @if (
+            item.oldPrice !== null &&
+            item.oldPrice > item.price
+          ) {
+            <span class="detail-old-price">
+              {{ formatPrice(item.oldPrice) }}
+            </span>
+          }
+        </div>
+
+        @if (item.quantity > 0) {
+          <div class="detail-stock available">
+            В наличии: {{ item.quantity }} шт.
+          </div>
+        } @else {
+          <div class="detail-stock unavailable">
+            Нет в наличии
+          </div>
+        }
+
+        <!-- ADD TO CART -->
+        <button
+          class="back-button detail-cart-button"
+          type="button"
+          [disabled]="item.quantity <= 0"
+          (click)="addToCart()"
+        >
+          В корзину
+        </button>
+
+        @if (cartMessage()) {
+          <div class="detail-cart-message" role="status">
+            <span>{{ cartMessage() }}</span>
+            <a routerLink="/cart">Перейти в корзину</a>
+          </div>
+        }
+
+        <div class="detail-divider"></div>
+
+        <div class="detail-description">
+          <h2>Описание</h2>
+
+          @if (item.description) {
+            <p>{{ item.description }}</p>
+          } @else {
+            <p class="muted-text">
+              Описание товара пока не добавлено.
+            </p>
+          }
+        </div>
+
+        <a class="back-button" routerLink="/">
+          Вернуться к покупкам
+        </a>
+      </div>
+    </section>
+
+    <!-- SPECIFICATIONS -->
+    <section class="specifications-section">
+      <h2>Характеристики товара</h2>
+
+      @if (item.specifications.length > 0) {
+        <div class="specifications-table-wrapper">
+          <table class="specifications-table">
+            <tbody>
+              @for (
+                specification of item.specifications;
+                track specification.categorySpecificationId
+              ) {
+                <tr>
+                  <th>{{ specification.name }}</th>
+
+                  <td>
+                    {{ specification.value }}
+                    @if (specification.unit) {
+                      {{ ' ' + specification.unit }}
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      } @else {
+        <p class="muted-text">
+          Характеристики для этого товара пока не добавлены.
+        </p>
+      }
+    </section>
+  }
+</div>

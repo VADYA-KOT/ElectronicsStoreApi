@@ -1,7 +1,4 @@
-﻿
-using System;
-using System.Collections.Generic;
-using ElectronicsStoreApi.Data;
+﻿using ElectronicsStoreApi.Data;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;

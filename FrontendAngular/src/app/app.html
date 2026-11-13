@@ -1,0 +1,1268 @@
+
+@if (isHomePage()) {
+  <div class="store">
+
+    <!-- =====================================
+         TOP BAR
+    ====================================== -->
+
+    <div class="store-topbar">
+      <span>Electronics Store — магазин электроники</span>
+      <span>Технологии для работы, дома и жизни</span>
+    </div>
+
+    <!-- =====================================
+         HEADER
+    ====================================== -->
+
+    <header class="site-header">
+
+      <a class="brand" href="/" aria-label="Electronics Store">
+        <img
+          class="brand-logo"
+          src="/store-logo.png"
+          alt="Electronics Store"
+        />
+      </a>
+
+      <nav class="header-nav" aria-label="Основная навигация">
+        <a href="#categories">Категории</a>
+        <a href="#products">Товары</a>
+        <a href="#advantages">О магазине</a>
+      </nav>
+
+      <div class="header-account-group">
+
+        @if (isAuthenticated()) {
+
+          @if (isAdmin()) {
+            <a
+              class="header-action admin-panel-action"
+              routerLink="/admin/orders"
+            >
+              Админ-панель
+            </a>
+          }
+
+          <a
+            class="header-action account-action"
+            routerLink="/account"
+          >
+            Личный кабинет
+          </a>
+
+          <a
+            class="header-action orders-action"
+            routerLink="/orders"
+          >
+            Мои заказы
+          </a>
+
+          <button
+            class="header-action auth-action"
+            type="button"
+            (click)="logout()"
+            aria-label="Выйти из аккаунта"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              width="21"
+              height="21"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              aria-hidden="true"
+            >
+              <circle cx="12" cy="8" r="4"/>
+              <path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/>
+            </svg>
+            <span>Выйти</span>
+          </button>
+
+        } @else {
+
+          <a
+            class="header-action auth-action"
+            routerLink="/auth"
+            aria-label="Войти в аккаунт"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              width="21"
+              height="21"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              aria-hidden="true"
+            >
+              <circle cx="12" cy="8" r="4"/>
+              <path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/>
+            </svg>
+            <span>Войти</span>
+          </a>
+
+        }
+
+      </div>
+
+      <a
+        class="header-action cart-action"
+        routerLink="/cart"
+        aria-label="Корзина"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          width="24"
+          height="24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M3 3h2l2.4 12.2a2 2 0 0 0 2 1.6h8.8a2 2 0 0 0 2-1.6L22 8H6"/>
+          <circle cx="10" cy="20" r="1"/>
+          <circle cx="18" cy="20" r="1"/>
+        </svg>
+
+        <span class="cart-count">{{ cartCount() }}</span>
+      </a>
+
+    </header>
+
+    <main>
+
+      <!-- =====================================
+           HERO
+      ====================================== -->
+
+      <section class="hero">
+
+        <div class="hero-content">
+
+          <span class="hero-label">
+            ELECTRONICS STORE
+          </span>
+
+          <h1>
+            Технологии для работы,
+            <span>дома и жизни</span>
+          </h1>
+
+          <p>
+            Выбирайте электронику, изучайте характеристики
+            и находите подходящие устройства для своих задач.
+          </p>
+
+          <div class="hero-actions">
+
+            <a
+              href="#products"
+              class="button-link button-primary"
+            >
+              Смотреть каталог
+              <span aria-hidden="true">→</span>
+            </a>
+
+            <a
+              href="#categories"
+              class="button-link button-secondary"
+            >
+              Выбрать категорию
+            </a>
+
+          </div>
+
+          <div class="hero-note">
+            <span class="hero-note__line"></span>
+            <span>
+              Удобный выбор, сравнение и оформление заказов
+            </span>
+          </div>
+
+        </div>
+
+        <div class="hero-decoration" aria-hidden="true">
+          <span>ES</span>
+        </div>
+
+      </section>
+
+      <!-- =====================================
+           STORE ADVANTAGES
+      ====================================== -->
+
+      <section class="advantages-section" id="advantages">
+
+        <div class="advantages-heading">
+          <span class="section-eyebrow">
+            ELECTRONICS STORE
+          </span>
+
+          <h2>Покупки без лишних сложностей</h2>
+
+          <p>
+            Всё необходимое для удобного выбора электроники
+            в одном магазине.
+          </p>
+        </div>
+
+        <div class="advantages-grid">
+
+          <article class="advantage-card">
+
+            <div class="advantage-icon">
+              <svg
+                viewBox="0 0 24 24"
+                width="28"
+                height="28"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M3 7h18"/>
+                <path d="M5 7l2-4h10l2 4"/>
+                <path d="M5 7l1 14h12l1-14"/>
+                <path d="M9 11h6"/>
+              </svg>
+            </div>
+
+            <div>
+              <h3>Выгодные цены</h3>
+              <p>
+                Доступная стоимость популярной техники
+                и наглядное отображение скидок.
+              </p>
+            </div>
+
+          </article>
+
+          <article class="advantage-card">
+
+            <div class="advantage-icon">
+              <svg
+                viewBox="0 0 24 24"
+                width="28"
+                height="28"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11z"/>
+                <path d="m9 12 2 2 4-4"/>
+              </svg>
+            </div>
+
+            <div>
+              <h3>Гарантия качества</h3>
+              <p>
+                Понятная информация о товарах,
+                характеристиках и условиях покупки.
+              </p>
+            </div>
+
+          </article>
+
+          <article class="advantage-card">
+
+            <div class="advantage-icon">
+              <svg
+                viewBox="0 0 24 24"
+                width="28"
+                height="28"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M3 7h11v11H3z"/>
+                <path d="M14 10h4l3 4v4h-7z"/>
+                <circle cx="7.5" cy="18.5" r="2.5"/>
+                <circle cx="17.5" cy="18.5" r="2.5"/>
+              </svg>
+            </div>
+
+            <div>
+              <h3>Удобное оформление</h3>
+              <p>
+                Выбор товаров, управление корзиной
+                и оформление заказов в одном месте.
+              </p>
+            </div>
+
+          </article>
+
+        </div>
+
+      </section>
+
+      <!-- =====================================
+           CATEGORIES
+      ====================================== -->
+
+      <section class="section categories-section" id="categories">
+
+        <div class="section-heading">
+
+          <div>
+            <span class="section-eyebrow">
+              ВЫБИРАЙТЕ ТО, ЧТО НУЖНО
+            </span>
+
+            <h2>Категории товаров</h2>
+
+            <p class="section-description">
+              Перейдите к нужному разделу магазина.
+            </p>
+          </div>
+
+          <button
+            class="text-button category-toggle"
+            type="button"
+            [attr.aria-expanded]="categoriesExpanded()"
+            aria-controls="categories-list"
+            (click)="toggleCategories()"
+          >
+            {{ categoriesExpanded()
+              ? 'Свернуть'
+              : 'Все категории' }}
+
+            <span
+              class="category-toggle-icon"
+              [class.expanded]="categoriesExpanded()"
+            >
+              ⌄
+            </span>
+          </button>
+
+        </div>
+
+        @if (isCategoriesLoading()) {
+
+          <div class="loading-message">
+            Загружаем категории...
+          </div>
+
+        } @else if (categoriesErrorMessage()) {
+
+          <div class="error-message">
+
+            <p>{{ categoriesErrorMessage() }}</p>
+
+            <button
+              class="primary-button"
+              type="button"
+              (click)="loadCategories()"
+            >
+              Повторить попытку
+            </button>
+
+          </div>
+
+        } @else if (categories().length > 0) {
+
+          <div
+            class="categories-grid"
+            id="categories-list"
+          >
+
+            @for (
+              category of visibleCategories();
+              track category.id
+            ) {
+
+              <button
+                class="category-card"
+                [class.active]="selectedCategory() === category.id"
+                type="button"
+                (click)="selectCategory(category.id)"
+              >
+
+                <div class="category-card-visual">
+
+                  @if (getCategoryImage(category.id); as categoryImage) {
+
+                    <img
+                      [src]="categoryImage"
+                      [alt]="category.name"
+                      loading="lazy"
+                    />
+
+                  } @else {
+
+                    <span class="category-icon" aria-hidden="true">
+                      {{ getCategoryIcon(category.name) }}
+                    </span>
+
+                  }
+
+                </div>
+
+                <span class="category-card-name">
+                  {{ category.name }}
+                </span>
+
+                <span class="category-card-arrow" aria-hidden="true">
+                  →
+                </span>
+
+              </button>
+
+            }
+
+          </div>
+
+          @if (categories().length === 0) {
+            <div class="empty-message">
+              Категории пока не добавлены.
+            </div>
+          }
+
+        } @else {
+
+          <div class="empty-message">
+            Категории пока не добавлены.
+          </div>
+
+        }
+
+      </section>
+
+      <!-- =====================================
+           PROMOTIONAL BANNER
+      ====================================== -->
+
+      <section class="catalog-promo">
+
+        <div class="promo-content">
+
+          <span class="promo-eyebrow">
+            СПЕЦИАЛЬНЫЕ ПРЕДЛОЖЕНИЯ
+          </span>
+
+          <h2>
+            Низкие цены на популярную технику
+          </h2>
+
+          <p>
+            Больше возможностей с Electronics Store:
+            выбирайте нужные устройства и находите
+            выгодные предложения в каталоге.
+          </p>
+
+          <a
+            href="#products"
+            class="promo-button"
+          >
+            Перейти в каталог
+            <span aria-hidden="true">→</span>
+          </a>
+
+        </div>
+
+        <div class="promo-visual" aria-hidden="true">
+          <span class="promo-percent">%</span>
+          <span class="promo-circle promo-circle-one"></span>
+          <span class="promo-circle promo-circle-two"></span>
+        </div>
+
+      </section>
+
+      <!-- =====================================
+           PRODUCT CATALOG
+      ====================================== -->
+
+      <section class="section catalog-section" id="products">
+
+        <div class="section-heading catalog-heading">
+
+          <div>
+            <span class="section-eyebrow">
+              НАЙДИТЕ СВОЁ УСТРОЙСТВО
+            </span>
+
+            <h2>Каталог товаров</h2>
+
+            <p class="section-description">
+              Используйте поиск и фильтры, чтобы подобрать товар.
+            </p>
+          </div>
+
+          <span class="total-count">
+            Всего товаров: {{ totalCount() }}
+          </span>
+
+        </div>
+
+        @if (selectedCategoryName()) {
+          <div class="filter-info">
+            <span>
+              Выбрана категория:
+              <strong>{{ selectedCategoryName() }}</strong>
+            </span>
+          </div>
+        }
+
+        <!-- SEARCH AND FILTERS -->
+
+        <div class="catalog-filters">
+
+          <label class="catalog-search-field">
+
+            <span>Поиск товаров</span>
+
+            <div class="catalog-search-control">
+
+              <svg
+                viewBox="0 0 24 24"
+                width="21"
+                height="21"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                aria-hidden="true"
+              >
+                <circle cx="11" cy="11" r="7"/>
+                <path d="m16 16 4 4"/>
+              </svg>
+
+              <input
+                type="search"
+                placeholder="Название товара..."
+                [value]="searchQuery()"
+                (input)="onSearch($event)"
+              />
+
+            </div>
+
+          </label>
+
+          <div class="price-filter">
+
+            <label class="filter-field">
+              <span>Цена от, BYN</span>
+
+              <input
+                type="number"
+                min="0"
+                step="0.01"
+                placeholder="0"
+                [value]="minPriceInput()"
+                (input)="onMinPriceChange($event)"
+              />
+            </label>
+
+            <label class="filter-field">
+              <span>Цена до, BYN</span>
+
+              <input
+                type="number"
+                min="0"
+                step="0.01"
+                placeholder="Без ограничения"
+                [value]="maxPriceInput()"
+                (input)="onMaxPriceChange($event)"
+              />
+            </label>
+
+            <button
+              class="filter-apply-button"
+              type="button"
+              (click)="applyPriceFilter()"
+            >
+              Применить
+            </button>
+
+          </div>
+
+          <label class="filter-field sort-field">
+
+            <span>Сортировка</span>
+
+            <select
+              [value]="sortOption()"
+              (change)="onSortChange($event)"
+            >
+              <option value="newest">Сначала новые</option>
+              <option value="name-asc">По названию: А–Я</option>
+              <option value="price-asc">Сначала дешевле</option>
+              <option value="price-desc">Сначала дороже</option>
+              <option value="quantity-desc">
+                По количеству в наличии
+              </option>
+            </select>
+
+          </label>
+
+          <label class="stock-filter">
+
+            <input
+              type="checkbox"
+              [checked]="inStockOnly()"
+              (change)="onStockOnlyChange($event)"
+            />
+
+            <span>Только в наличии</span>
+
+          </label>
+
+          <button
+            class="filter-reset-button"
+            type="button"
+            (click)="clearFilters()"
+          >
+            Сбросить
+          </button>
+
+        </div>
+
+        @if (filterErrorMessage()) {
+          <p class="filter-error">
+            {{ filterErrorMessage() }}
+          </p>
+        }
+
+        @if (comparisonMessage()) {
+          <div class="compare-message" role="status">
+            <span>{{ comparisonMessage() }}</span>
+
+            <button
+              type="button"
+              aria-label="Закрыть сообщение"
+              (click)="comparisonMessage.set(null)"
+            >
+              ×
+            </button>
+          </div>
+        }
+
+        <!-- PRODUCTS -->
+
+        @if (isLoading()) {
+
+          <div class="loading-message">
+            Загружаем товары...
+          </div>
+
+        } @else if (errorMessage()) {
+
+          <div class="error-message">
+
+            <p>{{ errorMessage() }}</p>
+
+            <button
+              class="primary-button"
+              type="button"
+              (click)="loadProducts(currentPage())"
+            >
+              Повторить попытку
+            </button>
+
+          </div>
+
+        } @else {
+
+          <div class="products-grid">
+
+            @for (
+              product of visibleProducts();
+              track product.id
+            ) {
+
+              <article
+                class="product-card"
+                role="link"
+                tabindex="0"
+                [attr.aria-label]="'Открыть товар: ' + product.name"
+                (click)="openProduct(product.id)"
+                (keydown.enter)="openProduct(product.id)"
+                (keydown.space)="$event.preventDefault(); openProduct(product.id)"
+              >
+
+                <!-- IMAGE -->
+
+                <div class="product-image">
+
+                  @if (
+                    product.oldPrice !== null &&
+                    product.oldPrice > product.price
+                  ) {
+                    <span class="discount-badge">
+                      −{{ getDiscountPercent(product) }}%
+                    </span>
+                  }
+
+                  @if (product.quantity > 0) {
+
+                    <span class="stock-label">
+                      В наличии
+                    </span>
+
+                  } @else {
+
+                    <span class="out-of-stock-label">
+                      Нет в наличии
+                    </span>
+
+                  }
+
+                  @if (product.imageUrl) {
+
+                    <img
+                      [src]="getImageUrl(product.imageUrl) ?? ''"
+                      [alt]="product.name"
+                      loading="lazy"
+                    />
+
+                  } @else {
+
+                    <div class="product-placeholder">
+                      Фотография скоро появится
+                    </div>
+
+                  }
+
+                </div>
+
+                <!-- INFORMATION -->
+
+                <div class="product-info">
+
+                  <span class="product-category">
+                    {{ product.categoryName ?? 'Без категории' }}
+                  </span>
+
+                  <h3>{{ product.name }}</h3>
+
+                  @if (product.description) {
+                    <p class="product-description">
+                      {{ product.description }}
+                    </p>
+                  }
+
+                  <div class="price-block">
+
+                    <strong class="product-price">
+                      {{ formatPrice(product.price) }}
+                    </strong>
+
+                    @if (
+                      product.oldPrice !== null &&
+                      product.oldPrice > product.price
+                    ) {
+
+                      <span class="old-price">
+                        {{ formatPrice(product.oldPrice) }}
+                      </span>
+
+                    }
+
+                  </div>
+
+                  <div class="product-card-actions">
+
+                    <button
+                      class="compare-button"
+                      [class.selected]="isCompared(product.id)"
+                      type="button"
+                      [attr.aria-pressed]="isCompared(product.id)"
+                      (click)="$event.stopPropagation(); toggleComparison(product)"
+                      (keydown.enter)="$event.stopPropagation()"
+                      (keydown.space)="$event.stopPropagation()"
+                    >
+                      <svg
+                        viewBox="0 0 24 24"
+                        width="17"
+                        height="17"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        aria-hidden="true"
+                      >
+                        <path d="M8 4H4v4"/>
+                        <path d="M4 8l6-6"/>
+                        <path d="M16 20h4v-4"/>
+                        <path d="m20 16-6 6"/>
+                        <path d="M14 4h6v6"/>
+                        <path d="M20 4 4 20"/>
+                      </svg>
+
+                      {{ isCompared(product.id)
+                        ? 'В сравнении'
+                        : 'Сравнить' }}
+                    </button>
+
+                    <button
+                      class="add-to-cart-button"
+                      type="button"
+                      [disabled]="product.quantity <= 0"
+                      (click)="$event.stopPropagation(); addToCart(product)"
+                      (keydown.enter)="$event.stopPropagation()"
+                      (keydown.space)="$event.stopPropagation()"
+                    >
+
+                      <svg
+                        viewBox="0 0 24 24"
+                        width="18"
+                        height="18"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        aria-hidden="true"
+                      >
+                        <path d="M3 3h2l2.4 12.2a2 2 0 0 0 2 1.6h8.8a2 2 0 0 0 2-1.6L22 8H6"/>
+                        <circle cx="10" cy="20" r="1"/>
+                        <circle cx="18" cy="20" r="1"/>
+                      </svg>
+
+                      В корзину
+
+                    </button>
+
+                  </div>
+
+                  <span class="product-card-hint">
+                    Открыть товар →
+                  </span>
+
+                </div>
+
+              </article>
+
+            } @empty {
+
+              <div class="empty-message">
+                По вашему запросу ничего не найдено.
+              </div>
+
+            }
+
+          </div>
+
+          <!-- PAGINATION -->
+
+          @if (totalPages() > 1) {
+
+            <nav class="pagination" aria-label="Страницы каталога">
+
+              <button
+                class="pagination-edge"
+                type="button"
+                aria-label="Первая страница"
+                [disabled]="currentPage() === 1 || isLoading()"
+                (click)="goToPage(1)"
+              >
+                «
+              </button>
+
+              <button
+                type="button"
+                aria-label="Предыдущая страница"
+                [disabled]="currentPage() === 1 || isLoading()"
+                (click)="goToPage(currentPage() - 1)"
+              >
+                ‹
+              </button>
+
+              @for (
+                item of paginationItems();
+                track item.type === 'page' ? item.value : item.key
+              ) {
+
+                @if (item.type === 'page') {
+
+                  <button
+                    type="button"
+                    class="pagination-page"
+                    [class.active]="currentPage() === item.value"
+                    [attr.aria-current]="currentPage() === item.value ? 'page' : null"
+                    [disabled]="isLoading()"
+                    (click)="goToPage(item.value)"
+                  >
+                    {{ item.value }}
+                  </button>
+
+                } @else {
+
+                  <span class="pagination-ellipsis">
+                    …
+                  </span>
+
+                }
+
+              }
+
+              <button
+                type="button"
+                aria-label="Следующая страница"
+                [disabled]="currentPage() === totalPages() || isLoading()"
+                (click)="goToPage(currentPage() + 1)"
+              >
+                ›
+              </button>
+
+              <button
+                class="pagination-edge"
+                type="button"
+                aria-label="Последняя страница"
+                [disabled]="currentPage() === totalPages() || isLoading()"
+                (click)="goToPage(totalPages())"
+              >
+                »
+              </button>
+
+            </nav>
+
+            <p class="pagination-caption">
+              Страница {{ currentPage() }} из {{ totalPages() }}
+            </p>
+
+          }
+
+        }
+
+      </section>
+
+    </main>
+
+    <!-- =====================================
+         COMPARISON BAR
+    ====================================== -->
+
+    @if (comparedProducts().length > 0) {
+
+      <div class="compare-tray">
+
+        <div class="compare-tray-information">
+
+          <strong>
+            Сравнение товаров
+          </strong>
+
+          <span>
+            Выбрано {{ comparisonCount() }} из 4
+          </span>
+
+        </div>
+
+        <div class="compare-tray-products">
+
+          @for (
+            product of comparedProducts();
+            track product.id
+          ) {
+            <span class="compare-tray-product">
+              {{ product.name }}
+            </span>
+          }
+
+        </div>
+
+        <div class="compare-tray-actions">
+
+          <button
+            class="compare-clear-button"
+            type="button"
+            (click)="clearComparison()"
+          >
+            Очистить
+          </button>
+
+          <button
+            class="compare-open-button"
+            type="button"
+            [disabled]="comparisonCount() < 2"
+            (click)="openComparison()"
+          >
+            Сравнить ({{ comparisonCount() }})
+          </button>
+
+        </div>
+
+      </div>
+
+    }
+
+    <!-- =====================================
+         COMPARISON MODAL
+    ====================================== -->
+
+    @if (comparisonOpen()) {
+
+      <div
+        class="comparison-overlay"
+        (click)="closeComparison()"
+        (keydown.escape)="closeComparison()"
+      >
+
+        <section
+          class="comparison-dialog"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Сравнение товаров"
+          (click)="$event.stopPropagation()"
+        >
+
+          <div class="comparison-header">
+
+            <div>
+              <span class="section-eyebrow">
+                ELECTRONICS STORE
+              </span>
+
+              <h2>Сравнение товаров</h2>
+
+              <p>
+                Сравните цены, наличие и характеристики выбранных устройств.
+              </p>
+            </div>
+
+            <button
+              class="comparison-close-button"
+              type="button"
+              aria-label="Закрыть сравнение"
+              (click)="closeComparison()"
+            >
+              ×
+            </button>
+
+          </div>
+
+          <div class="comparison-table-wrapper">
+
+            <table class="comparison-table">
+
+              <thead>
+                <tr>
+
+                  <th class="comparison-property-heading">
+                    Характеристика
+                  </th>
+
+                  @for (
+                    product of comparedProducts();
+                    track product.id
+                  ) {
+
+                    <th>
+
+                      <div class="comparison-product-heading">
+
+                        <span>{{ product.name }}</span>
+
+                        <button
+                          type="button"
+                          aria-label="Убрать товар из сравнения"
+                          (click)="removeComparedProduct(product.id)"
+                        >
+                          ×
+                        </button>
+
+                      </div>
+
+                    </th>
+
+                  }
+
+                </tr>
+              </thead>
+
+              <tbody>
+
+                <tr>
+                  <th>Категория</th>
+
+                  @for (
+                    product of comparedProducts();
+                    track product.id
+                  ) {
+                    <td>
+                      {{ product.categoryName ?? 'Без категории' }}
+                    </td>
+                  }
+                </tr>
+
+                <tr>
+                  <th>Цена</th>
+
+                  @for (
+                    product of comparedProducts();
+                    track product.id
+                  ) {
+                    <td class="comparison-price">
+                      {{ formatPrice(product.price) }}
+                    </td>
+                  }
+                </tr>
+
+                <tr>
+                  <th>Скидка</th>
+
+                  @for (
+                    product of comparedProducts();
+                    track product.id
+                  ) {
+                    <td>
+                      @if (getDiscountPercent(product) > 0) {
+                        <span class="comparison-discount">
+                          −{{ getDiscountPercent(product) }}%
+                        </span>
+                      } @else {
+                        —
+                      }
+                    </td>
+                  }
+                </tr>
+
+                <tr>
+                  <th>Наличие</th>
+
+                  @for (
+                    product of comparedProducts();
+                    track product.id
+                  ) {
+                    <td>
+                      @if (product.quantity > 0) {
+                        В наличии: {{ product.quantity }}
+                      } @else {
+                        Нет в наличии
+                      }
+                    </td>
+                  }
+                </tr>
+
+                <tr>
+                  <th>Описание</th>
+
+                  @for (
+                    product of comparedProducts();
+                    track product.id
+                  ) {
+                    <td>
+                      {{ product.description || 'Нет описания' }}
+                    </td>
+                  }
+                </tr>
+
+                @for (
+                  row of comparisonSpecificationRows();
+                  track row.key
+                ) {
+
+                  <tr>
+                    <th>{{ row.name }}</th>
+
+                    @for (
+                      value of row.values;
+                      track $index
+                    ) {
+                      <td>{{ value }}</td>
+                    }
+
+                  </tr>
+
+                }
+
+              </tbody>
+
+            </table>
+
+          </div>
+
+          <div class="comparison-footer">
+
+            <span>
+              Выбрано товаров: {{ comparisonCount() }}
+            </span>
+
+            <button
+              class="compare-open-button"
+              type="button"
+              (click)="closeComparison()"
+            >
+              Закрыть сравнение
+            </button>
+
+          </div>
+
+        </section>
+
+      </div>
+
+    }
+
+    <!-- =====================================
+         FOOTER
+    ====================================== -->
+
+    <footer class="site-footer">
+
+      <div class="footer-brand">
+
+        <strong class="footer-brand-title">
+          Electronics Store
+        </strong>
+
+        <p>
+          Электроника для работы, дома и повседневной жизни.
+        </p>
+
+      </div>
+
+      <div class="footer-column">
+
+        <strong>Покупателям</strong>
+
+        <a href="#products">Каталог товаров</a>
+        <a href="#categories">Категории</a>
+        <a routerLink="/cart">Корзина</a>
+        <a routerLink="/orders">Мои заказы</a>
+
+      </div>
+
+      <div class="footer-column">
+
+        <strong>Личный кабинет</strong>
+
+        <a routerLink="/account">Мой профиль</a>
+        <a routerLink="/auth">Вход и регистрация</a>
+
+      </div>
+
+      <div class="footer-column">
+
+        <strong>Electronics Store</strong>
+
+        <p>
+          Современный выбор электроники
+          и удобное оформление покупок.
+        </p>
+
+      </div>
+
+      <div class="footer-bottom">
+        © Electronics Store
+      </div>
+
+    </footer>
+
+  </div>
+}
+
+<router-outlet />

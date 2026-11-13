@@ -5,10 +5,9 @@ using ElectronicsStoreApi.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.OpenApi;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,7 +23,8 @@ builder.Services.AddCors(options =>
             .WithOrigins(
                 "http://192.168.1.12:5500",
                 "http://localhost:5500",
-                "http://127.0.0.1:5500"
+                "http://127.0.0.1:5500",
+                "http://localhost:4200"
             )
             .AllowAnyHeader()
             .AllowAnyMethod();
@@ -45,6 +45,7 @@ builder.Services.AddScoped<ProductService>();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<OrderService>();
 builder.Services.AddScoped<ProductImageService>();
+builder.Services.AddScoped<CategoryImageService>();
 
 // Password hashing.
 builder.Services.AddScoped<
@@ -93,8 +94,37 @@ builder.Services
 // Authorization.
 builder.Services.AddAuthorization();
 
-// OpenAPI.
+// Built-in OpenAPI.
 builder.Services.AddOpenApi();
+
+// Swagger.
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "Electronics Store API",
+        Version = "v1",
+        Description = "API интернет-магазина электроники."
+    });
+
+    // JWT Bearer authentication.
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Description =
+            "Введите JWT access token. Префикс Bearer добавляется автоматически.",
+
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT"
+    });
+
+    // Подключаем JWT к запросам из Swagger.
+    options.AddSecurityRequirement(document =>
+        new OpenApiSecurityRequirement
+        {
+            [new OpenApiSecuritySchemeReference("Bearer", document)] = []
+        });
+});
 
 var app = builder.Build();
 
@@ -136,10 +166,35 @@ app.UseStaticFiles(new StaticFileOptions
     RequestPath = "/uploads/products"
 });
 
-// OpenAPI.
+// Category images.
+var categoryImagesPath = Path.Combine(
+    app.Environment.ContentRootPath,
+    "CategoryImages");
+
+// Создаём папку, если её ещё нет.
+Directory.CreateDirectory(categoryImagesPath);
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(categoryImagesPath),
+    RequestPath = "/uploads/categories"
+});
+
+// OpenAPI and Swagger UI.
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+
+    app.UseSwagger();
+
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint(
+            "/swagger/v1/swagger.json",
+            "Electronics Store API v1");
+
+        options.RoutePrefix = "swagger";
+    });
 }
 
 // Authentication и Authorization.

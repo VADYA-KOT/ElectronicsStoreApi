@@ -1,0 +1,221 @@
+<div class="orders-page">
+
+  <!-- HEADER -->
+  <header class="orders-header">
+    <a class="orders-brand" routerLink="/">
+      Electronics Store
+    </a>
+
+    <a class="back-to-store" routerLink="/">
+      ← Вернуться в магазин
+    </a>
+  </header>
+
+  <main class="orders-content">
+
+    <!-- PAGE TITLE -->
+    <section class="orders-title">
+      <div>
+        <span class="orders-label">PERSONAL ACCOUNT</span>
+        <h1>Мои заказы</h1>
+        <p>История ваших покупок в Electronics Store.</p>
+      </div>
+
+      @if (orders().length > 0) {
+        <span class="orders-total-count">
+          Заказов: {{ orders().length }}
+        </span>
+      }
+    </section>
+
+    <!-- LOADING -->
+    @if (isLoading()) {
+      <div class="orders-loading">
+        <div class="loading-spinner"></div>
+        <p>Загружаем историю заказов...</p>
+      </div>
+    }
+
+    <!-- ERROR -->
+    @else if (errorMessage()) {
+      <section class="orders-error">
+        <h2>Не удалось загрузить заказы</h2>
+
+        <p>{{ errorMessage() }}</p>
+
+        <button
+          class="orders-primary-button"
+          type="button"
+          (click)="retry()"
+        >
+          Повторить попытку
+        </button>
+      </section>
+    }
+
+    <!-- EMPTY HISTORY -->
+    @else if (orders().length === 0) {
+      <section class="orders-empty">
+        <div class="orders-empty-icon">
+          <svg
+            viewBox="0 0 24 24"
+            width="64"
+            height="64"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M6 2h9l5 5v15H6z"/>
+            <path d="M14 2v6h6"/>
+            <path d="M9 13h8"/>
+            <path d="M9 17h8"/>
+          </svg>
+        </div>
+
+        <h2>У вас пока нет заказов</h2>
+
+        <p>
+          Здесь будут отображаться ваши покупки после оформления заказа.
+        </p>
+
+        <a class="orders-primary-button" routerLink="/">
+          Перейти в каталог
+        </a>
+      </section>
+    }
+
+    <!-- ORDERS LIST -->
+    @else {
+      <section class="orders-list">
+
+        @for (order of orders(); track order.id) {
+          <article class="order-card">
+
+            <!-- ORDER HEADER -->
+            <button
+              class="order-card-header"
+              type="button"
+              [attr.aria-expanded]="isExpanded(order.id)"
+              (click)="toggleOrder(order.id)"
+            >
+              <div class="order-main-information">
+                <span class="order-number">
+                  Заказ №{{ order.id }}
+                </span>
+
+                <span class="order-date">
+                  {{ formatDate(order.createdAtUtc) }}
+                </span>
+              </div>
+
+              <div class="order-header-right">
+                <div class="order-status">
+                  <span
+                    class="status-badge"
+                    [class.pending]="getStatusClass(order.status) === 'pending'"
+                    [class.processing]="getStatusClass(order.status) === 'processing'"
+                    [class.shipped]="getStatusClass(order.status) === 'shipped'"
+                    [class.completed]="getStatusClass(order.status) === 'completed'"
+                    [class.cancelled]="getStatusClass(order.status) === 'cancelled'"
+                    [class.default-status]="getStatusClass(order.status) === 'default'"
+                  >
+                    {{ getStatusLabel(order.status) }}
+                  </span>
+                </div>
+
+                <strong class="order-total">
+                  {{ formatPrice(order.totalAmount) }}
+                </strong>
+
+                <span
+                  class="order-expand-icon"
+                  [class.expanded]="isExpanded(order.id)"
+                  aria-hidden="true"
+                >
+                  ⌄
+                </span>
+              </div>
+            </button>
+
+            <!-- ORDER DETAILS -->
+            @if (isExpanded(order.id)) {
+              <div class="order-details">
+
+                <div class="order-items-heading">
+                  <h3>Состав заказа</h3>
+
+                  <span>
+                    Позиций: {{ order.items.length }}
+                  </span>
+                </div>
+
+                <div class="order-items-list">
+
+                  @for (item of order.items; track $index) {
+                    <div class="order-item">
+
+                      <div class="order-item-information">
+
+                        @if (item.productId !== null) {
+                          <a
+                            class="order-item-name"
+                            [routerLink]="[
+                              '/products',
+                              item.productId
+                            ]"
+                          >
+                            {{ item.productName }}
+                          </a>
+                        } @else {
+                          <span class="order-item-name">
+                            {{ item.productName }}
+                          </span>
+
+                          <span class="deleted-product-label">
+                            Товар удалён из каталога
+                          </span>
+                        }
+
+                        <span class="order-item-price">
+                          {{ formatPrice(item.unitPrice) }} ×
+                          {{ item.quantity }} шт.
+                        </span>
+                      </div>
+
+                      <strong class="order-item-total">
+                        {{ formatPrice(item.lineTotal) }}
+                      </strong>
+
+                    </div>
+                  }
+
+                </div>
+
+                <div class="order-details-footer">
+                  <span>Итого по заказу</span>
+
+                  <strong>
+                    {{ formatPrice(order.totalAmount) }}
+                  </strong>
+                </div>
+
+              </div>
+            }
+
+          </article>
+        }
+
+      </section>
+    }
+
+    <div class="orders-bottom-link">
+      <a routerLink="/">
+        ← Вернуться в каталог
+      </a>
+    </div>
+
+  </main>
+</div>

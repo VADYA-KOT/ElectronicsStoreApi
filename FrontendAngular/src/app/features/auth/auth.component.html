@@ -1,0 +1,138 @@
+
+<div class="auth-page">
+  <a class="auth-brand" routerLink="/">
+    Electronics Store
+  </a>
+
+  <main class="auth-card">
+    <div class="auth-heading">
+      <h1>
+        {{ isRegistering() ? 'Создание аккаунта' : 'Вход в аккаунт' }}
+      </h1>
+
+      <p>
+        {{
+          isRegistering()
+            ? 'Зарегистрируйтесь, чтобы оформлять и отслеживать заказы.'
+            : 'Войдите, чтобы продолжить оформление заказа.'
+        }}
+      </p>
+    </div>
+
+    <div class="auth-tabs">
+      <button
+        type="button"
+        [class.active]="!isRegistering()"
+        [disabled]="isSubmitting()"
+        (click)="setMode(false)"
+      >
+        Вход
+      </button>
+
+      <button
+        type="button"
+        [class.active]="isRegistering()"
+        [disabled]="isSubmitting()"
+        (click)="setMode(true)"
+      >
+        Регистрация
+      </button>
+    </div>
+
+    @if (successMessage()) {
+      <div class="auth-success" role="status">
+        {{ successMessage() }}
+      </div>
+    }
+
+    @if (errorMessage()) {
+      <div class="auth-error" role="alert">
+        {{ errorMessage() }}
+      </div>
+    }
+
+    <form [formGroup]="form" (ngSubmit)="submit()">
+      <div class="auth-field">
+        <label for="username">Имя пользователя</label>
+
+        <input
+          id="username"
+          type="text"
+          formControlName="username"
+          autocomplete="username"
+          placeholder="Введите имя пользователя"
+        />
+
+        @if (
+          form.controls.username.touched &&
+          form.controls.username.invalid
+        ) {
+          <span class="field-error">
+            @if (form.controls.username.hasError('required')) {
+              Введите имя пользователя.
+            } @else if (
+              form.controls.username.hasError('minlength') ||
+              form.controls.username.hasError('maxlength')
+            ) {
+              Имя должно содержать от 3 до 40 символов.
+            } @else if (form.controls.username.hasError('pattern')) {
+              Допустимы латинские буквы, цифры, точка, дефис и подчёркивание.
+            }
+          </span>
+        }
+      </div>
+
+      <div class="auth-field">
+        <label for="password">Пароль</label>
+
+        <input
+          id="password"
+          type="password"
+          formControlName="password"
+          [attr.autocomplete]="
+            isRegistering() ? 'new-password' : 'current-password'
+          "
+          placeholder="Введите пароль"
+        />
+
+        @if (
+          form.controls.password.touched &&
+          form.controls.password.invalid
+        ) {
+          <span class="field-error">
+            @if (form.controls.password.hasError('required')) {
+              Введите пароль.
+            } @else if (
+              form.controls.password.hasError('minlength') ||
+              form.controls.password.hasError('maxlength')
+            ) {
+              Пароль должен содержать от 12 до 128 символов.
+            }
+          </span>
+        }
+      </div>
+
+      @if (isRegistering()) {
+        <p class="auth-hint">
+          Пароль должен содержать минимум 12 символов.
+        </p>
+      }
+
+      <button
+        class="auth-submit"
+        type="submit"
+        [disabled]="form.invalid || isSubmitting()"
+      >
+        @if (isSubmitting()) {
+          Выполняется запрос...
+        } @else {
+          {{ isRegistering() ? 'Зарегистрироваться' : 'Войти' }}
+        }
+      </button>
+    </form>
+
+    <a class="auth-back-link" routerLink="/">
+      Вернуться в магазин
+    </a>
+  </main>
+</div>

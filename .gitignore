@@ -1,34 +1,42 @@
-# Visual Studio
+
+# Visual Studio and IDE
 .vs/
+.vscode/
 *.suo
 *.user
 *.userosscache
 *.sln.docstates
 
-# Результаты сборки
+# .NET build artifacts
 **/bin/
 **/obj/
 
-# Результаты тестирования
+# Test results
 **/TestResults/
 *.trx
 *.coverage
 *.coveragexml
 
-# Локальные логи
+# Coverage reports
+/Coverage*/
+
+# Logs
 *.log
 
-# Локальные секреты и переменные окружения
+# Local secrets and environment files
 .env
 .env.*
 !.env.example
 
-# Локальная конфигурация разработки
+# Local development settings
 **/appsettings.Development.json
 appsettings.*.Local.json
 
-# Local VS Code settings
-.vscode/
-
-# Uploaded product images
+# Uploaded product and category images
 /ElectronicsStoreApi/ProductImages/
+/ElectronicsStoreApi/CategoryImages/
+
+# Angular generated files
+/FrontendAngular/node_modules/
+/FrontendAngular/dist/
+/FrontendAngular/.angular/

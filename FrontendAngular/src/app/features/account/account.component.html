@@ -1,0 +1,166 @@
+<main class="account-page">
+  <section class="account-card">
+
+    <!-- HEADER -->
+    <div class="account-header">
+      <div>
+        <p class="account-subtitle">ЛИЧНЫЙ КАБИНЕТ</p>
+        <h1>Мой профиль</h1>
+      </div>
+
+      <button
+        type="button"
+        class="logout-button"
+        (click)="logout()">
+        Выйти
+      </button>
+    </div>
+
+    @if (isLoading()) {
+      <div class="status-message">
+        Загрузка профиля...
+      </div>
+    }
+
+    @else if (errorMessage()) {
+      <div class="error-message">
+        {{ errorMessage() }}
+      </div>
+    }
+
+    @else if (profile(); as user) {
+
+      <!-- PROFILE INFORMATION -->
+      <div class="profile-info">
+
+        <div class="profile-field">
+          <span>Имя пользователя</span>
+          <strong>{{ user.username }}</strong>
+        </div>
+
+        <div class="profile-field">
+          <span>ID пользователя</span>
+          <strong>{{ user.id }}</strong>
+        </div>
+
+        <div class="profile-field">
+          <span>Роль</span>
+          <strong>
+            {{ user.role === 'Admin' ? 'Администратор' : 'Пользователь' }}
+          </strong>
+        </div>
+
+        <div class="profile-field">
+          <span>Дата регистрации</span>
+          <strong>
+            {{ user.createdAtUtc | date:'dd.MM.yyyy HH:mm' }}
+          </strong>
+        </div>
+
+      </div>
+
+      <!-- ACCOUNT NAVIGATION -->
+      <div class="account-navigation">
+
+        <a
+          class="catalog-link"
+          routerLink="/">
+          ← Вернуться в каталог
+        </a>
+
+        <a
+          class="orders-link"
+          routerLink="/orders">
+          История заказов →
+        </a>
+
+      </div>
+
+      <!-- PASSWORD CHANGE -->
+      <section class="security-section">
+
+        <div class="security-heading">
+          <h2>Безопасность</h2>
+          <p>
+            Здесь можно изменить пароль от своей учётной записи.
+          </p>
+        </div>
+
+        <form
+          class="password-form"
+          (submit)="changePassword($event)">
+
+          <label class="password-field">
+            <span>Текущий пароль</span>
+
+            <input
+              type="password"
+              autocomplete="current-password"
+              placeholder="Введите текущий пароль"
+              [value]="currentPassword()"
+              (input)="onCurrentPasswordChange($event)"
+              maxlength="128"
+              required
+            />
+          </label>
+
+          <label class="password-field">
+            <span>Новый пароль</span>
+
+            <input
+              type="password"
+              autocomplete="new-password"
+              placeholder="Минимум 12 символов"
+              [value]="newPassword()"
+              (input)="onNewPasswordChange($event)"
+              minlength="12"
+              maxlength="128"
+              required
+            />
+          </label>
+
+          <label class="password-field">
+            <span>Повторите новый пароль</span>
+
+            <input
+              type="password"
+              autocomplete="new-password"
+              placeholder="Повторите новый пароль"
+              [value]="confirmNewPassword()"
+              (input)="onConfirmNewPasswordChange($event)"
+              maxlength="128"
+              required
+            />
+          </label>
+
+          @if (passwordErrorMessage()) {
+            <div
+              class="password-error"
+              role="alert">
+              {{ passwordErrorMessage() }}
+            </div>
+          }
+
+          @if (passwordSuccessMessage()) {
+            <div
+              class="password-success"
+              role="status">
+              {{ passwordSuccessMessage() }}
+            </div>
+          }
+
+          <button
+            type="submit"
+            class="change-password-button"
+            [disabled]="isChangingPassword()">
+            <span>
+              {{ isChangingPassword() ? 'Сохраняем...' : 'Изменить пароль' }}
+            </span>
+          </button>
+
+        </form>
+      </section>
+    }
+
+  </section>
+</main>

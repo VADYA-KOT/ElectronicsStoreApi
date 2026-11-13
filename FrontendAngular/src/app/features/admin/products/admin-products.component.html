@@ -1,0 +1,761 @@
+
+<div class="admin-products-page">
+
+  <!-- HEADER -->
+  <header class="admin-header">
+    <a class="admin-brand" routerLink="/">
+      Electronics Store
+    </a>
+
+    <div class="admin-header-right">
+      <span class="admin-role">ADMIN PANEL</span>
+
+      <a
+        class="admin-back-link"
+        routerLink="/admin/orders"
+      >
+        Управление заказами
+      </a>
+
+      <a
+        class="admin-back-link"
+        routerLink="/admin/categories"
+      >
+        Управление категориями
+      </a>
+
+      <a class="admin-back-link" routerLink="/">
+        ← Вернуться в магазин
+      </a>
+    </div>
+  </header>
+
+  <main class="admin-content">
+
+    <!-- PAGE TITLE -->
+    <section class="admin-page-title">
+      <div>
+        <span class="admin-eyebrow">MANAGEMENT</span>
+
+        <h1>Управление товарами</h1>
+
+        <p>
+          Создание, редактирование и удаление товаров каталога.
+        </p>
+      </div>
+
+      <div class="admin-title-actions">
+        <button
+          class="refresh-button"
+          type="button"
+          [disabled]="isLoading()"
+          (click)="loadProducts()"
+        >
+          ↻ Обновить
+        </button>
+
+        <button
+          class="add-product-button"
+          type="button"
+          (click)="openCreateForm()"
+        >
+          + Добавить товар
+        </button>
+      </div>
+    </section>
+
+    <!-- NOTIFICATIONS -->
+    @if (successMessage()) {
+      <div class="admin-success-message" role="status">
+        {{ successMessage() }}
+      </div>
+    }
+
+    @if (errorMessage()) {
+      <div class="admin-error-message" role="alert">
+        <span>{{ errorMessage() }}</span>
+
+        <button
+          type="button"
+          class="retry-button"
+          (click)="loadProducts()"
+        >
+          Обновить список
+        </button>
+      </div>
+    }
+
+    <!-- PRODUCT FORM -->
+    @if (showForm()) {
+      <section
+        class="admin-product-form"
+        #productFormSection
+      >
+
+        <div class="form-header">
+          <div>
+            <span class="admin-eyebrow">
+              PRODUCT EDITOR
+            </span>
+
+            <h2>
+              {{ editingProduct() ? 'Редактирование товара' : 'Новый товар' }}
+            </h2>
+          </div>
+
+          <button
+            type="button"
+            class="form-close-button"
+            (click)="closeForm()"
+            [disabled]="isSaving()"
+            aria-label="Закрыть форму"
+          >
+            ×
+          </button>
+        </div>
+
+        <form
+          #productFormElement="ngForm"
+          (ngSubmit)="saveProduct()"
+        >
+
+          <div class="product-form-grid">
+
+            <!-- NAME -->
+            <label class="form-field">
+              <span>Название товара *</span>
+
+              <input
+                type="text"
+                name="name"
+                [(ngModel)]="productForm.name"
+                placeholder="Например, Samsung Galaxy S25"
+                maxlength="200"
+                required
+              />
+            </label>
+
+            <!-- CATEGORY -->
+            <label class="form-field">
+              <span>Категория</span>
+
+              <select
+                name="categoryId"
+                [ngModel]="productForm.categoryId"
+                (ngModelChange)="onCategoryChanged($event)"
+              >
+                <option [ngValue]="null">
+                  Без категории
+                </option>
+
+                @for (category of categories(); track category.id) {
+                  <option [ngValue]="category.id">
+                    {{ category.name }}
+                  </option>
+                }
+              </select>
+            </label>
+
+            <!-- PRICE -->
+            <label class="form-field">
+              <span>Цена (BYN) *</span>
+
+              <input
+                type="number"
+                name="price"
+                [(ngModel)]="productForm.price"
+                min="0.01"
+                max="99999999.99"
+                step="0.01"
+                placeholder="0.00"
+                required
+              />
+            </label>
+
+            <!-- OLD PRICE -->
+            <label class="form-field">
+              <span>Старая цена (BYN)</span>
+
+              <input
+                type="number"
+                name="oldPrice"
+                [(ngModel)]="productForm.oldPrice"
+                min="0.01"
+                max="99999999.99"
+                step="0.01"
+                placeholder="Не указана"
+              />
+
+              <small>
+                Должна быть выше текущей цены.
+              </small>
+            </label>
+
+            <!-- QUANTITY -->
+            <label class="form-field">
+              <span>Количество на складе *</span>
+
+              <input
+                type="number"
+                name="quantity"
+                [(ngModel)]="productForm.quantity"
+                min="0"
+                step="1"
+                required
+              />
+            </label>
+
+            <!-- DESCRIPTION -->
+            <label class="form-field form-field-wide">
+              <span>Описание товара</span>
+
+              <textarea
+                name="description"
+                [(ngModel)]="productForm.description"
+                rows="5"
+                placeholder="Описание, особенности и преимущества товара..."
+              ></textarea>
+            </label>
+
+            <!-- IMAGE -->
+            <div class="form-field form-field-wide">
+
+              <span>Фотография товара</span>
+
+              <div class="image-upload-area">
+
+                <div class="image-preview">
+                  @if (formImageUrl()) {
+                    <img
+                      [src]="formImageUrl()!"
+                      [alt]="productForm.name || 'Фотография товара'"
+                    />
+                  } @else {
+                    <div class="image-placeholder">
+                      <span>+</span>
+                      <small>Нет фотографии</small>
+                    </div>
+                  }
+                </div>
+
+                <div class="image-upload-controls">
+
+                  <label class="image-select-button">
+                    Выбрать фотографию
+
+                    <input
+                      #imageInput
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp"
+                      (change)="onImageSelected($event)"
+                    />
+                  </label>
+
+                  @if (selectedImage()) {
+                    <button
+                      type="button"
+                      class="image-clear-button"
+                      (click)="clearSelectedImage(imageInput)"
+                    >
+                      Отменить выбор фотографии
+                    </button>
+                  }
+
+                  <p>
+                    JPEG, PNG или WebP. Максимальный размер — 5 МБ.
+                  </p>
+
+                  @if (selectedImage()) {
+                    <small class="selected-file-name">
+                      Выбрано: {{ selectedImage()!.name }}
+                    </small>
+                  }
+
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+          <!-- PRODUCT SPECIFICATIONS -->
+          <section class="product-specifications-editor">
+
+            <div class="specifications-editor-header">
+              <div>
+                <span class="admin-eyebrow">
+                  PRODUCT SPECIFICATIONS
+                </span>
+
+                <h3>Характеристики товара</h3>
+
+                <p>
+                  Характеристики загружаются автоматически
+                  в зависимости от выбранной категории.
+                </p>
+              </div>
+            </div>
+
+            <!-- CATEGORY NOT SELECTED -->
+            @if (productForm.categoryId === null) {
+              <div class="product-specifications-message">
+                <span class="specifications-message-icon">ℹ</span>
+
+                <div>
+                  <strong>Категория не выбрана</strong>
+
+                  <p>
+                    Выберите категорию товара, чтобы получить
+                    доступные для неё характеристики.
+                  </p>
+                </div>
+              </div>
+            }
+
+            @else {
+
+              <!-- LOADING SPECIFICATIONS -->
+              @if (isLoadingSpecifications()) {
+                <div class="product-specifications-loading">
+                  <div class="admin-spinner"></div>
+
+                  <span>
+                    Загружаем характеристики категории...
+                  </span>
+                </div>
+              }
+
+              <!-- SPECIFICATIONS ERROR -->
+              @else if (specificationsErrorMessage()) {
+                <div class="product-specifications-error">
+                  <p>
+                    {{ specificationsErrorMessage() }}
+                  </p>
+
+                  <button
+                    type="button"
+                    class="retry-specifications-button"
+                    (click)="retryLoadCategorySpecifications()"
+                  >
+                    Повторить загрузку
+                  </button>
+                </div>
+              }
+
+              <!-- NO SPECIFICATIONS -->
+              @else if (categorySpecifications().length === 0) {
+                <div class="product-specifications-message">
+                  <span class="specifications-message-icon">ℹ</span>
+
+                  <div>
+                    <strong>
+                      Для этой категории характеристики не настроены
+                    </strong>
+
+                    <p>
+                      Перейдите в раздел «Управление категориями»,
+                      откройте список характеристик и добавьте
+                      необходимые поля.
+                    </p>
+
+                    <a
+                      class="specifications-admin-link"
+                      routerLink="/admin/categories"
+                    >
+                      Перейти к управлению категориями →
+                    </a>
+                  </div>
+                </div>
+              }
+
+              <!-- SPECIFICATIONS FIELDS -->
+              @else {
+                <div class="product-specifications-grid">
+
+                  @for (
+                    specification of categorySpecifications();
+                    track specification.id
+                  ) {
+                    <label class="product-specification-field">
+
+                      <span class="product-specification-label">
+                        {{ specification.name }}
+
+                        @if (specification.unit) {
+                          <span class="product-specification-unit">
+                            ({{ specification.unit }})
+                          </span>
+                        }
+                      </span>
+
+                      <input
+                        type="text"
+                        [name]="'specification-' + specification.id"
+                        [ngModel]="
+                          specificationValues()[specification.id] ?? ''
+                        "
+                        (ngModelChange)="
+                          onSpecificationValueChanged(
+                            specification.id,
+                            $event
+                          )
+                        "
+                        [placeholder]="
+                          specification.unit
+                            ? 'Введите значение в ' + specification.unit
+                            : 'Введите значение'
+                        "
+                        maxlength="500"
+                      />
+
+                    </label>
+                  }
+
+                </div>
+
+                <div class="product-specifications-hint">
+                  <span>ℹ</span>
+
+                  <p>
+                    Характеристики можно оставить пустыми.
+                    Заполненные значения будут сохранены вместе с товаром.
+                  </p>
+                </div>
+              }
+
+            }
+
+          </section>
+
+          <!-- EXISTING SPECIFICATIONS NOTE -->
+          @if (
+            editingProduct()?.specifications?.length &&
+            editingProduct()?.categoryId === productForm.categoryId
+          ) {
+            <div class="specifications-note">
+              При редактировании заполненные характеристики загружаются
+              из сохранённых данных товара. Незаполненные поля
+              не будут добавлены в карточку товара.
+            </div>
+          }
+
+          @if (categoriesErrorMessage()) {
+            <div class="form-warning">
+              {{ categoriesErrorMessage() }}
+              Проверьте соединение с сервером.
+            </div>
+          }
+
+          <!-- FORM ACTIONS -->
+          <div class="form-actions">
+
+            <button
+              class="form-cancel-button"
+              type="button"
+              [disabled]="isSaving()"
+              (click)="closeForm()"
+            >
+              Отмена
+            </button>
+
+            <button
+              class="form-submit-button"
+              type="submit"
+              [disabled]="
+                isSaving() ||
+                isLoadingSpecifications() ||
+                specificationsErrorMessage() !== null
+              "
+            >
+              @if (isSaving()) {
+                Сохранение...
+              } @else if (editingProduct()) {
+                Сохранить изменения
+              } @else {
+                Создать товар
+              }
+            </button>
+
+          </div>
+
+        </form>
+
+      </section>
+    }
+
+    <!-- SEARCH -->
+    <section class="admin-product-toolbar">
+
+      <label class="product-search-field">
+        <span>Поиск товаров</span>
+
+        <input
+          type="search"
+          name="searchTerm"
+          [(ngModel)]="searchTerm"
+          placeholder="Введите название товара..."
+          (keyup.enter)="searchProducts()"
+        />
+      </label>
+
+      <div class="search-actions">
+        <button
+          class="search-button"
+          type="button"
+          (click)="searchProducts()"
+          [disabled]="isLoading()"
+        >
+          Найти
+        </button>
+
+        <button
+          class="search-clear-button"
+          type="button"
+          (click)="clearSearch()"
+          [disabled]="isLoading() || !searchTerm.trim()"
+        >
+          Сбросить
+        </button>
+      </div>
+
+      <div class="admin-product-count">
+        Всего товаров:
+        <strong>{{ totalCount() }}</strong>
+      </div>
+
+    </section>
+
+    <!-- LOADING -->
+    @if (isLoading()) {
+      <div class="admin-loading">
+        <div class="admin-spinner"></div>
+        <p>Загружаем товары...</p>
+      </div>
+    }
+
+    <!-- EMPTY -->
+    @else if (!errorMessage() && products().length === 0) {
+      <section class="admin-empty">
+        <h2>Товары не найдены</h2>
+
+        <p>
+          В каталоге пока нет товаров или поиск не дал результатов.
+        </p>
+
+        <button
+          type="button"
+          class="add-product-button"
+          (click)="openCreateForm()"
+        >
+          + Добавить первый товар
+        </button>
+      </section>
+    }
+
+    <!-- PRODUCTS -->
+    @else if (!errorMessage()) {
+      <section class="admin-products-grid">
+
+        @for (product of products(); track product.id) {
+          <article class="admin-product-card">
+
+            <!-- IMAGE -->
+            <div class="admin-product-image">
+
+              @if (getProductImage(product)) {
+                <img
+                  [src]="getProductImage(product)!"
+                  [alt]="product.name"
+                  loading="lazy"
+                />
+              } @else {
+                <div class="product-no-image">
+                  <span>Нет фото</span>
+                </div>
+              }
+
+              <span class="product-id">
+                №{{ product.id }}
+              </span>
+
+            </div>
+
+            <!-- INFORMATION -->
+            <div class="admin-product-information">
+
+              <div class="product-category">
+                {{ product.categoryName || 'Без категории' }}
+              </div>
+
+              <h3>{{ product.name }}</h3>
+
+              @if (product.description) {
+                <p class="product-description">
+                  {{ product.description }}
+                </p>
+              }
+
+              <div class="product-prices">
+
+                <strong class="product-price">
+                  {{ formatPrice(product.price) }}
+                </strong>
+
+                @if (product.oldPrice !== null) {
+                  <span class="product-old-price">
+                    {{ formatPrice(product.oldPrice) }}
+                  </span>
+                }
+
+              </div>
+
+              <div class="product-stock">
+                <span
+                  [class.stock-empty]="product.quantity === 0"
+                  [class.stock-low]="
+                    product.quantity > 0 &&
+                    product.quantity <= 5
+                  "
+                >
+                  {{ formatQuantity(product.quantity) }}
+                </span>
+              </div>
+
+              @if (product.specifications.length > 0) {
+                <div class="product-specifications-count">
+                  Характеристик: {{ product.specifications.length }}
+                </div>
+              }
+
+            </div>
+
+            <!-- ACTIONS -->
+            <div class="admin-product-actions">
+
+              <button
+                type="button"
+                class="product-edit-button"
+                (click)="openEditForm(product)"
+              >
+                Редактировать
+              </button>
+
+              @if (product.imageUrl) {
+                <button
+                  type="button"
+                  class="product-image-delete-button"
+                  [disabled]="
+                    deletingImageProductId() === product.id
+                  "
+                  (click)="deleteProductImage(product)"
+                >
+                  @if (
+                    deletingImageProductId() === product.id
+                  ) {
+                    Удаление...
+                  } @else {
+                    Удалить фото
+                  }
+                </button>
+              }
+
+              <button
+                type="button"
+                class="product-delete-button"
+                [disabled]="
+                  deletingProductId() === product.id
+                "
+                (click)="deleteProduct(product)"
+              >
+                @if (deletingProductId() === product.id) {
+                  Удаление...
+                } @else {
+                  Удалить товар
+                }
+              </button>
+
+            </div>
+
+          </article>
+        }
+
+      </section>
+
+      <!-- NUMBERED PAGINATION -->
+      @if (totalPages() > 1) {
+        <nav class="admin-pagination" aria-label="Страницы товаров">
+
+          <button
+            class="pagination-edge"
+            type="button"
+            aria-label="Первая страница"
+            [disabled]="currentPage() === 1 || isLoading()"
+            (click)="goToPage(1)"
+          >
+            «
+          </button>
+
+          <button
+            type="button"
+            aria-label="Предыдущая страница"
+            [disabled]="currentPage() === 1 || isLoading()"
+            (click)="goToPage(currentPage() - 1)"
+          >
+            ‹
+          </button>
+
+          @for (
+            item of paginationItems();
+            track item.type === 'page' ? item.value : item.key
+          ) {
+
+            @if (item.type === 'page') {
+              <button
+                type="button"
+                class="pagination-page"
+                [class.active]="currentPage() === item.value"
+                [attr.aria-current]="currentPage() === item.value ? 'page' : null"
+                [disabled]="isLoading()"
+                (click)="goToPage(item.value)"
+              >
+                {{ item.value }}
+              </button>
+            } @else {
+              <span class="pagination-ellipsis">
+                …
+              </span>
+            }
+
+          }
+
+          <button
+            type="button"
+            aria-label="Следующая страница"
+            [disabled]="currentPage() === totalPages() || isLoading()"
+            (click)="goToPage(currentPage() + 1)"
+          >
+            ›
+          </button>
+
+          <button
+            class="pagination-edge"
+            type="button"
+            aria-label="Последняя страница"
+            [disabled]="currentPage() === totalPages() || isLoading()"
+            (click)="goToPage(totalPages())"
+          >
+            »
+          </button>
+
+        </nav>
+
+        <p class="pagination-caption">
+          Страница {{ currentPage() }} из {{ totalPages() }}
+        </p>
+      }
+
+    }
+
+  </main>
+</div>

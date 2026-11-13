@@ -47,45 +47,55 @@ public class ProductService
         IQueryable<Product> query =
             _context.Products.AsNoTracking();
 
+        // Поиск по названию товара и категории.
         if (!string.IsNullOrWhiteSpace(search))
         {
             string term = search.Trim();
 
             query = query.Where(p =>
-                EF.Functions.ILike(p.Name, $"%{term}%"));
+                EF.Functions.ILike(p.Name, $"%{term}%") ||
+                (p.Category != null &&
+                 EF.Functions.ILike(p.Category.Name, $"%{term}%")));
         }
 
+        // Фильтрация по категории.
         if (categoryId.HasValue)
         {
             query = query.Where(p =>
                 p.CategoryId == categoryId.Value);
         }
 
+        // Минимальная цена.
         if (minPrice.HasValue)
         {
             query = query.Where(p =>
                 p.Price >= minPrice.Value);
         }
 
+        // Максимальная цена.
         if (maxPrice.HasValue)
         {
             query = query.Where(p =>
                 p.Price <= maxPrice.Value);
         }
 
+        // Максимальное количество.
         if (maxQuantity.HasValue)
         {
             query = query.Where(p =>
                 p.Quantity <= maxQuantity.Value);
         }
 
+        // Только товары в наличии.
         if (inStockOnly)
         {
             query = query.Where(p => p.Quantity > 0);
         }
 
+        // Считаем количество после применения фильтров.
         int totalCount = await query.CountAsync();
 
+        // Сортировка.
         query = (sortBy, descending) switch
         {
             ("id", false) =>
@@ -115,6 +125,7 @@ public class ProductService
             _ => query.OrderBy(p => p.Id)
         };
 
+        // Пагинация выполняется на стороне базы данных.
         var products = await query
             .Include(p => p.Category)
             .Include(p => p.Specifications)
@@ -241,13 +252,11 @@ public class ProductService
             return true;
         }
 
-        // Характеристики нельзя добавить товару без категории.
         if (!categoryId.HasValue)
         {
             return false;
         }
 
-        // Проверяем заполненность и корректность значений.
         if (specifications.Any(s =>
             s is null ||
             s.CategorySpecificationId <= 0 ||
@@ -257,7 +266,6 @@ public class ProductService
             return false;
         }
 
-        // Проверяем отсутствие дубликатов.
         int[] requestedIds = specifications
             .Select(s => s.CategorySpecificationId)
             .ToArray();
@@ -267,8 +275,6 @@ public class ProductService
             return false;
         }
 
-        // Проверяем, что все характеристики принадлежат
-        // указанной категории товара.
         int matchingCount = await _context.CategorySpecifications
             .CountAsync(s =>
                 s.CategoryId == categoryId.Value &&
@@ -344,8 +350,6 @@ public class ProductService
 
         await _context.SaveChangesAsync();
 
-        // Повторно получаем товар вместе с сохранёнными
-        // характеристиками и определениями характеристик.
         var createdProduct = await _context.Products
             .AsNoTracking()
             .Include(p => p.Category)
@@ -380,7 +384,6 @@ public class ProductService
             return ProductServiceStatus.InvalidPrice;
         }
 
-        // Проверяем существование категории.
         if (request.CategoryId.HasValue)
         {
             bool categoryExists = await _context.Categories
@@ -405,7 +408,6 @@ public class ProductService
             return ProductServiceStatus.InvalidSpecifications;
         }
 
-        // Обновляем основные поля товара.
         product.Name = request.Name;
         product.Price = request.Price;
         product.OldPrice = request.OldPrice;
@@ -413,13 +415,11 @@ public class ProductService
         product.CategoryId = request.CategoryId;
         product.Description = request.Description;
 
-        // Удаляем предыдущие значения характеристик.
         _context.ProductSpecifications.RemoveRange(
             product.Specifications);
 
         product.Specifications.Clear();
 
-        // Добавляем новые значения характеристик.
         foreach (var specification in specifications)
         {
             product.Specifications.Add(new ProductSpecification

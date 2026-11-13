@@ -28,7 +28,7 @@ public class ProductsController : ControllerBase
         [FromQuery] bool descending = false,
         [FromQuery] bool inStockOnly = false,
         [FromQuery] int page = 1,
-        [FromQuery] int pageSize = 10)
+        [FromQuery] int pageSize = 12)
     {
         if (page < 1)
         {
@@ -189,6 +189,14 @@ public class ProductsController : ControllerBase
             {
                 message =
                     "Старая цена должна быть выше текущей."
+            });
+        }
+
+        if (status == ProductServiceStatus.InvalidSpecifications)
+        {
+            return BadRequest(new
+            {
+                message = "Переданы некорректные характеристики. Проверьте их принадлежность категории товара и отсутствие повторов."
             });
         }
 
