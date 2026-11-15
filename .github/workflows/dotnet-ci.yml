@@ -55,3 +55,26 @@ jobs:
 
       - name: Run all tests
         run: dotnet test ElectronicsStoreApi.slnx --configuration Release --no-build --no-restore --logger "console;verbosity=minimal"
+
+  container-build:
+    name: Validate Docker deployment
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    env:
+      POSTGRES_DB: electronics_store_ci
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres_ci_password
+      JWT_ISSUER: ElectronicsStoreApi
+      JWT_AUDIENCE: ElectronicsStoreClient
+      JWT_KEY: Y2ktb25seS1rZXktZm9yLWRvY2tlci1idWlsZC0zMg==
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Validate Docker Compose configuration
+        run: docker compose config --quiet
+
+      - name: Build application and migration images
+        run: docker compose build
