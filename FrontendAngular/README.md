@@ -50,6 +50,14 @@ dist/electronics-store-frontend/browser/
 
 The root Dockerfile copies this directory into the ASP.NET Core image as `wwwroot`.
 
+## Tests
+
+Run the Angular unit tests once without entering watch mode:
+
+```powershell
+npm.cmd test -- --watch=false
+```
+
 ## Formatting
 
 Format Angular source files:
