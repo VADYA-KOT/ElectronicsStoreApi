@@ -238,10 +238,15 @@ Initialize .NET User Secrets once:
 dotnet user-secrets init --project .\ElectronicsStoreApi\ElectronicsStoreApi.csproj
 ```
 
-Set the database connection string. Use the same database name, username, and password as in `.env`:
+Set the database connection string using the values from the running PostgreSQL container. This keeps the local API connected to the database selected in your `.env` file, even when its name is not `electronics_store`:
 
 ```powershell
-dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Host=localhost;Port=5435;Database=electronics_store;Username=store_user;Password=YOUR_DATABASE_PASSWORD" --project .\ElectronicsStoreApi\ElectronicsStoreApi.csproj
+$pgDatabase = (docker compose exec -T db printenv POSTGRES_DB).Trim()
+$pgUser = (docker compose exec -T db printenv POSTGRES_USER).Trim()
+$pgPassword = (docker compose exec -T db printenv POSTGRES_PASSWORD).Trim()
+$connectionString = "Host=localhost;Port=5435;Database=$pgDatabase;Username=$pgUser;Password=$pgPassword"
+
+dotnet user-secrets set "ConnectionStrings:DefaultConnection" $connectionString --project .\ElectronicsStoreApi\ElectronicsStoreApi.csproj
 ```
 
 Set the JWT issuer, audience, and key. Generate a key using the PowerShell command from the Docker section:
@@ -255,6 +260,16 @@ dotnet user-secrets set "Jwt:Key" "YOUR_BASE64_SIGNING_KEY" --project .\Electron
 Do not commit real secrets or database passwords to source control.
 
 ### 3. Apply migrations and run the API
+
+Install the EF Core command-line tool once. The version matches the EF Core tooling used by this project:
+
+```powershell
+dotnet tool install --global dotnet-ef --version 10.0.14
+```
+
+If that version is already installed, this step can be skipped. To update an existing global installation to this version, use `dotnet tool update --global dotnet-ef --version 10.0.14`.
+
+Then restore the solution, apply migrations, and start the API:
 
 ```powershell
 dotnet restore .\ElectronicsStoreApi.slnx
@@ -294,11 +309,38 @@ Build the backend:
 dotnet build .\ElectronicsStoreApi.slnx --configuration Release
 ```
 
-Run the backend test suite:
+### Backend tests
+
+The complete backend test suite includes four tests that run against a real PostgreSQL database. They require the `ELECTRONICS_STORE_TEST_CONNECTION` environment variable. Use a dedicated test database; do not point this variable at the database containing your application data.
+
+Start the PostgreSQL service:
+
+```powershell
+docker compose up -d db
+```
+
+Create the test database if it does not already exist, then set the connection string for the current PowerShell session:
+
+```powershell
+$pgUser = (docker compose exec -T db printenv POSTGRES_USER).Trim()
+$pgPassword = (docker compose exec -T db printenv POSTGRES_PASSWORD).Trim()
+
+$testDatabaseExists = (docker compose exec -T db psql -U $pgUser -d postgres -tAc "SELECT 1 FROM pg_database WHERE datname = 'electronics_store_tests'").Trim()
+if ($testDatabaseExists -ne "1") {
+    docker compose exec -T db createdb -U $pgUser electronics_store_tests
+}
+
+$env:ELECTRONICS_STORE_TEST_CONNECTION = "Host=localhost;Port=5435;Database=electronics_store_tests;Username=$pgUser;Password=$pgPassword"
+```
+
+The environment variable is session-specific. Repeat the assignment in each new PowerShell window before running the full test suite:
 
 ```powershell
 dotnet test .\ElectronicsStoreApi.slnx --configuration Release
 ```
+
+The PostgreSQL-backed tests create their schema in `electronics_store_tests`. Their data is isolated from the application's configured database.
+
 
 Build the Angular frontend:
 
@@ -307,6 +349,13 @@ Set-Location .\FrontendAngular
 npm.cmd ci
 npm.cmd run build
 ```
+
+Run Angular unit tests once, without entering watch mode:
+
+```powershell
+npm.cmd test -- --watch=false
+```
+
 
 Format Angular source files with the repository's Prettier configuration:
 
