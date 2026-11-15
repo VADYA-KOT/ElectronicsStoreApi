@@ -1,8 +1,5 @@
 import { inject } from '@angular/core';
-import {
-  CanActivateFn,
-  Router
-} from '@angular/router';
+import { CanActivateFn, Router } from '@angular/router';
 
 import { AuthService } from '../services/auth.service';
 
@@ -13,8 +10,8 @@ export const adminGuard: CanActivateFn = (_route, state) => {
   if (!authService.isAuthenticated) {
     return router.createUrlTree(['/auth'], {
       queryParams: {
-        returnUrl: state.url
-      }
+        returnUrl: state.url,
+      },
     });
   }
 

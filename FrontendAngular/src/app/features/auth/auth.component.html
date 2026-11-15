@@ -1,8 +1,5 @@
-
 <div class="auth-page">
-  <a class="auth-brand" routerLink="/">
-    Electronics Store
-  </a>
+  <a class="auth-brand" routerLink="/"> Electronics Store </a>
 
   <main class="auth-card">
     <div class="auth-heading">
@@ -63,10 +60,7 @@
           placeholder="Введите имя пользователя"
         />
 
-        @if (
-          form.controls.username.touched &&
-          form.controls.username.invalid
-        ) {
+        @if (form.controls.username.touched && form.controls.username.invalid) {
           <span class="field-error">
             @if (form.controls.username.hasError('required')) {
               Введите имя пользователя.
@@ -89,16 +83,11 @@
           id="password"
           type="password"
           formControlName="password"
-          [attr.autocomplete]="
-            isRegistering() ? 'new-password' : 'current-password'
-          "
+          [attr.autocomplete]="isRegistering() ? 'new-password' : 'current-password'"
           placeholder="Введите пароль"
         />
 
-        @if (
-          form.controls.password.touched &&
-          form.controls.password.invalid
-        ) {
+        @if (form.controls.password.touched && form.controls.password.invalid) {
           <span class="field-error">
             @if (form.controls.password.hasError('required')) {
               Введите пароль.
@@ -113,16 +102,10 @@
       </div>
 
       @if (isRegistering()) {
-        <p class="auth-hint">
-          Пароль должен содержать минимум 12 символов.
-        </p>
+        <p class="auth-hint">Пароль должен содержать минимум 12 символов.</p>
       }
 
-      <button
-        class="auth-submit"
-        type="submit"
-        [disabled]="form.invalid || isSubmitting()"
-      >
+      <button class="auth-submit" type="submit" [disabled]="form.invalid || isSubmitting()">
         @if (isSubmitting()) {
           Выполняется запрос...
         } @else {
@@ -131,8 +114,6 @@
       </button>
     </form>
 
-    <a class="auth-back-link" routerLink="/">
-      Вернуться в магазин
-    </a>
+    <a class="auth-back-link" routerLink="/"> Вернуться в магазин </a>
   </main>
 </div>

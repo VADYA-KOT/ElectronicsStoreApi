@@ -1,45 +1,27 @@
-import {
-  Component,
-  computed,
-  inject,
-  signal
-} from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 
-import {
-  Router,
-  RouterLink
-} from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 
 import { HttpErrorResponse } from '@angular/common/http';
 
 import { CartItem } from '../../core/models/cart-item.model';
 
-import {
-  CartService
-} from '../../core/services/cart.service';
+import { CartService } from '../../core/services/cart.service';
 
-import {
-  ProductService
-} from '../../core/services/product.service';
+import { ProductService } from '../../core/services/product.service';
 
-import {
-  AuthService
-} from '../../core/services/auth.service';
+import { AuthService } from '../../core/services/auth.service';
 
-import {
-  OrderApiService
-} from '../../core/services/order-api.service';
+import { OrderApiService } from '../../core/services/order-api.service';
 
-import {
-  InsufficientStockItemResponse
-} from '../../core/models/order.model';
+import { InsufficientStockItemResponse } from '../../core/models/order.model';
 
 @Component({
   selector: 'app-cart',
   standalone: true,
   imports: [RouterLink],
   templateUrl: './cart.component.html',
-  styleUrl: './cart.component.css'
+  styleUrl: './cart.component.css',
 })
 export class CartComponent {
   private readonly cartService = inject(CartService);
@@ -55,18 +37,14 @@ export class CartComponent {
   protected readonly notice = signal<string | null>(null);
   protected readonly isSubmitting = signal(false);
 
-  protected readonly isAuthenticated = computed(
-    () => this.authService.isAuthenticated
-  );
+  protected readonly isAuthenticated = computed(() => this.authService.isAuthenticated);
 
   // Увеличение количества.
   protected increase(item: CartItem): void {
     const added = this.cartService.addItem(item.product);
 
     this.notice.set(
-      added
-        ? null
-        : `Достигнуто максимальное доступное количество товара «${item.product.name}».`
+      added ? null : `Достигнуто максимальное доступное количество товара «${item.product.name}».`,
     );
   }
 
@@ -74,10 +52,7 @@ export class CartComponent {
   protected decrease(item: CartItem): void {
     this.notice.set(null);
 
-    this.cartService.updateQuantity(
-      item.product.id,
-      item.quantity - 1
-    );
+    this.cartService.updateQuantity(item.product.id, item.quantity - 1);
   }
 
   // Удаление отдельного товара.
@@ -108,8 +83,8 @@ export class CartComponent {
 
       void this.router.navigate(['/auth'], {
         queryParams: {
-          returnUrl: '/cart'
-        }
+          returnUrl: '/cart',
+        },
       });
 
       return;
@@ -119,18 +94,18 @@ export class CartComponent {
     this.isSubmitting.set(true);
 
     const request = {
-      items: this.items().map(item => ({
+      items: this.items().map((item) => ({
         productId: item.product.id,
-        quantity: item.quantity
-      }))
+        quantity: item.quantity,
+      })),
     };
 
     this.orderApiService.createOrder(request).subscribe({
-      next: order => {
+      next: (order) => {
         this.cartService.clearCart();
 
         this.notice.set(
-          `Заказ №${order.id} успешно оформлен. Сумма заказа: ${this.formatPrice(order.totalAmount)}.`
+          `Заказ №${order.id} успешно оформлен. Сумма заказа: ${this.formatPrice(order.totalAmount)}.`,
         );
 
         this.isSubmitting.set(false);
@@ -139,25 +114,20 @@ export class CartComponent {
       error: (error: unknown) => {
         this.isSubmitting.set(false);
 
-        if (
-          error instanceof HttpErrorResponse &&
-          error.status === 401
-        ) {
-          this.notice.set(
-            'Срок действия авторизации истёк. Войдите в аккаунт повторно.'
-          );
+        if (error instanceof HttpErrorResponse && error.status === 401) {
+          this.notice.set('Срок действия авторизации истёк. Войдите в аккаунт повторно.');
 
           void this.router.navigate(['/auth'], {
             queryParams: {
-              returnUrl: '/cart'
-            }
+              returnUrl: '/cart',
+            },
           });
 
           return;
         }
 
         this.notice.set(this.getOrderErrorMessage(error));
-      }
+      },
     });
   }
 
@@ -172,8 +142,9 @@ export class CartComponent {
     }
 
     if (error.status === 400) {
-      return this.getServerMessage(error.error) ??
-        'Сервер отклонил заказ. Проверьте данные корзины.';
+      return (
+        this.getServerMessage(error.error) ?? 'Сервер отклонил заказ. Проверьте данные корзины.'
+      );
     }
 
     if (error.status === 404) {
@@ -183,17 +154,18 @@ export class CartComponent {
     if (error.status === 409) {
       const stockMessage = this.getStockErrorMessage(error.error);
 
-      return stockMessage ??
+      return (
+        stockMessage ??
         this.getServerMessage(error.error) ??
-        'Не удалось оформить заказ. Возможно, остатки товаров изменились. Проверьте корзину.';
+        'Не удалось оформить заказ. Возможно, остатки товаров изменились. Проверьте корзину.'
+      );
     }
 
     if (error.status >= 500) {
       return 'На сервере произошла ошибка. Попробуйте оформить заказ позже.';
     }
 
-    return this.getServerMessage(error.error) ??
-      'Не удалось оформить заказ.';
+    return this.getServerMessage(error.error) ?? 'Не удалось оформить заказ.';
   }
 
   // Получение сообщения от Backend.
@@ -204,14 +176,9 @@ export class CartComponent {
 
     const response = body as Record<string, unknown>;
 
-    const message =
-      response['message'] ??
-      response['title'] ??
-      response['detail'];
+    const message = response['message'] ?? response['title'] ?? response['detail'];
 
-    return typeof message === 'string'
-      ? message
-      : null;
+    return typeof message === 'string' ? message : null;
   }
 
   // Формирование подробного сообщения о нехватке товара.
@@ -223,9 +190,7 @@ export class CartComponent {
     const response = body as Record<string, unknown>;
 
     const rawItems =
-      response['insufficientStockItems'] ??
-      response['items'] ??
-      response['InsufficientStockItems'];
+      response['insufficientStockItems'] ?? response['items'] ?? response['InsufficientStockItems'];
 
     if (!Array.isArray(rawItems) || rawItems.length === 0) {
       return null;
@@ -233,8 +198,9 @@ export class CartComponent {
 
     const stockItems = rawItems as InsufficientStockItemResponse[];
 
-    const details = stockItems.map(item =>
-      `${item.productName}: заказано ${item.requestedQuantity}, доступно ${item.availableQuantity}`
+    const details = stockItems.map(
+      (item) =>
+        `${item.productName}: заказано ${item.requestedQuantity}, доступно ${item.availableQuantity}`,
     );
 
     return `Недостаточно товаров на складе: ${details.join('; ')}. Измените количество в корзине.`;
@@ -244,7 +210,7 @@ export class CartComponent {
   protected formatPrice(price: number): string {
     return new Intl.NumberFormat('ru-RU', {
       style: 'currency',
-      currency: 'BYN'
+      currency: 'BYN',
     }).format(price);
   }
 

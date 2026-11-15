@@ -1,4 +1,4 @@
-﻿namespace ElectronicsStoreApi.DTOs.Response;
+namespace ElectronicsStoreApi.DTOs.Response;
 
 public class InsufficientStockItemResponse
 {

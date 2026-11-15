@@ -1,4 +1,3 @@
-
 :host {
   display: block;
   min-height: 100%;
@@ -20,16 +19,8 @@
   overflow: hidden;
 
   background:
-    radial-gradient(
-      ellipse at 10% 10%,
-      rgba(59, 130, 246, 0.10),
-      transparent 38%
-    ),
-    radial-gradient(
-      ellipse at 90% 85%,
-      rgba(32, 184, 178, 0.10),
-      transparent 36%
-    ),
+    radial-gradient(ellipse at 10% 10%, rgba(59, 130, 246, 0.1), transparent 38%),
+    radial-gradient(ellipse at 90% 85%, rgba(32, 184, 178, 0.1), transparent 36%),
     var(--color-background);
 }
 
@@ -53,7 +44,7 @@
 }
 
 .auth-brand::after {
-  content: "";
+  content: '';
   position: absolute;
   left: 0;
   bottom: -7px;

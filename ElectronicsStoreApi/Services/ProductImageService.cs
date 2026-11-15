@@ -1,4 +1,4 @@
-﻿using ElectronicsStoreApi.Data;
+using ElectronicsStoreApi.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace ElectronicsStoreApi.Services;

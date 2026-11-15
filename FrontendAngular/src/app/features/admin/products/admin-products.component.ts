@@ -1,4 +1,3 @@
-
 import {
   Component,
   ElementRef,
@@ -7,35 +6,21 @@ import {
   ViewChild,
   computed,
   inject,
-  signal
+  signal,
 } from '@angular/core';
 
 import { FormsModule } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
 
-import {
-  Router,
-  RouterLink
-} from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 
-import {
-  map,
-  of,
-  switchMap,
-  tap
-} from 'rxjs';
+import { map, of, switchMap, tap } from 'rxjs';
 
 import { Product } from '../../../core/models/product.model';
 
-import {
-  ProductService,
-  ProductWriteRequest
-} from '../../../core/services/product.service';
+import { ProductService, ProductWriteRequest } from '../../../core/services/product.service';
 
-import {
-  CategoryService,
-  CategorySpecification
-} from '../../../core/services/category.service';
+import { CategoryService, CategorySpecification } from '../../../core/services/category.service';
 
 import { AuthService } from '../../../core/services/auth.service';
 
@@ -66,12 +51,9 @@ type PaginationItem =
 @Component({
   selector: 'app-admin-products',
   standalone: true,
-  imports: [
-    RouterLink,
-    FormsModule
-  ],
+  imports: [RouterLink, FormsModule],
   templateUrl: './admin-products.component.html',
-  styleUrl: './admin-products.component.css'
+  styleUrl: './admin-products.component.css',
 })
 export class AdminProductsComponent implements OnInit, OnDestroy {
   private readonly productService = inject(ProductService);
@@ -109,22 +91,13 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
     const current = this.currentPage();
 
     if (total <= 7) {
-      return Array.from(
-        { length: total },
-        (_, index) => ({
-          type: 'page' as const,
-          value: index + 1
-        })
-      );
+      return Array.from({ length: total }, (_, index) => ({
+        type: 'page' as const,
+        value: index + 1,
+      }));
     }
 
-    const pageNumbers = new Set<number>([
-      1,
-      total,
-      current - 1,
-      current,
-      current + 1
-    ]);
+    const pageNumbers = new Set<number>([1, total, current - 1, current, current + 1]);
 
     if (current <= 4) {
       pageNumbers.add(2);
@@ -141,7 +114,7 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
     }
 
     const sortedPages = [...pageNumbers]
-      .filter(page => page >= 1 && page <= total)
+      .filter((page) => page >= 1 && page <= total)
       .sort((a, b) => a - b);
 
     const result: PaginationItem[] = [];
@@ -151,13 +124,13 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
       if (previousPage > 0 && page - previousPage > 1) {
         result.push({
           type: 'ellipsis',
-          key: `ellipsis-${previousPage}-${page}`
+          key: `ellipsis-${previousPage}-${page}`,
         });
       }
 
       result.push({
         type: 'page',
-        value: page
+        value: page,
       });
 
       previousPage = page;
@@ -187,26 +160,20 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
   // ХАРАКТЕРИСТИКИ ТОВАРА
   // ================================================
 
-  protected readonly categorySpecifications =
-    signal<CategorySpecification[]>([]);
+  protected readonly categorySpecifications = signal<CategorySpecification[]>([]);
 
-  protected readonly specificationValues =
-    signal<Record<number, string>>({});
+  protected readonly specificationValues = signal<Record<number, string>>({});
 
   protected readonly isLoadingSpecifications = signal(false);
 
-  protected readonly specificationsErrorMessage =
-    signal<string | null>(null);
+  protected readonly specificationsErrorMessage = signal<string | null>(null);
 
   // ================================================
   // ИНИЦИАЛИЗАЦИЯ
   // ================================================
 
   ngOnInit(): void {
-    if (
-      !this.authService.isAuthenticated ||
-      !this.authService.isAdmin
-    ) {
+    if (!this.authService.isAuthenticated || !this.authService.isAdmin) {
       void this.router.navigate(['/']);
       return;
     }
@@ -230,7 +197,7 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
     requestAnimationFrame(() => {
       this.productFormSection?.nativeElement.scrollIntoView({
         behavior: 'smooth',
-        block: 'start'
+        block: 'start',
       });
     });
   }
@@ -246,7 +213,7 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
       oldPrice: null,
       quantity: 0,
       categoryId: null,
-      description: ''
+      description: '',
     };
   }
 
@@ -279,22 +246,18 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
       oldPrice: product.oldPrice,
       quantity: product.quantity,
       categoryId: product.categoryId,
-      description: product.description ?? ''
+      description: product.description ?? '',
     };
 
     // Восстанавливаем значения уже сохранённых характеристик.
     const initialValues: Record<number, string> = {};
 
     for (const specification of product.specifications) {
-      initialValues[specification.categorySpecificationId] =
-        specification.value;
+      initialValues[specification.categorySpecificationId] = specification.value;
     }
 
     // Загружаем шаблоны характеристик категории.
-    this.loadCategorySpecifications(
-      product.categoryId,
-      initialValues
-    );
+    this.loadCategorySpecifications(product.categoryId, initialValues);
 
     this.errorMessage.set(null);
     this.successMessage.set(null);
@@ -346,7 +309,7 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
     this.categoriesErrorMessage.set(null);
 
     this.categoryService.getCategories().subscribe({
-      next: categories => {
+      next: (categories) => {
         this.categories.set(categories);
         this.isLoadingCategories.set(false);
       },
@@ -354,12 +317,10 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
       error: (error: unknown) => {
         console.error('Ошибка загрузки категорий:', error);
 
-        this.categoriesErrorMessage.set(
-          'Не удалось загрузить категории.'
-        );
+        this.categoriesErrorMessage.set('Не удалось загрузить категории.');
 
         this.isLoadingCategories.set(false);
-      }
+      },
     });
   }
 
@@ -381,7 +342,7 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
 
   private loadCategorySpecifications(
     categoryId: number | null,
-    initialValues: Record<number, string> = {}
+    initialValues: Record<number, string> = {},
   ): void {
     const requestVersion = ++this.specificationRequestVersion;
 
@@ -397,58 +358,47 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
 
     this.isLoadingSpecifications.set(true);
 
-    this.categoryService
-      .getCategorySpecifications(categoryId)
-      .subscribe({
-        next: specifications => {
-          // Если пользователь уже выбрал другую категорию,
-          // игнорируем ответ старого запроса.
-          if (requestVersion !== this.specificationRequestVersion) {
-            return;
-          }
-
-          this.categorySpecifications.set(specifications);
-          this.isLoadingSpecifications.set(false);
-        },
-
-        error: (error: unknown) => {
-          if (requestVersion !== this.specificationRequestVersion) {
-            return;
-          }
-
-          console.error(
-            'Ошибка загрузки характеристик категории:',
-            error
-          );
-
-          this.isLoadingSpecifications.set(false);
-
-          this.specificationsErrorMessage.set(
-            'Не удалось загрузить характеристики категории. Повторите загрузку.'
-          );
+    this.categoryService.getCategorySpecifications(categoryId).subscribe({
+      next: (specifications) => {
+        // Если пользователь уже выбрал другую категорию,
+        // игнорируем ответ старого запроса.
+        if (requestVersion !== this.specificationRequestVersion) {
+          return;
         }
-      });
+
+        this.categorySpecifications.set(specifications);
+        this.isLoadingSpecifications.set(false);
+      },
+
+      error: (error: unknown) => {
+        if (requestVersion !== this.specificationRequestVersion) {
+          return;
+        }
+
+        console.error('Ошибка загрузки характеристик категории:', error);
+
+        this.isLoadingSpecifications.set(false);
+
+        this.specificationsErrorMessage.set(
+          'Не удалось загрузить характеристики категории. Повторите загрузку.',
+        );
+      },
+    });
   }
 
   // Повторная загрузка характеристик после ошибки.
   protected retryLoadCategorySpecifications(): void {
-    this.loadCategorySpecifications(
-      this.productForm.categoryId,
-      this.specificationValues()
-    );
+    this.loadCategorySpecifications(this.productForm.categoryId, this.specificationValues());
   }
 
   // ================================================
   // ИЗМЕНЕНИЕ ЗНАЧЕНИЯ ХАРАКТЕРИСТИКИ
   // ================================================
 
-  protected onSpecificationValueChanged(
-    specificationId: number,
-    value: string
-  ): void {
-    this.specificationValues.update(current => ({
+  protected onSpecificationValueChanged(specificationId: number, value: string): void {
+    this.specificationValues.update((current) => ({
       ...current,
-      [specificationId]: value
+      [specificationId]: value,
     }));
   }
 
@@ -456,10 +406,7 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
   // ТОВАРЫ
   // ================================================
 
-  protected loadProducts(
-    page: number = this.currentPage(),
-    clearMessages: boolean = true
-  ): void {
+  protected loadProducts(page: number = this.currentPage(), clearMessages: boolean = true): void {
     if (clearMessages) {
       this.errorMessage.set(null);
       this.successMessage.set(null);
@@ -467,33 +414,33 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
 
     this.isLoading.set(true);
 
-    this.productService.getProducts({
-      search: this.searchTerm.trim(),
-      page,
-      pageSize: this.pageSize,
-      sortBy: 'id',
-      descending: true
-    }).subscribe({
-      next: response => {
-        this.products.set(response.items);
+    this.productService
+      .getProducts({
+        search: this.searchTerm.trim(),
+        page,
+        pageSize: this.pageSize,
+        sortBy: 'id',
+        descending: true,
+      })
+      .subscribe({
+        next: (response) => {
+          this.products.set(response.items);
 
-        this.currentPage.set(response.page);
-        this.totalPages.set(response.totalPages);
-        this.totalCount.set(response.totalCount);
+          this.currentPage.set(response.page);
+          this.totalPages.set(response.totalPages);
+          this.totalCount.set(response.totalCount);
 
-        this.isLoading.set(false);
-      },
+          this.isLoading.set(false);
+        },
 
-      error: (error: unknown) => {
-        console.error('Ошибка загрузки товаров:', error);
+        error: (error: unknown) => {
+          console.error('Ошибка загрузки товаров:', error);
 
-        this.errorMessage.set(
-          this.getErrorMessage(error)
-        );
+          this.errorMessage.set(this.getErrorMessage(error));
 
-        this.isLoading.set(false);
-      }
-    });
+          this.isLoading.set(false);
+        },
+      });
   }
 
   protected searchProducts(): void {
@@ -506,12 +453,7 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
   }
 
   protected goToPage(page: number): void {
-    if (
-      page < 1 ||
-      page > this.totalPages() ||
-      page === this.currentPage() ||
-      this.isLoading()
-    ) {
+    if (page < 1 || page > this.totalPages() || page === this.currentPage() || this.isLoading()) {
       return;
     }
 
@@ -529,18 +471,14 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
 
     // Нельзя сохранять товар, пока загружаются шаблоны.
     if (this.isLoadingSpecifications()) {
-      this.errorMessage.set(
-        'Дождитесь загрузки характеристик выбранной категории.'
-      );
+      this.errorMessage.set('Дождитесь загрузки характеристик выбранной категории.');
       return;
     }
 
     // Нельзя случайно потерять характеристики,
     // если сервер не смог загрузить шаблоны категории.
     if (this.specificationsErrorMessage()) {
-      this.errorMessage.set(
-        'Сначала загрузите характеристики категории повторно.'
-      );
+      this.errorMessage.set('Сначала загрузите характеристики категории повторно.');
       return;
     }
 
@@ -550,44 +488,25 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
     const quantity = Number(this.productForm.quantity);
 
     if (!name || name.length > 200) {
-      this.errorMessage.set(
-        'Название товара обязательно и не должно превышать 200 символов.'
-      );
+      this.errorMessage.set('Название товара обязательно и не должно превышать 200 символов.');
       return;
     }
 
-    if (
-      !Number.isFinite(price) ||
-      price <= 0 ||
-      price > 99999999.99
-    ) {
-      this.errorMessage.set(
-        'Укажите корректную цену товара.'
-      );
+    if (!Number.isFinite(price) || price <= 0 || price > 99999999.99) {
+      this.errorMessage.set('Укажите корректную цену товара.');
       return;
     }
 
     if (
       oldPrice !== null &&
-      (
-        !Number.isFinite(oldPrice) ||
-        oldPrice <= price ||
-        oldPrice > 99999999.99
-      )
+      (!Number.isFinite(oldPrice) || oldPrice <= price || oldPrice > 99999999.99)
     ) {
-      this.errorMessage.set(
-        'Старая цена должна быть выше текущей.'
-      );
+      this.errorMessage.set('Старая цена должна быть выше текущей.');
       return;
     }
 
-    if (
-      !Number.isInteger(quantity) ||
-      quantity < 0
-    ) {
-      this.errorMessage.set(
-        'Количество товара должно быть целым неотрицательным числом.'
-      );
+    if (!Number.isInteger(quantity) || quantity < 0) {
+      this.errorMessage.set('Количество товара должно быть целым неотрицательным числом.');
       return;
     }
 
@@ -595,22 +514,14 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
     // Пустые поля не отправляем, поскольку backend принимает
     // только непустые значения.
     const specifications = this.categorySpecifications()
-      .map(specification => ({
+      .map((specification) => ({
         categorySpecificationId: specification.id,
-        value: (
-          this.specificationValues()[specification.id] ?? ''
-        ).trim()
+        value: (this.specificationValues()[specification.id] ?? '').trim(),
       }))
-      .filter(specification => specification.value.length > 0);
+      .filter((specification) => specification.value.length > 0);
 
-    if (
-      specifications.some(specification =>
-        specification.value.length > 500
-      )
-    ) {
-      this.errorMessage.set(
-        'Значение характеристики не должно превышать 500 символов.'
-      );
+    if (specifications.some((specification) => specification.value.length > 500)) {
+      this.errorMessage.set('Значение характеристики не должно превышать 500 символов.');
       return;
     }
 
@@ -620,9 +531,8 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
       oldPrice,
       quantity,
       categoryId: this.productForm.categoryId,
-      description:
-        this.productForm.description.trim() || null,
-      specifications
+      description: this.productForm.description.trim() || null,
+      specifications,
     };
 
     const editing = this.editingProduct();
@@ -634,28 +544,24 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
     const wasEditing = editing !== null;
 
     const saveRequest$ = editing
-      ? this.productService
-          .updateProduct(editing.id, request)
-          .pipe(
-            map(() => ({
-              id: editing.id,
-              product: editing
-            }))
-          )
-      : this.productService
-          .createProduct(request)
-          .pipe(
-            map(product => ({
-              id: product.id,
-              product
-            }))
-          );
+      ? this.productService.updateProduct(editing.id, request).pipe(
+          map(() => ({
+            id: editing.id,
+            product: editing,
+          })),
+        )
+      : this.productService.createProduct(request).pipe(
+          map((product) => ({
+            id: product.id,
+            product,
+          })),
+        );
 
     let productDataSaved = false;
 
     saveRequest$
       .pipe(
-        tap(result => {
+        tap((result) => {
           productDataSaved = true;
 
           if (!this.editingProduct()) {
@@ -663,19 +569,15 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
           }
         }),
 
-        switchMap(result => {
+        switchMap((result) => {
           const file = this.selectedImage();
 
           if (!file) {
             return of(result.id);
           }
 
-          return this.productService
-            .uploadProductImage(result.id, file)
-            .pipe(
-              map(() => result.id)
-            );
-        })
+          return this.productService.uploadProductImage(result.id, file).pipe(map(() => result.id));
+        }),
       )
       .subscribe({
         next: () => {
@@ -686,9 +588,7 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
           this.loadProducts(1);
 
           this.successMessage.set(
-            wasEditing
-              ? 'Товар успешно обновлён.'
-              : 'Товар успешно добавлен.'
+            wasEditing ? 'Товар успешно обновлён.' : 'Товар успешно добавлен.',
           );
         },
 
@@ -697,17 +597,15 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
 
           if (productDataSaved) {
             this.errorMessage.set(
-              'Данные товара сохранены, но фотографию загрузить не удалось. Проверьте файл и повторите сохранение.'
+              'Данные товара сохранены, но фотографию загрузить не удалось. Проверьте файл и повторите сохранение.',
             );
 
             this.loadProducts(this.currentPage(), false);
             return;
           }
 
-          this.errorMessage.set(
-            this.getErrorMessage(error)
-          );
-        }
+          this.errorMessage.set(this.getErrorMessage(error));
+        },
       });
   }
 
@@ -721,7 +619,7 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
     }
 
     const confirmed = window.confirm(
-      `Удалить товар «${product.name}»? Это действие нельзя отменить.`
+      `Удалить товар «${product.name}»? Это действие нельзя отменить.`,
     );
 
     if (!confirmed) {
@@ -738,25 +636,20 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
         this.deletingProductId.set(null);
 
         const nextPage =
-          this.products().length === 1 &&
-          this.currentPage() > 1
+          this.products().length === 1 && this.currentPage() > 1
             ? this.currentPage() - 1
             : this.currentPage();
 
         this.loadProducts(nextPage);
 
-        this.successMessage.set(
-          `Товар «${product.name}» удалён.`
-        );
+        this.successMessage.set(`Товар «${product.name}» удалён.`);
       },
 
       error: (error: unknown) => {
         this.deletingProductId.set(null);
 
-        this.errorMessage.set(
-          this.getErrorMessage(error)
-        );
-      }
+        this.errorMessage.set(this.getErrorMessage(error));
+      },
     });
   }
 
@@ -772,25 +665,17 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const allowedTypes = [
-      'image/jpeg',
-      'image/png',
-      'image/webp'
-    ];
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
 
     if (!allowedTypes.includes(file.type)) {
-      this.errorMessage.set(
-        'Выберите фотографию в формате JPEG, PNG или WebP.'
-      );
+      this.errorMessage.set('Выберите фотографию в формате JPEG, PNG или WebP.');
 
       input.value = '';
       return;
     }
 
     if (file.size > 5 * 1024 * 1024) {
-      this.errorMessage.set(
-        'Размер фотографии не должен превышать 5 МБ.'
-      );
+      this.errorMessage.set('Размер фотографии не должен превышать 5 МБ.');
 
       input.value = '';
       return;
@@ -806,9 +691,7 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
     this.previewUrl.set(this.previewObjectUrl);
   }
 
-  protected clearSelectedImage(
-    input?: HTMLInputElement
-  ): void {
+  protected clearSelectedImage(input?: HTMLInputElement): void {
     this.selectedImage.set(null);
     this.clearPreviewUrl();
 
@@ -826,28 +709,19 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
 
     const editing = this.editingProduct();
 
-    return editing
-      ? this.productService.getImageUrl(editing.imageUrl)
-      : null;
+    return editing ? this.productService.getImageUrl(editing.imageUrl) : null;
   }
 
   protected getProductImage(product: Product): string | null {
-    return this.productService.getImageUrl(
-      product.imageUrl
-    );
+    return this.productService.getImageUrl(product.imageUrl);
   }
 
   protected deleteProductImage(product: Product): void {
-    if (
-      !product.imageUrl ||
-      this.deletingImageProductId() !== null
-    ) {
+    if (!product.imageUrl || this.deletingImageProductId() !== null) {
       return;
     }
 
-    const confirmed = window.confirm(
-      `Удалить фотографию товара «${product.name}»?`
-    );
+    const confirmed = window.confirm(`Удалить фотографию товара «${product.name}»?`);
 
     if (!confirmed) {
       return;
@@ -858,27 +732,21 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
 
     this.deletingImageProductId.set(product.id);
 
-    this.productService
-      .deleteProductImage(product.id)
-      .subscribe({
-        next: () => {
-          this.deletingImageProductId.set(null);
+    this.productService.deleteProductImage(product.id).subscribe({
+      next: () => {
+        this.deletingImageProductId.set(null);
 
-          this.loadProducts(this.currentPage());
+        this.loadProducts(this.currentPage());
 
-          this.successMessage.set(
-            `Фотография товара «${product.name}» удалена.`
-          );
-        },
+        this.successMessage.set(`Фотография товара «${product.name}» удалена.`);
+      },
 
-        error: (error: unknown) => {
-          this.deletingImageProductId.set(null);
+      error: (error: unknown) => {
+        this.deletingImageProductId.set(null);
 
-          this.errorMessage.set(
-            this.getErrorMessage(error)
-          );
-        }
-      });
+        this.errorMessage.set(this.getErrorMessage(error));
+      },
+    });
   }
 
   private clearPreviewUrl(): void {
@@ -897,7 +765,7 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
   protected formatPrice(price: number): string {
     return new Intl.NumberFormat('ru-RU', {
       style: 'currency',
-      currency: 'BYN'
+      currency: 'BYN',
     }).format(price);
   }
 
@@ -929,8 +797,8 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
     if (error.status === 401) {
       void this.router.navigate(['/auth'], {
         queryParams: {
-          returnUrl: '/admin/products'
-        }
+          returnUrl: '/admin/products',
+        },
       });
 
       return 'Необходимо войти в систему повторно.';
@@ -945,8 +813,7 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
     }
 
     if (error.status === 409) {
-      return this.getServerMessage(error.error) ??
-        'Операция конфликтует с текущими данными.';
+      return this.getServerMessage(error.error) ?? 'Операция конфликтует с текущими данными.';
     }
 
     if (error.status === 413) {
@@ -954,8 +821,9 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
     }
 
     if (error.status === 400) {
-      return this.getServerMessage(error.error) ??
-        'Сервер отклонил запрос. Проверьте введённые данные.';
+      return (
+        this.getServerMessage(error.error) ?? 'Сервер отклонил запрос. Проверьте введённые данные.'
+      );
     }
 
     if (error.status >= 500) {
@@ -972,13 +840,8 @@ export class AdminProductsComponent implements OnInit, OnDestroy {
 
     const response = body as Record<string, unknown>;
 
-    const message =
-      response['message'] ??
-      response['detail'] ??
-      response['title'];
+    const message = response['message'] ?? response['detail'] ?? response['title'];
 
-    return typeof message === 'string'
-      ? message
-      : null;
+    return typeof message === 'string' ? message : null;
   }
 }

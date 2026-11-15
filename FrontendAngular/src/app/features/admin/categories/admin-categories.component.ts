@@ -1,4 +1,3 @@
-
 import {
   Component,
   DestroyRef,
@@ -7,34 +6,24 @@ import {
   OnInit,
   ViewChild,
   inject,
-  signal
+  signal,
 } from '@angular/core';
 
 import { FormsModule } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
 
-import {
-  Router,
-  RouterLink
-} from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 
-import {
-  takeUntilDestroyed
-} from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
-import {
-  map,
-  of,
-  switchMap,
-  tap
-} from 'rxjs';
+import { map, of, switchMap, tap } from 'rxjs';
 
 import { Category } from '../../../core/models/category.model';
 
 import {
   CategoryService,
   CategorySpecification,
-  SaveCategorySpecificationRequest
+  SaveCategorySpecificationRequest,
 } from '../../../core/services/category.service';
 
 import { ProductService } from '../../../core/services/product.service';
@@ -50,12 +39,9 @@ interface CategorySpecificationFormState {
 @Component({
   selector: 'app-admin-categories',
   standalone: true,
-  imports: [
-    RouterLink,
-    FormsModule
-  ],
+  imports: [RouterLink, FormsModule],
   templateUrl: './admin-categories.component.html',
-  styleUrl: './admin-categories.component.css'
+  styleUrl: './admin-categories.component.css',
 })
 export class AdminCategoriesComponent implements OnInit, OnDestroy {
   private readonly categoryService = inject(CategoryService);
@@ -92,40 +78,30 @@ export class AdminCategoriesComponent implements OnInit, OnDestroy {
   // ХАРАКТЕРИСТИКИ КАТЕГОРИЙ
   // ================================================
 
-  protected readonly categorySpecifications =
-    signal<Record<number, CategorySpecification[]>>({});
+  protected readonly categorySpecifications = signal<Record<number, CategorySpecification[]>>({});
 
-  protected readonly expandedSpecificationCategoryId =
-    signal<number | null>(null);
+  protected readonly expandedSpecificationCategoryId = signal<number | null>(null);
 
-  protected readonly loadingSpecificationsCategoryId =
-    signal<number | null>(null);
+  protected readonly loadingSpecificationsCategoryId = signal<number | null>(null);
 
   protected readonly showSpecificationForm = signal(false);
 
-  protected readonly specificationCategoryId =
-    signal<number | null>(null);
+  protected readonly specificationCategoryId = signal<number | null>(null);
 
-  protected readonly editingSpecification =
-    signal<CategorySpecification | null>(null);
+  protected readonly editingSpecification = signal<CategorySpecification | null>(null);
 
   protected readonly isSavingSpecification = signal(false);
 
-  protected readonly deletingSpecificationId =
-    signal<number | null>(null);
+  protected readonly deletingSpecificationId = signal<number | null>(null);
 
-  protected specificationForm: CategorySpecificationFormState =
-    this.createEmptySpecificationForm();
+  protected specificationForm: CategorySpecificationFormState = this.createEmptySpecificationForm();
 
   // ================================================
   // ИНИЦИАЛИЗАЦИЯ
   // ================================================
 
   ngOnInit(): void {
-    if (
-      !this.authService.isAuthenticated ||
-      !this.authService.isAdmin
-    ) {
+    if (!this.authService.isAuthenticated || !this.authService.isAdmin) {
       void this.router.navigate(['/']);
       return;
     }
@@ -145,7 +121,7 @@ export class AdminCategoriesComponent implements OnInit, OnDestroy {
     requestAnimationFrame(() => {
       this.categoryFormSection?.nativeElement.scrollIntoView({
         behavior: 'smooth',
-        block: 'start'
+        block: 'start',
       });
     });
   }
@@ -158,10 +134,11 @@ export class AdminCategoriesComponent implements OnInit, OnDestroy {
     this.isLoading.set(true);
     this.errorMessage.set(null);
 
-    this.categoryService.getCategories()
+    this.categoryService
+      .getCategories()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: categories => {
+        next: (categories) => {
           this.categories.set(categories);
           this.isLoading.set(false);
         },
@@ -169,12 +146,10 @@ export class AdminCategoriesComponent implements OnInit, OnDestroy {
         error: (error: unknown) => {
           console.error('Ошибка загрузки категорий:', error);
 
-          this.errorMessage.set(
-            this.getErrorMessage(error)
-          );
+          this.errorMessage.set(this.getErrorMessage(error));
 
           this.isLoading.set(false);
-        }
+        },
       });
   }
 
@@ -234,9 +209,7 @@ export class AdminCategoriesComponent implements OnInit, OnDestroy {
     const name = this.categoryName().trim();
 
     if (name.length < 2 || name.length > 100) {
-      this.errorMessage.set(
-        'Название категории должно содержать от 2 до 100 символов.'
-      );
+      this.errorMessage.set('Название категории должно содержать от 2 до 100 символов.');
       return;
     }
 
@@ -254,32 +227,30 @@ export class AdminCategoriesComponent implements OnInit, OnDestroy {
 
     saveRequest$
       .pipe(
-        tap(category => {
+        tap((category) => {
           savedCategory = category;
           this.editingCategory.set(category);
         }),
 
-        switchMap(category => {
+        switchMap((category) => {
           const file = this.selectedImage();
 
           if (!file) {
             return of(category);
           }
 
-          return this.categoryService
-            .uploadCategoryImage(category.id, file)
-            .pipe(
-              map(result => ({
-                ...category,
-                imageUrl: result.imageUrl
-              }))
-            );
+          return this.categoryService.uploadCategoryImage(category.id, file).pipe(
+            map((result) => ({
+              ...category,
+              imageUrl: result.imageUrl,
+            })),
+          );
         }),
 
-        takeUntilDestroyed(this.destroyRef)
+        takeUntilDestroyed(this.destroyRef),
       )
       .subscribe({
-        next: category => {
+        next: (category) => {
           this.isSaving.set(false);
 
           this.closeForm();
@@ -288,7 +259,7 @@ export class AdminCategoriesComponent implements OnInit, OnDestroy {
           this.successMessage.set(
             editing
               ? `Категория «${category.name}» обновлена.`
-              : `Категория «${category.name}» создана.`
+              : `Категория «${category.name}» создана.`,
           );
         },
 
@@ -299,34 +270,30 @@ export class AdminCategoriesComponent implements OnInit, OnDestroy {
             this.editingCategory.set(savedCategory);
 
             this.errorMessage.set(
-              'Категория сохранена, но фотографию загрузить не удалось. Проверьте файл и повторите попытку.'
+              'Категория сохранена, но фотографию загрузить не удалось. Проверьте файл и повторите попытку.',
             );
 
             this.loadCategoriesWithoutClearingForm();
             return;
           }
 
-          this.errorMessage.set(
-            this.getErrorMessage(error)
-          );
-        }
+          this.errorMessage.set(this.getErrorMessage(error));
+        },
       });
   }
 
   private loadCategoriesWithoutClearingForm(): void {
-    this.categoryService.getCategories()
+    this.categoryService
+      .getCategories()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: categories => {
+        next: (categories) => {
           this.categories.set(categories);
         },
 
         error: (error: unknown) => {
-          console.error(
-            'Ошибка обновления списка категорий:',
-            error
-          );
-        }
+          console.error('Ошибка обновления списка категорий:', error);
+        },
       });
   }
 
@@ -335,22 +302,19 @@ export class AdminCategoriesComponent implements OnInit, OnDestroy {
   // ================================================
 
   protected deleteCategory(category: Category): void {
-    if (
-      this.deletingCategoryId() !== null ||
-      this.deletingImageCategoryId() !== null
-    ) {
+    if (this.deletingCategoryId() !== null || this.deletingImageCategoryId() !== null) {
       return;
     }
 
     if (category.productCount > 0) {
       this.errorMessage.set(
-        `Нельзя удалить категорию «${category.name}»: к ней привязано товаров — ${category.productCount}. Сначала переместите или удалите эти товары.`
+        `Нельзя удалить категорию «${category.name}»: к ней привязано товаров — ${category.productCount}. Сначала переместите или удалите эти товары.`,
       );
       return;
     }
 
     const confirmed = window.confirm(
-      `Удалить категорию «${category.name}»? Это действие нельзя отменить.`
+      `Удалить категорию «${category.name}»? Это действие нельзя отменить.`,
     );
 
     if (!confirmed) {
@@ -362,7 +326,8 @@ export class AdminCategoriesComponent implements OnInit, OnDestroy {
 
     this.deletingCategoryId.set(category.id);
 
-    this.categoryService.deleteCategory(category.id)
+    this.categoryService
+      .deleteCategory(category.id)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
@@ -370,20 +335,16 @@ export class AdminCategoriesComponent implements OnInit, OnDestroy {
 
           this.loadCategories();
 
-          this.successMessage.set(
-            `Категория «${category.name}» удалена.`
-          );
+          this.successMessage.set(`Категория «${category.name}» удалена.`);
         },
 
         error: (error: unknown) => {
           this.deletingCategoryId.set(null);
 
-          this.errorMessage.set(
-            this.getErrorMessage(error)
-          );
+          this.errorMessage.set(this.getErrorMessage(error));
 
           this.loadCategoriesWithoutClearingForm();
-        }
+        },
       });
   }
 
@@ -399,25 +360,17 @@ export class AdminCategoriesComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const allowedTypes = [
-      'image/jpeg',
-      'image/png',
-      'image/webp'
-    ];
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
 
     if (!allowedTypes.includes(file.type)) {
-      this.errorMessage.set(
-        'Выберите изображение в формате JPEG, PNG или WebP.'
-      );
+      this.errorMessage.set('Выберите изображение в формате JPEG, PNG или WebP.');
 
       input.value = '';
       return;
     }
 
     if (file.size > 5 * 1024 * 1024) {
-      this.errorMessage.set(
-        'Размер фотографии не должен превышать 5 МБ.'
-      );
+      this.errorMessage.set('Размер фотографии не должен превышать 5 МБ.');
 
       input.value = '';
       return;
@@ -433,9 +386,7 @@ export class AdminCategoriesComponent implements OnInit, OnDestroy {
     this.previewUrl.set(this.previewObjectUrl);
   }
 
-  protected clearSelectedImage(
-    input?: HTMLInputElement
-  ): void {
+  protected clearSelectedImage(input?: HTMLInputElement): void {
     this.selectedImage.set(null);
     this.clearPreviewUrl();
 
@@ -453,9 +404,7 @@ export class AdminCategoriesComponent implements OnInit, OnDestroy {
 
     const category = this.editingCategory();
 
-    return category
-      ? this.getCategoryImage(category)
-      : null;
+    return category ? this.getCategoryImage(category) : null;
   }
 
   // ================================================
@@ -463,9 +412,7 @@ export class AdminCategoriesComponent implements OnInit, OnDestroy {
   // ================================================
 
   protected getCategoryImage(category: Category): string | null {
-    return this.productService.getImageUrl(
-      category.imageUrl
-    );
+    return this.productService.getImageUrl(category.imageUrl);
   }
 
   protected deleteCategoryImage(category: Category): void {
@@ -477,9 +424,7 @@ export class AdminCategoriesComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const confirmed = window.confirm(
-      `Удалить фотографию категории «${category.name}»?`
-    );
+    const confirmed = window.confirm(`Удалить фотографию категории «${category.name}»?`);
 
     if (!confirmed) {
       return;
@@ -499,18 +444,14 @@ export class AdminCategoriesComponent implements OnInit, OnDestroy {
 
           this.loadCategories();
 
-          this.successMessage.set(
-            `Фотография категории «${category.name}» удалена.`
-          );
+          this.successMessage.set(`Фотография категории «${category.name}» удалена.`);
         },
 
         error: (error: unknown) => {
           this.deletingImageCategoryId.set(null);
 
-          this.errorMessage.set(
-            this.getErrorMessage(error)
-          );
-        }
+          this.errorMessage.set(this.getErrorMessage(error));
+        },
       });
   }
 
@@ -527,16 +468,12 @@ export class AdminCategoriesComponent implements OnInit, OnDestroy {
   // ЗАГРУЗКА ХАРАКТЕРИСТИК КАТЕГОРИИ
   // ================================================
 
-  protected getCategorySpecifications(
-    categoryId: number
-  ): CategorySpecification[] {
+  protected getCategorySpecifications(categoryId: number): CategorySpecification[] {
     return this.categorySpecifications()[categoryId] ?? [];
   }
 
   protected toggleCategorySpecifications(category: Category): void {
-    if (
-      this.expandedSpecificationCategoryId() === category.id
-    ) {
+    if (this.expandedSpecificationCategoryId() === category.id) {
       this.expandedSpecificationCategoryId.set(null);
       this.closeSpecificationForm();
       return;
@@ -555,35 +492,26 @@ export class AdminCategoriesComponent implements OnInit, OnDestroy {
       .getCategorySpecifications(categoryId)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: specifications => {
-          this.categorySpecifications.update(current => ({
+        next: (specifications) => {
+          this.categorySpecifications.update((current) => ({
             ...current,
-            [categoryId]: specifications
+            [categoryId]: specifications,
           }));
 
-          if (
-            this.loadingSpecificationsCategoryId() === categoryId
-          ) {
+          if (this.loadingSpecificationsCategoryId() === categoryId) {
             this.loadingSpecificationsCategoryId.set(null);
           }
         },
 
         error: (error: unknown) => {
-          console.error(
-            'Ошибка загрузки характеристик категории:',
-            error
-          );
+          console.error('Ошибка загрузки характеристик категории:', error);
 
-          if (
-            this.loadingSpecificationsCategoryId() === categoryId
-          ) {
+          if (this.loadingSpecificationsCategoryId() === categoryId) {
             this.loadingSpecificationsCategoryId.set(null);
           }
 
-          this.errorMessage.set(
-            this.getErrorMessage(error)
-          );
-        }
+          this.errorMessage.set(this.getErrorMessage(error));
+        },
       });
   }
 
@@ -591,32 +519,25 @@ export class AdminCategoriesComponent implements OnInit, OnDestroy {
   // ФОРМА ХАРАКТЕРИСТИКИ
   // ================================================
 
-  private createEmptySpecificationForm(
-    sortOrder: number = 0
-  ): CategorySpecificationFormState {
+  private createEmptySpecificationForm(sortOrder: number = 0): CategorySpecificationFormState {
     return {
       code: '',
       name: '',
       unit: '',
-      sortOrder
+      sortOrder,
     };
   }
 
-  protected openCreateSpecificationForm(
-    category: Category
-  ): void {
-    const specifications =
-      this.getCategorySpecifications(category.id);
+  protected openCreateSpecificationForm(category: Category): void {
+    const specifications = this.getCategorySpecifications(category.id);
 
-    const nextSortOrder = specifications.length > 0
-      ? Math.max(...specifications.map(s => s.sortOrder)) + 10
-      : 0;
+    const nextSortOrder =
+      specifications.length > 0 ? Math.max(...specifications.map((s) => s.sortOrder)) + 10 : 0;
 
     this.editingSpecification.set(null);
     this.specificationCategoryId.set(category.id);
 
-    this.specificationForm =
-      this.createEmptySpecificationForm(nextSortOrder);
+    this.specificationForm = this.createEmptySpecificationForm(nextSortOrder);
 
     this.showSpecificationForm.set(true);
 
@@ -626,7 +547,7 @@ export class AdminCategoriesComponent implements OnInit, OnDestroy {
 
   protected openEditSpecificationForm(
     category: Category,
-    specification: CategorySpecification
+    specification: CategorySpecification,
   ): void {
     this.editingSpecification.set(specification);
     this.specificationCategoryId.set(category.id);
@@ -635,7 +556,7 @@ export class AdminCategoriesComponent implements OnInit, OnDestroy {
       code: specification.code,
       name: specification.name,
       unit: specification.unit ?? '',
-      sortOrder: specification.sortOrder
+      sortOrder: specification.sortOrder,
     };
 
     this.showSpecificationForm.set(true);
@@ -653,8 +574,7 @@ export class AdminCategoriesComponent implements OnInit, OnDestroy {
     this.editingSpecification.set(null);
     this.specificationCategoryId.set(null);
 
-    this.specificationForm =
-      this.createEmptySpecificationForm();
+    this.specificationForm = this.createEmptySpecificationForm();
   }
 
   // ================================================
@@ -669,56 +589,37 @@ export class AdminCategoriesComponent implements OnInit, OnDestroy {
     const categoryId = this.specificationCategoryId();
 
     if (categoryId === null) {
-      this.errorMessage.set(
-        'Не удалось определить категорию характеристики.'
-      );
+      this.errorMessage.set('Не удалось определить категорию характеристики.');
       return;
     }
 
-    const code = this.specificationForm.code
-      .trim()
-      .toLowerCase();
+    const code = this.specificationForm.code.trim().toLowerCase();
 
     const name = this.specificationForm.name.trim();
 
     const unit = this.specificationForm.unit.trim();
 
-    const sortOrder = Number(
-      this.specificationForm.sortOrder
-    );
+    const sortOrder = Number(this.specificationForm.sortOrder);
 
-    if (
-      code.length < 2 ||
-      code.length > 50 ||
-      !/^[a-zA-Z0-9_-]+$/.test(code)
-    ) {
+    if (code.length < 2 || code.length > 50 || !/^[a-zA-Z0-9_-]+$/.test(code)) {
       this.errorMessage.set(
-        'Код должен содержать от 2 до 50 символов: только латинские буквы, цифры, дефис и нижнее подчёркивание.'
+        'Код должен содержать от 2 до 50 символов: только латинские буквы, цифры, дефис и нижнее подчёркивание.',
       );
       return;
     }
 
     if (name.length < 2 || name.length > 100) {
-      this.errorMessage.set(
-        'Название характеристики должно содержать от 2 до 100 символов.'
-      );
+      this.errorMessage.set('Название характеристики должно содержать от 2 до 100 символов.');
       return;
     }
 
     if (unit.length > 30) {
-      this.errorMessage.set(
-        'Единица измерения не должна превышать 30 символов.'
-      );
+      this.errorMessage.set('Единица измерения не должна превышать 30 символов.');
       return;
     }
 
-    if (
-      !Number.isInteger(sortOrder) ||
-      sortOrder < 0
-    ) {
-      this.errorMessage.set(
-        'Порядок отображения должен быть целым неотрицательным числом.'
-      );
+    if (!Number.isInteger(sortOrder) || sortOrder < 0) {
+      this.errorMessage.set('Порядок отображения должен быть целым неотрицательным числом.');
       return;
     }
 
@@ -726,7 +627,7 @@ export class AdminCategoriesComponent implements OnInit, OnDestroy {
       code,
       name,
       unit: unit || null,
-      sortOrder
+      sortOrder,
     };
 
     const editing = this.editingSpecification();
@@ -736,41 +637,30 @@ export class AdminCategoriesComponent implements OnInit, OnDestroy {
     this.isSavingSpecification.set(true);
 
     const saveRequest$ = editing
-      ? this.categoryService.updateCategorySpecification(
-          categoryId,
-          editing.id,
-          request
-        )
-      : this.categoryService.createCategorySpecification(
-          categoryId,
-          request
+      ? this.categoryService.updateCategorySpecification(categoryId, editing.id, request)
+      : this.categoryService.createCategorySpecification(categoryId, request);
+
+    saveRequest$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: (specification) => {
+        this.isSavingSpecification.set(false);
+
+        this.closeSpecificationForm();
+
+        this.loadCategorySpecifications(categoryId);
+
+        this.successMessage.set(
+          editing
+            ? `Характеристика «${specification.name}» обновлена.`
+            : `Характеристика «${specification.name}» добавлена.`,
         );
+      },
 
-    saveRequest$
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: specification => {
-          this.isSavingSpecification.set(false);
+      error: (error: unknown) => {
+        this.isSavingSpecification.set(false);
 
-          this.closeSpecificationForm();
-
-          this.loadCategorySpecifications(categoryId);
-
-          this.successMessage.set(
-            editing
-              ? `Характеристика «${specification.name}» обновлена.`
-              : `Характеристика «${specification.name}» добавлена.`
-          );
-        },
-
-        error: (error: unknown) => {
-          this.isSavingSpecification.set(false);
-
-          this.errorMessage.set(
-            this.getErrorMessage(error)
-          );
-        }
-      });
+        this.errorMessage.set(this.getErrorMessage(error));
+      },
+    });
   }
 
   // ================================================
@@ -779,18 +669,13 @@ export class AdminCategoriesComponent implements OnInit, OnDestroy {
 
   protected deleteCategorySpecification(
     category: Category,
-    specification: CategorySpecification
+    specification: CategorySpecification,
   ): void {
-    if (
-      this.deletingSpecificationId() !== null ||
-      this.isSavingSpecification()
-    ) {
+    if (this.deletingSpecificationId() !== null || this.isSavingSpecification()) {
       return;
     }
 
-    const confirmed = window.confirm(
-      `Удалить характеристику «${specification.name}»?`
-    );
+    const confirmed = window.confirm(`Удалить характеристику «${specification.name}»?`);
 
     if (!confirmed) {
       return;
@@ -802,10 +687,7 @@ export class AdminCategoriesComponent implements OnInit, OnDestroy {
     this.deletingSpecificationId.set(specification.id);
 
     this.categoryService
-      .deleteCategorySpecification(
-        category.id,
-        specification.id
-      )
+      .deleteCategorySpecification(category.id, specification.id)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
@@ -813,18 +695,14 @@ export class AdminCategoriesComponent implements OnInit, OnDestroy {
 
           this.loadCategorySpecifications(category.id);
 
-          this.successMessage.set(
-            `Характеристика «${specification.name}» удалена.`
-          );
+          this.successMessage.set(`Характеристика «${specification.name}» удалена.`);
         },
 
         error: (error: unknown) => {
           this.deletingSpecificationId.set(null);
 
-          this.errorMessage.set(
-            this.getErrorMessage(error)
-          );
-        }
+          this.errorMessage.set(this.getErrorMessage(error));
+        },
       });
   }
 
@@ -867,8 +745,8 @@ export class AdminCategoriesComponent implements OnInit, OnDestroy {
     if (error.status === 401) {
       void this.router.navigate(['/auth'], {
         queryParams: {
-          returnUrl: '/admin/categories'
-        }
+          returnUrl: '/admin/categories',
+        },
       });
 
       return 'Необходимо войти в систему повторно.';
@@ -883,8 +761,7 @@ export class AdminCategoriesComponent implements OnInit, OnDestroy {
     }
 
     if (error.status === 409) {
-      return this.getServerMessage(error.error) ??
-        'Операция конфликтует с текущими данными.';
+      return this.getServerMessage(error.error) ?? 'Операция конфликтует с текущими данными.';
     }
 
     if (error.status === 413) {
@@ -892,8 +769,9 @@ export class AdminCategoriesComponent implements OnInit, OnDestroy {
     }
 
     if (error.status === 400) {
-      return this.getServerMessage(error.error) ??
-        'Сервер отклонил запрос. Проверьте введённые данные.';
+      return (
+        this.getServerMessage(error.error) ?? 'Сервер отклонил запрос. Проверьте введённые данные.'
+      );
     }
 
     if (error.status >= 500) {
@@ -910,13 +788,8 @@ export class AdminCategoriesComponent implements OnInit, OnDestroy {
 
     const response = body as Record<string, unknown>;
 
-    const message =
-      response['message'] ??
-      response['detail'] ??
-      response['title'];
+    const message = response['message'] ?? response['detail'] ?? response['title'];
 
-    return typeof message === 'string'
-      ? message
-      : null;
+    return typeof message === 'string' ? message : null;
   }
 }

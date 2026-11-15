@@ -5,31 +5,14 @@ using ElectronicsStoreApi.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Controllers.
 builder.Services.AddControllers();
-
-// CORS.
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("FrontendPolicy", policy =>
-    {
-        policy
-            .WithOrigins(
-                "http://192.168.1.12:5500",
-                "http://localhost:5500",
-                "http://127.0.0.1:5500",
-                "http://localhost:4200"
-            )
-            .AllowAnyHeader()
-            .AllowAnyMethod();
-    });
-});
 
 // Database.
 var connectionString =
@@ -94,7 +77,7 @@ builder.Services
 // Authorization.
 builder.Services.AddAuthorization();
 
-// Built-in OpenAPI.
+// OpenAPI.
 builder.Services.AddOpenApi();
 
 // Swagger.
@@ -107,7 +90,6 @@ builder.Services.AddSwaggerGen(options =>
         Description = "API интернет-магазина электроники."
     });
 
-    // JWT Bearer authentication.
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Description =
@@ -118,7 +100,6 @@ builder.Services.AddSwaggerGen(options =>
         BearerFormat = "JWT"
     });
 
-    // Подключаем JWT к запросам из Swagger.
     options.AddSecurityRequirement(document =>
         new OpenApiSecurityRequirement
         {
@@ -128,36 +109,17 @@ builder.Services.AddSwaggerGen(options =>
 
 var app = builder.Build();
 
-// HTTPS.
 app.UseHttpsRedirection();
 
-// CORS.
-app.UseCors("FrontendPolicy");
-
-// Frontend.
-var frontendPath = Path.GetFullPath(
-    Path.Combine(
-        app.Environment.ContentRootPath,
-        "..",
-        "Frontend"));
-
-if (!Directory.Exists(frontendPath))
-{
-    throw new DirectoryNotFoundException(
-        $"Папка Frontend не найдена: {frontendPath}");
-}
-
-app.UseStaticFiles(new StaticFileOptions
-{
-    FileProvider = new PhysicalFileProvider(frontendPath)
-});
+// Angular application.
+app.UseDefaultFiles();
+app.UseStaticFiles();
 
 // Product images.
 var productImagesPath = Path.Combine(
     app.Environment.ContentRootPath,
     "ProductImages");
 
-// Создаём папку, если её ещё нет.
 Directory.CreateDirectory(productImagesPath);
 
 app.UseStaticFiles(new StaticFileOptions
@@ -171,7 +133,6 @@ var categoryImagesPath = Path.Combine(
     app.Environment.ContentRootPath,
     "CategoryImages");
 
-// Создаём папку, если её ещё нет.
 Directory.CreateDirectory(categoryImagesPath);
 
 app.UseStaticFiles(new StaticFileOptions
@@ -197,15 +158,14 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-// Authentication и Authorization.
+// Authentication and authorization.
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Controllers.
 app.MapControllers();
 
-// Главная страница.
-app.MapGet("/", () => Results.Redirect("/index.html"));
+// Angular client-side routes.
+app.MapFallbackToFile("index.html");
 
 app.Run();
 

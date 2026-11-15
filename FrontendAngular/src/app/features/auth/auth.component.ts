@@ -1,11 +1,6 @@
-
 import { Component, inject, signal } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
-import {
-  FormBuilder,
-  ReactiveFormsModule,
-  Validators
-} from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 
@@ -16,7 +11,7 @@ import { AuthService } from '../../core/services/auth.service';
   standalone: true,
   imports: [ReactiveFormsModule, RouterLink],
   templateUrl: './auth.component.html',
-  styleUrl: './auth.component.css'
+  styleUrl: './auth.component.css',
 })
 export class AuthComponent {
   private readonly fb = inject(FormBuilder);
@@ -36,16 +31,14 @@ export class AuthComponent {
         Validators.required,
         Validators.minLength(3),
         Validators.maxLength(40),
-        Validators.pattern(/^[a-zA-Z0-9._-]+$/)
-      ]
+        Validators.pattern(/^[a-zA-Z0-9._-]+$/),
+      ],
     ],
-    password: ['', [Validators.required]]
+    password: ['', [Validators.required]],
   });
 
   constructor() {
-    this.isRegistering.set(
-      this.route.snapshot.queryParamMap.get('mode') === 'register'
-    );
+    this.isRegistering.set(this.route.snapshot.queryParamMap.get('mode') === 'register');
 
     this.updatePasswordValidators();
   }
@@ -67,10 +60,10 @@ export class AuthComponent {
     void this.router.navigate([], {
       relativeTo: this.route,
       queryParams: {
-        mode: register ? 'register' : null
+        mode: register ? 'register' : null,
       },
       queryParamsHandling: 'merge',
-      replaceUrl: true
+      replaceUrl: true,
     });
   }
 
@@ -94,72 +87,55 @@ export class AuthComponent {
     this.isSubmitting.set(true);
 
     if (this.isRegistering()) {
-      this.authService.register(request)
-        .pipe(
-          finalize(() => this.isSubmitting.set(false))
-        )
+      this.authService
+        .register(request)
+        .pipe(finalize(() => this.isSubmitting.set(false)))
         .subscribe({
           next: () => {
             this.setMode(false);
             this.form.controls.password.reset('');
 
-            this.successMessage.set(
-              'Регистрация выполнена. Теперь войдите в аккаунт.'
-            );
+            this.successMessage.set('Регистрация выполнена. Теперь войдите в аккаунт.');
           },
           error: (error: unknown) => {
-            this.errorMessage.set(
-              this.getErrorMessage(error, true)
-            );
-          }
+            this.errorMessage.set(this.getErrorMessage(error, true));
+          },
         });
 
       return;
     }
 
-    this.authService.login(request)
-      .pipe(
-        finalize(() => this.isSubmitting.set(false))
-      )
+    this.authService
+      .login(request)
+      .pipe(finalize(() => this.isSubmitting.set(false)))
       .subscribe({
         next: () => {
           this.redirectAfterLogin();
         },
         error: (error: unknown) => {
-          this.errorMessage.set(
-            this.getErrorMessage(error, false)
-          );
-        }
+          this.errorMessage.set(this.getErrorMessage(error, false));
+        },
       });
   }
 
   // Проверка и обновление ограничений пароля.
   private updatePasswordValidators(): void {
     const validators = this.isRegistering()
-      ? [
-          Validators.required,
-          Validators.minLength(12),
-          Validators.maxLength(128)
-        ]
+      ? [Validators.required, Validators.minLength(12), Validators.maxLength(128)]
       : [Validators.required];
 
     this.form.controls.password.setValidators(validators);
 
     this.form.controls.password.updateValueAndValidity({
-      emitEvent: false
+      emitEvent: false,
     });
   }
 
   // Определение адреса возврата после входа.
   private redirectAfterLogin(): void {
-    const returnUrl =
-      this.route.snapshot.queryParamMap.get('returnUrl');
+    const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
 
-    if (
-      returnUrl &&
-      returnUrl.startsWith('/') &&
-      !returnUrl.startsWith('//')
-    ) {
+    if (returnUrl && returnUrl.startsWith('/') && !returnUrl.startsWith('//')) {
       void this.router.navigateByUrl(returnUrl);
       return;
     }
@@ -168,10 +144,7 @@ export class AuthComponent {
   }
 
   // Обработка ошибок Backend.
-  private getErrorMessage(
-    error: unknown,
-    registering: boolean
-  ): string {
+  private getErrorMessage(error: unknown, registering: boolean): string {
     if (!(error instanceof HttpErrorResponse)) {
       return 'Произошла непредвиденная ошибка.';
     }

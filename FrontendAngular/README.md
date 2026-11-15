@@ -1,59 +1,85 @@
-# ElectronicsStoreFrontend
+# Angular frontend
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.2.6.
+This directory contains the active frontend for the Electronics Store application. It is built with Angular 22, TypeScript, and RxJS.
 
-## Development server
+In Docker deployments, Angular is compiled into static production assets and served by the ASP.NET Core API from its `wwwroot` directory. The frontend does not run in a separate container.
 
-To start a local development server, run:
+## Requirements
 
-```bash
-ng serve
+- Node.js 26.x.
+- npm 11.x (the repository's package manager version is recorded in `package.json`).
+
+See the [Angular version compatibility guide](https://angular.dev/reference/versions) for supported Node.js versions.
+
+On Windows PowerShell, use `npm.cmd` in the commands below. On macOS and Linux, use `npm`.
+
+## Local development
+
+Start the ASP.NET Core API separately using its HTTP launch profile. By default, the API listens at:
+
+```text
+http://localhost:5248
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+From this directory, install the locked dependencies and start the Angular development server:
 
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
+```powershell
+npm.cmd ci
+npm.cmd start
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+Open [http://localhost:4200](http://localhost:4200).
 
-```bash
-ng generate --help
+The development server uses `proxy.conf.json` to forward both `/api` and `/uploads` requests to `http://localhost:5248`. The frontend uses relative API and image paths, so the same application code works with the local proxy and with the Docker deployment.
+
+To make the development server accessible from another device on the same local network:
+
+```powershell
+npm.cmd start -- --host 0.0.0.0
 ```
 
-## Building
+Open `http://<COMPUTER-IP>:4200` from the other device. API and uploaded-image requests continue to pass through the Angular development proxy. Allow inbound TCP port `4200` in Windows Firewall on a trusted private network if required.
 
-To build the project run:
+## Production build
 
-```bash
-ng build
+Create an optimized production build:
+
+```powershell
+npm.cmd run build
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+The browser bundle is written to:
 
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
+```text
+dist/electronics-store-frontend/browser/
 ```
 
-## Running end-to-end tests
+The root `Dockerfile` builds this bundle in its `frontend-build` stage and copies it into the ASP.NET Core image as `wwwroot`. The API then serves the Angular application and API from the same origin.
 
-For end-to-end (e2e) testing, run:
+The production build has bundle-size budgets configured in `angular.json`: an initial-bundle warning at 700 kB and an error threshold at 800 kB.
 
-```bash
-ng e2e
+## Unit tests
+
+Run Angular unit tests once without entering watch mode:
+
+```powershell
+npm.cmd test -- --watch=false
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+The Angular CLI uses the unit-test configuration in `angular.json`. The current GitHub Actions workflow builds the Angular production bundle through Docker but does not yet run Angular unit tests; run the command above locally when changing frontend code.
 
-## Additional Resources
+## Formatting
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+Format Angular source files under `src/`:
+
+```powershell
+npm.cmd run format
+```
+
+Check formatting without modifying files:
+
+```powershell
+npm.cmd run format:check
+```
+
+Formatting is configured in `.prettierrc.json`. The scripts cover TypeScript, HTML, CSS, and JSON files under `src/`.

@@ -1,10 +1,4 @@
-
-import {
-  Injectable,
-  inject,
-  signal,
-  computed
-} from '@angular/core';
+import { Injectable, inject, signal, computed } from '@angular/core';
 
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
@@ -13,7 +7,7 @@ import {
   LoginRequest,
   RegisterRequest,
   RegisterResponse,
-  AuthTokenResponse
+  AuthTokenResponse,
 } from '../models/auth.model';
 
 import { UserProfileResponse } from '../models/user-profile.model';
@@ -22,8 +16,7 @@ import { API_BASE_URL } from '../config/api.config';
 
 const AUTH_STORAGE_KEY = 'electronics-store-auth';
 
-const ROLE_CLAIM =
-  'http://schemas.microsoft.com/ws/2008/06/identity/claims/role';
+const ROLE_CLAIM = 'http://schemas.microsoft.com/ws/2008/06/identity/claims/role';
 
 interface StoredAuth {
   accessToken: string;
@@ -35,14 +28,12 @@ interface JwtPayload {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AuthService {
   private readonly http = inject(HttpClient);
 
-  private readonly authState = signal<StoredAuth | null>(
-    this.readStoredAuth()
-  );
+  private readonly authState = signal<StoredAuth | null>(this.readStoredAuth());
 
   // ID текущего авторизованного пользователя.
   readonly currentUserId = computed<number | null>(() => {
@@ -61,18 +52,13 @@ export class AuthService {
     const payload = this.decodeTokenPayload(auth.accessToken);
     const subject = payload?.['sub'];
 
-    if (
-      typeof subject !== 'string' &&
-      typeof subject !== 'number'
-    ) {
+    if (typeof subject !== 'string' && typeof subject !== 'number') {
       return null;
     }
 
     const userId = Number(subject);
 
-    return Number.isSafeInteger(userId) && userId > 0
-      ? userId
-      : null;
+    return Number.isSafeInteger(userId) && userId > 0 ? userId : null;
   });
 
   // Проверка авторизации.
@@ -94,21 +80,14 @@ export class AuthService {
       return false;
     }
 
-    const roleClaim =
-      payload[ROLE_CLAIM] ??
-      payload['role'] ??
-      payload['roles'];
+    const roleClaim = payload[ROLE_CLAIM] ?? payload['role'] ?? payload['roles'];
 
     if (typeof roleClaim === 'string') {
       return roleClaim.toLowerCase() === 'admin';
     }
 
     if (Array.isArray(roleClaim)) {
-      return roleClaim.some(
-        role =>
-          typeof role === 'string' &&
-          role.toLowerCase() === 'admin'
-      );
+      return roleClaim.some((role) => typeof role === 'string' && role.toLowerCase() === 'admin');
     }
 
     return false;
@@ -116,43 +95,27 @@ export class AuthService {
 
   // Регистрация пользователя.
   register(request: RegisterRequest): Observable<RegisterResponse> {
-    return this.http.post<RegisterResponse>(
-      `${API_BASE_URL}/api/auth/register`,
-      request
-    );
+    return this.http.post<RegisterResponse>(`${API_BASE_URL}/api/auth/register`, request);
   }
 
   // Вход пользователя.
   login(request: LoginRequest): Observable<AuthTokenResponse> {
     return this.http
-      .post<AuthTokenResponse>(
-        `${API_BASE_URL}/api/auth/login`,
-        request
-      )
-      .pipe(
-        tap(response => this.saveAuth(response))
-      );
+      .post<AuthTokenResponse>(`${API_BASE_URL}/api/auth/login`, request)
+      .pipe(tap((response) => this.saveAuth(response)));
   }
 
   // Получение профиля текущего пользователя.
   getCurrentProfile(): Observable<UserProfileResponse> {
-    return this.http.get<UserProfileResponse>(
-      `${API_BASE_URL}/api/auth/me`
-    );
+    return this.http.get<UserProfileResponse>(`${API_BASE_URL}/api/auth/me`);
   }
 
   // Изменение пароля текущего пользователя.
-  changePassword(
-    currentPassword: string,
-    newPassword: string
-  ): Observable<{ message: string }> {
-    return this.http.post<{ message: string }>(
-      `${API_BASE_URL}/api/auth/change-password`,
-      {
-        currentPassword,
-        newPassword
-      }
-    );
+  changePassword(currentPassword: string, newPassword: string): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${API_BASE_URL}/api/auth/change-password`, {
+      currentPassword,
+      newPassword,
+    });
   }
 
   // Получение действующего токена.
@@ -186,16 +149,13 @@ export class AuthService {
   private saveAuth(response: AuthTokenResponse): void {
     const auth: StoredAuth = {
       accessToken: response.accessToken,
-      expiresAtUtc: response.expiresAtUtc
+      expiresAtUtc: response.expiresAtUtc,
     };
 
     this.authState.set(auth);
 
     try {
-      sessionStorage.setItem(
-        AUTH_STORAGE_KEY,
-        JSON.stringify(auth)
-      );
+      sessionStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(auth));
     } catch (error: unknown) {
       console.error('Не удалось сохранить данные авторизации:', error);
     }
@@ -210,31 +170,19 @@ export class AuthService {
         return null;
       }
 
-      const base64 = parts[1]
-        .replace(/-/g, '+')
-        .replace(/_/g, '/');
+      const base64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
 
-      const paddedBase64 = base64.padEnd(
-        Math.ceil(base64.length / 4) * 4,
-        '='
-      );
+      const paddedBase64 = base64.padEnd(Math.ceil(base64.length / 4) * 4, '=');
 
       const binary = atob(paddedBase64);
 
-      const bytes = Uint8Array.from(
-        binary,
-        character => character.charCodeAt(0)
-      );
+      const bytes = Uint8Array.from(binary, (character) => character.charCodeAt(0));
 
       const decoded = new TextDecoder().decode(bytes);
 
       const payload: unknown = JSON.parse(decoded);
 
-      if (
-        typeof payload !== 'object' ||
-        payload === null ||
-        Array.isArray(payload)
-      ) {
+      if (typeof payload !== 'object' || payload === null || Array.isArray(payload)) {
         return null;
       }
 
@@ -265,10 +213,7 @@ export class AuthService {
 
       const auth = parsed as Record<string, unknown>;
 
-      if (
-        typeof auth['accessToken'] !== 'string' ||
-        typeof auth['expiresAtUtc'] !== 'string'
-      ) {
+      if (typeof auth['accessToken'] !== 'string' || typeof auth['expiresAtUtc'] !== 'string') {
         return null;
       }
 
@@ -281,7 +226,7 @@ export class AuthService {
 
       return {
         accessToken: auth['accessToken'],
-        expiresAtUtc: auth['expiresAtUtc']
+        expiresAtUtc: auth['expiresAtUtc'],
       };
     } catch (error: unknown) {
       console.error('Не удалось загрузить авторизацию:', error);
