@@ -361,3 +361,15 @@ Product and category write operations, image management, category specification 
 - `.editorconfig` defines indentation, line endings, and core C# formatting conventions.
 - `FrontendAngular/.prettierrc.json` defines frontend formatting.
 - Angular formatting commands are available through the `format` and `format:check` npm scripts.
+
+Format C# files:
+
+```powershell
+dotnet format whitespace .\ElectronicsStoreApi.slnx
+```
+
+Check C# formatting without changing files:
+
+```powershell
+dotnet format whitespace .\ElectronicsStoreApi.slnx --verify-no-changes
+```
