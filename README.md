@@ -316,7 +316,7 @@ The complete backend test suite includes four tests that run against a real Post
 Start the PostgreSQL service:
 
 ```powershell
-docker compose up -d db
+docker compose up -d --wait db
 ```
 
 Create the test database if it does not already exist, then set the connection string for the current PowerShell session:
