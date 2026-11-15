@@ -11,7 +11,7 @@ The repository contains an Angular single-page application, a .NET 10 backend, a
 | Frontend | Angular 22, TypeScript, RxJS, HTML, CSS |
 | Backend | C#, .NET 10, ASP.NET Core Web API |
 | Data access | Entity Framework Core, Npgsql |
-| Database | PostgreSQL 17 |
+| Database | PostgreSQL 18 |
 | Authentication | JWT Bearer, role-based authorization, ASP.NET Core password hashing |
 | Testing | xUnit, ASP.NET Core integration tests |
 | Containers | Docker, Docker Compose |
@@ -180,7 +180,7 @@ This setup is intended for development or demonstration on a trusted local netwo
 
 The following named volumes persist data when containers are recreated:
 
-- `electronics-store-db` — PostgreSQL database files.
+- `electronics-store-db-v18` — PostgreSQL 18 database files.
 - `electronics-store-product-images` — uploaded product images.
 - `electronics-store-category-images` — uploaded category images.
 
