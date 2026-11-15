@@ -1,335 +1,363 @@
 # Electronics Store
 
-A web application simulating an online electronics store. The system provides product catalog management, category management, user authentication, order creation, inventory management, and product image uploads.
+A full-stack electronics store application built with Angular, ASP.NET Core Web API, and PostgreSQL.
 
-The application consists of an ASP.NET Core Web API backend, a PostgreSQL database, and a web-based frontend.
+The repository contains an Angular single-page application, a .NET 10 backend, automated tests, and a Docker Compose setup for running the complete application.
 
-## Technologies
+## Technology stack
+
+| Area | Technologies |
+|---|---|
+| Frontend | Angular 22, TypeScript, RxJS, HTML, CSS |
+| Backend | C#, .NET 10, ASP.NET Core Web API |
+| Data access | Entity Framework Core, Npgsql |
+| Database | PostgreSQL 17 |
+| Authentication | JWT Bearer, role-based authorization, ASP.NET Core password hashing |
+| Testing | xUnit, ASP.NET Core integration tests |
+| Containers | Docker, Docker Compose |
+| CI | GitHub Actions |
+
+## Application capabilities
+
+### Storefront
+- Browse the product catalog and product details.
+- Search, filter, sort, and paginate products.
+- Browse categories and category-specific product specifications.
+- Add products to a persistent browser cart.
+- Register, sign in, view the current account, and change the password.
+- Create orders and view order history.
+
+### Administration
+- Create, update, and delete products and categories.
+- Upload and replace product and category images.
+- Manage category specification templates.
+- View all orders and update order statuses.
 
 ### Backend
-- C#
-- .NET 10
-- ASP.NET Core Web API
-- Entity Framework Core
-- PostgreSQL
-- Npgsql
-- JWT Bearer Authentication
-- Role-based Authorization
+- Validate incoming requests and separate API contracts from database entities with DTOs.
+- Enforce role-based access to administrative operations.
+- Calculate order totals using current database prices.
+- Update order and stock data within database transactions.
+- Apply database schema changes through EF Core migrations.
 
-### Frontend
-- HTML5
-- CSS3
-- JavaScript
+New registrations receive the `User` role. Public registration does not allow a user to assign themselves the `Admin` role. An administrator account must be provisioned through a controlled database administration process.
 
-### Infrastructure and Testing
-- Docker
-- Docker Compose
-- xUnit
-- ASP.NET Core Integration Testing
-- EF Core Migrations
-- GitHub Actions
+## Architecture
 
-## Features
+The Angular application is built as static production assets and copied into the ASP.NET Core `wwwroot` directory during the Docker build.
 
-### Product Management
-- Create, retrieve, update, and delete products.
-- Retrieve products by ID or category.
-- Search products by name.
-- Filter products by category, price range, and stock availability.
-- Sort products by supported fields: ID, name, price, and quantity.
-- Paginate product listings.
-- Manage product prices, previous prices, quantities, descriptions, and images.
-- Validate product data and category references.
+The API and frontend are served from the same origin:
 
-### Category Management
-- Create, retrieve, update, and delete categories.
-- Retrieve category information, including product counts.
-- Manage category-specific product specifications through the API.
-- Create, update, retrieve, and delete category specifications.
+- Angular pages and static assets are served by ASP.NET Core.
+- API requests use relative paths such as `/api/products`.
+- Product images are exposed under `/uploads/products`.
+- Category images are exposed under `/uploads/categories`.
 
-### Authentication and Authorization
-- Register new users and authenticate with a username and password.
-- Hash passwords using ASP.NET Core Identity password-hashing services.
-- Issue JWT access tokens.
-- Validate token signatures, issuer, audience, and expiration.
-- Implement role-based authorization.
-- Restrict product, category, and image management operations to administrators.
+This avoids a separate frontend container and removes the need to configure CORS for the deployed application. During local development, the Angular development server forwards `/api` and `/uploads` requests to the local API using its proxy configuration.
 
-Newly registered users receive the `User` role. Administrative role assignment is not exposed through public registration.
-
-### Order Processing
-- Create orders containing multiple products.
-- Associate orders with authenticated users.
-- Validate product availability and requested quantities.
-- Calculate order totals using current product prices.
-- Decrease inventory quantities after successful order creation.
-- Save orders and inventory changes within a database transaction.
-- Use Serializable transaction isolation to handle concurrent stock changes.
-- Return information about products with insufficient stock.
-
-The current API supports order creation. Order history management, status transitions, and payment processing are not included.
-
-### Product Image Management
-- Upload and replace product images.
-- Delete product images.
-- Support JPEG, PNG, and WebP formats.
-- Limit image size to 5 MB.
-- Validate file signatures.
-- Generate unique filenames.
-- Store image references in PostgreSQL and image files in persistent file storage.
-
-Image management operations require the administrator role.
-
-### Frontend
-- Product catalog.
-- Product details page.
-- Shopping cart with browser-based persistence using localStorage.
-- User authentication.
-- Order submission through the backend API.
-- Administrative dashboard.
-- Product and category management.
-- Product image previews and uploads.
-- Catalog statistics and product search.
-
-### Database and Data Integrity
-- PostgreSQL persistence through Entity Framework Core.
-- Database schema management using EF Core migrations.
-- Database constraints for product prices and quantities.
-- Relationships between products, categories, users, orders, and order items.
-- Request and response DTOs separating API contracts from database entities.
-
-## Project Structure
+## Repository layout
 
 ```text
-ElectronicsStoreApiPractice/
-│
-├── ElectronicsStoreApi/
-│   ├── Controllers/
-│   ├── Data/
-│   ├── DTOs/
-│   │   ├── Requests/
-│   │   └── Response/
-│   ├── Migrations/
-│   ├── Models/
-│   ├── Services/
-│   ├── ProductImages/
-│   ├── Program.cs
-│   └── appsettings.json
-│
-├── ElectronicsStoreApi.Tests/
-│   ├── Services/
-│   │   └── ProductImageServiceTests.cs
-│   ├── CategoriesAuthorizationIntegrationTests.cs
-│   ├── CreateProductRequestTests.cs
-│   ├── OrderServiceAvailabilityTests.cs
-│   ├── OrderServiceTests.cs
-│   ├── OrderServiceTransactionTests.cs
-│   ├── ProductImagesControllerIntegrationTests.cs
-│   ├── ProductServiceTests.cs
-│   ├── ProductsApiIntegrationTests.cs
-│   ├── ProductsFilteringIntegrationTests.cs
-│   └── TestApplicationFactory.cs
-│
-├── Frontend/
-│   ├── images/
-│   ├── admin.html
-│   ├── admin.js
-│   ├── cart.js
-│   ├── index.html
-│   ├── product.html
-│   ├── script.js
-│   └── style.css
-│
-├── .github/
-│   └── workflows/
-│       └── dotnet-tests.yml
-│
-├── Dockerfile
-├── compose.yaml
-├── .gitignore
-├── .env.example
-└── ElectronicsStoreApi.slnx
+ElectronicsStoreApi/
+  Controllers/
+  Data/
+  DTOs/
+  Migrations/
+  Models/
+  Services/
+  Program.cs
+
+ElectronicsStoreApi.Tests/
+  Infrastructure/
+  Unit/
+  Intagration/
+
+FrontendAngular/
+  public/
+  src/
+    app/
+      core/
+      features/
+  angular.json
+  package.json
+  package-lock.json
+  proxy.conf.json
+
+Dockerfile
+compose.yaml
+.dockerignore
+.editorconfig
+.env.example
+ElectronicsStoreApi.slnx
 ```
 
-## Getting Started
+The legacy static frontend in the `Frontend/` directory is not used by the current Docker deployment. The active frontend is `FrontendAngular/`.
+
+## Run with Docker Compose
 
 ### Requirements
 
-- Docker Desktop
-- Docker Compose
+- Docker Desktop with Docker Compose.
+- Windows, macOS, or Linux.
 
-For local development:
-- .NET 10 SDK
-- PostgreSQL
-- EF Core CLI
-- Visual Studio or another .NET-compatible development environment
+### 1. Configure environment variables
 
-### Running with Docker Compose
+From the repository root, create a local environment file:
 
-Create a `.env` file in the repository root:
-
-```dotenv
-POSTGRES_DB=electronics_store
-POSTGRES_USER=store_user
-POSTGRES_PASSWORD=replace_with_a_local_password
-JWT_ISSUER=ElectronicsStoreApiPractice
-JWT_AUDIENCE=ElectronicsStoreApiPracticeClient
-JWT_KEY=replace_with_a_base64_encoded_key
+```powershell
+Copy-Item .env.example .env
 ```
 
-Generate a secure JWT signing key using PowerShell:
+Edit `.env` and set a strong database password. Generate a Base64-encoded JWT signing key with PowerShell:
 
 ```powershell
 [Convert]::ToBase64String([Security.Cryptography.RandomNumberGenerator]::GetBytes(32))
 ```
 
-Use your own database password and generated signing key. Never commit `.env` or real credentials to source control.
+Copy the generated value into `JWT_KEY` in `.env`.
 
-Build and start the application:
+The `.env` file is ignored by Git and must not be committed.
+
+### 2. Build and start the application
 
 ```powershell
 docker compose up -d --build
 ```
 
-Check the running services:
+Docker Compose performs the following steps:
+
+1. Starts PostgreSQL and waits for its health check.
+2. Builds the Angular production application.
+3. Builds the ASP.NET Core API.
+4. Runs the EF Core migration service.
+5. Starts the API after the migrations complete successfully.
+
+Check the service state:
 
 ```powershell
 docker compose ps -a
 ```
 
-The application is available at:
+The migration service is expected to exit with code `0` after applying pending migrations.
 
-- Frontend: http://localhost:8081
-- Backend API: http://localhost:8081
-- PostgreSQL: localhost:5435
+### 3. Open the application
 
-The API connects to PostgreSQL through the Docker Compose network using the database service hostname `db` and port `5432`.
+Open:
 
-### Database Migrations
+- Storefront: [http://localhost:8081](http://localhost:8081)
+- API: [http://localhost:8081/api](http://localhost:8081/api)
 
-Docker Compose includes a dedicated migration service.
+The Docker Compose API container uses the Production environment. Swagger is therefore disabled in this configuration.
 
-The service:
+### 4. Open the application from another device on the same network
 
-1. Waits for PostgreSQL to become healthy.
-2. Applies pending EF Core migrations.
-3. Exits after successful completion.
-4. Allows the API service to start after migrations complete successfully.
+The computer running Docker and the other device must be connected to the same local network.
 
-There is no need to apply migrations manually when starting the application through Docker Compose.
+1. Find the computer's local IPv4 address with `ipconfig`.
+2. Locate the IPv4 address of the active Wi-Fi or Ethernet adapter.
+3. On the other device, open `http://<COMPUTER-IP>:8081`, replacing the placeholder with that IPv4 address.
 
-Inspect migration logs:
+For example:
+
+```text
+http://192.168.1.100:8081
+```
+
+If Windows Firewall blocks the connection, add an inbound rule for TCP port `8081` on the Private network profile. Run PowerShell as Administrator:
 
 ```powershell
+New-NetFirewallRule -DisplayName "Electronics Store - HTTP 8081" -Direction Inbound -Protocol TCP -LocalPort 8081 -Action Allow -Profile Private
+```
+
+This setup is intended for development or demonstration on a trusted local network. HTTP traffic is not encrypted. Do not expose this configuration directly to the public internet; public deployment requires HTTPS, a domain or public IP, and an appropriately configured reverse proxy.
+
+### Docker ports and persistent data
+
+| Host address | Purpose |
+|---|---|
+| `localhost:8081` | Angular frontend and ASP.NET Core API |
+| `localhost:5435` | PostgreSQL, bound to the host loopback interface only |
+
+The following named volumes persist data when containers are recreated:
+
+- `electronics-store-db` — PostgreSQL database files.
+- `electronics-store-product-images` — uploaded product images.
+- `electronics-store-category-images` — uploaded category images.
+
+Stop the containers without deleting persistent data:
+
+```powershell
+docker compose down
+```
+
+To remove containers and all named volumes, including the database and uploaded images:
+
+```powershell
+docker compose down -v
+```
+
+**Warning:** `docker compose down -v` permanently deletes the application's persisted database and uploaded images.
+
+### Useful Docker commands
+
+```powershell
+docker compose ps -a
+docker compose logs -f api
 docker compose logs migrate
-```
-
-### Useful Docker Commands
-
-```powershell
-docker compose ps -a
-docker compose logs api
 docker compose logs db
-docker compose logs migrate
 docker compose restart api
 docker compose down
 ```
 
-PostgreSQL data and uploaded product images are stored in persistent Docker volumes.
+## Local development
 
-Running `docker compose down` does not remove named volumes. Avoid `docker compose down -v` unless you intentionally want to delete persistent database and image data.
+### Requirements
 
-## Running Locally
+- .NET 10 SDK.
+- Node.js 26.x and npm.
+- Docker Desktop with Docker Compose.
+- An editor such as Visual Studio or Visual Studio Code.
 
-Configure the following settings through .NET User Secrets or environment variables:
+Angular 22 supports Node.js 26. The official compatibility table is available in the [Angular version compatibility guide](https://angular.dev/reference/versions).
 
-- `ConnectionStrings:DefaultConnection` — PostgreSQL connection string.
-- `Jwt:Issuer` — expected token issuer.
-- `Jwt:Audience` — expected token audience.
-- `Jwt:Key` — Base64-encoded JWT signing key.
+### 1. Start PostgreSQL
 
-Restore dependencies:
+Create and configure the root `.env` file as described in the Docker section, then start only the database:
 
 ```powershell
-dotnet restore ElectronicsStoreApi.slnx
+docker compose up -d db
 ```
 
-Apply database migrations:
+PostgreSQL is available to local development tools at `localhost:5435`.
+
+### 2. Configure backend secrets
+
+Initialize .NET User Secrets once:
 
 ```powershell
+dotnet user-secrets init --project .\ElectronicsStoreApi\ElectronicsStoreApi.csproj
+```
+
+Set the database connection string. Use the same database name, username, and password as in `.env`:
+
+```powershell
+dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Host=localhost;Port=5435;Database=electronics_store;Username=store_user;Password=YOUR_DATABASE_PASSWORD" --project .\ElectronicsStoreApi\ElectronicsStoreApi.csproj
+```
+
+Set the JWT issuer, audience, and key. Generate a key using the PowerShell command from the Docker section:
+
+```powershell
+dotnet user-secrets set "Jwt:Issuer" "ElectronicsStoreApi" --project .\ElectronicsStoreApi\ElectronicsStoreApi.csproj
+dotnet user-secrets set "Jwt:Audience" "ElectronicsStoreClient" --project .\ElectronicsStoreApi\ElectronicsStoreApi.csproj
+dotnet user-secrets set "Jwt:Key" "YOUR_BASE64_SIGNING_KEY" --project .\ElectronicsStoreApi\ElectronicsStoreApi.csproj
+```
+
+Do not commit real secrets or database passwords to source control.
+
+### 3. Apply migrations and run the API
+
+```powershell
+dotnet restore .\ElectronicsStoreApi.slnx
+
 dotnet ef database update --project .\ElectronicsStoreApi\ElectronicsStoreApi.csproj --startup-project .\ElectronicsStoreApi\ElectronicsStoreApi.csproj
+
+dotnet run --project .\ElectronicsStoreApi\ElectronicsStoreApi.csproj --launch-profile http
 ```
 
-Run the API:
+The API listens at `http://localhost:5248`. In the Development environment, Swagger UI is available at `http://localhost:5248/swagger`.
+
+### 4. Run the Angular application
+
+In a separate terminal:
 
 ```powershell
-dotnet run --project .\ElectronicsStoreApi\ElectronicsStoreApi.csproj
+Set-Location .\FrontendAngular
+npm.cmd ci
+npm.cmd start
 ```
 
-The local HTTP and HTTPS addresses depend on the configured launch profile.
+Open [http://localhost:4200](http://localhost:4200). The Angular development proxy forwards API and uploaded-image requests to `http://localhost:5248`.
 
-## API Endpoints
+To make the Angular development server reachable from other devices on the same local network:
+
+```powershell
+npm.cmd start -- --host 0.0.0.0
+```
+
+Then open `http://<COMPUTER-IP>:4200` on the other device and allow inbound TCP port `4200) in Windows Firewall if required. The local API remains behind the Angular proxy.
+
+## Build and tests
+
+Build the backend:
+
+```powershell
+dotnet build .\ElectronicsStoreApi.slnx --configuration Release
+```
+
+Run the backend test suite:
+
+```powershell
+dotnet test .\ElectronicsStoreApi.slnx --configuration Release
+```
+
+Build the Angular frontend:
+
+```powershell
+Set-Location .\FrontendAngular
+npm.cmd ci
+npm.cmd run build
+```
+
+Format Angular source files with the repository's Prettier configuration:
+
+```powershell
+npm.cmd run format
+```
+
+Check formatting without changing files:
+
+```powershell
+npm.cmd run format:check
+```
+
+The current GitHub Actions workflow validates the .NET solution and its tests. The Angular build is available as a separate local command.
+
+## API endpoints
 
 | Method | Endpoint | Description |
 |---|---|---|
 | POST | `/api/auth/register` | Register a user |
-| POST | `/api/auth/login` | Authenticate and obtain a JWT |
+| POST | `/api/auth/login` | Authenticate and receive a JWT |
+| GET | `/api/auth/me` | Get the current user's profile |
+| POST | `/api/auth/change-password` | Change the current user's password |
 | GET | `/api/products` | List, search, filter, sort, and paginate products |
-| GET | `/api/products/{id}` | Retrieve a product |
-| GET | `/api/products/by-category/{categoryId}` | Retrieve products by category |
+| GET | `/api/products/{id}` | Get a product |
+| GET | `/api/products/by-category/{categoryId}` | Get products in a category |
 | POST | `/api/products` | Create a product |
 | PUT | `/api/products/{id}` | Update a product |
 | DELETE | `/api/products/{id}` | Delete a product |
+| POST | `/api/products/{productId}/image` | Upload or replace a product image |
+| DELETE | `/api/products/{productId}/image` | Delete a product image |
 | GET | `/api/categories` | List categories |
-| GET | `/api/categories/{id}` | Retrieve a category |
+| GET | `/api/categories/{id}` | Get a category |
 | POST | `/api/categories` | Create a category |
 | PUT | `/api/categories/{id}` | Update a category |
 | DELETE | `/api/categories/{id}` | Delete a category |
+| POST | `/api/categories/{categoryId}/image` | Upload or replace a category image |
+| DELETE | `/api/categories/{categoryId}/image` | Delete a category image |
 | GET | `/api/categories/{categoryId}/specifications` | List category specifications |
 | POST | `/api/categories/{categoryId}/specifications` | Create a category specification |
 | PUT | `/api/categories/{categoryId}/specifications/{specificationId}` | Update a category specification |
 | DELETE | `/api/categories/{categoryId}/specifications/{specificationId}` | Delete a category specification |
+| GET | `/api/orders` | Get the current user's orders |
+| GET | `/api/orders/admin` | Get all orders for administration |
 | POST | `/api/orders` | Create an order |
-| POST | `/api/products/{productId}/image` | Upload or replace a product image |
-| DELETE | `/api/products/{productId}/image` | Delete a product image |
+| PATCH | `/api/orders/{id}/status` | Update an order status |
 
-Product, category, image, and category specification write operations require the administrator role. Order creation requires authentication. Public catalog and category retrieval endpoints do not require authentication.
+Product and category write operations, image management, category specification changes, and order administration require the `Admin` role. Order retrieval and creation require authentication. Public catalog and category retrieval endpoints are available without authentication.
 
-## Testing
+## Code style
 
-The solution includes automated unit and integration tests implemented with xUnit.
-
-Test coverage includes:
-- Product service behaviour and request validation.
-- Product API endpoints.
-- Product filtering and pagination.
-- Category authorization.
-- Order availability validation.
-- Order transaction handling.
-- Product image validation and upload endpoints.
-- Product image service behaviour.
-
-Run the test suite:
-
-```powershell
-dotnet test ElectronicsStoreApi.slnx --configuration Release
-```
-
-The tests use isolated EF Core InMemory databases where configured. This does not replace testing against a real PostgreSQL instance.
-
-The current test suite contains 69 tests, all passing.
-
-GitHub Actions runs automated tests when changes are pushed to the `main` branch or submitted through a pull request.
-
-## Architecture
-
-The application follows a layered structure:
-
-- **Controllers** handle HTTP requests and responses.
-- **Services** contain application and business logic.
-- **DTOs** define request and response contracts.
-- **Models** represent application entities.
-- **Data** contains the Entity Framework Core database context.
-- **Migrations** manage database schema changes.
-
-The backend exposes REST API endpoints consumed by the frontend. PostgreSQL stores application data, while uploaded product images are stored in persistent file storage.
+- `.editorconfig` defines indentation, line endings, and core C# formatting conventions.
+- `FrontendAngular/.prettierrc.json` defines frontend formatting.
+- Angular formatting commands are available through the `format` and `format:check` npm scripts.
