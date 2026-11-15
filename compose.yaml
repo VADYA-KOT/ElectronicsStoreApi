@@ -6,7 +6,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
-      - "5435:5432"
+      - "127.0.0.1:5435:5432"
     volumes:
       - electronics-store-db:/var/lib/postgresql/data
     healthcheck:
@@ -22,7 +22,7 @@ services:
       target: migrations
     image: electronics-store-api-migrations:dev
     environment:
-      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_ENVIRONMENT: Production
       ConnectionStrings__DefaultConnection: "Host=db;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}"
       Jwt__Issuer: ${JWT_ISSUER}
       Jwt__Audience: ${JWT_AUDIENCE}
@@ -39,7 +39,7 @@ services:
       target: final
     image: electronics-store-api:dev
     environment:
-      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_ENVIRONMENT: Production
       ASPNETCORE_HTTP_PORTS: "8080"
       ConnectionStrings__DefaultConnection: "Host=db;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}"
       Jwt__Issuer: ${JWT_ISSUER}
@@ -49,10 +49,13 @@ services:
       - "8081:8080"
     volumes:
       - electronics-store-product-images:/app/ProductImages
+      - electronics-store-category-images:/app/CategoryImages
     depends_on:
       migrate:
         condition: service_completed_successfully
+    restart: unless-stopped
 
 volumes:
   electronics-store-db:
   electronics-store-product-images:
+  electronics-store-category-images:
