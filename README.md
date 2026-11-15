@@ -196,7 +196,54 @@ To remove containers and all named volumes, including the database and uploaded 
 docker compose down -v
 ```
 
-**Warning:** `docker compose down -v` permanently deletes the application's persisted database and uploaded images.
+**Warning:** `docker compose down -v` removes the named volumes declared by the current Compose configuration, including the active database and uploaded-image volumes. This permanently deletes the data stored in those volumes. Do not use it as a routine cleanup command.
+
+### PostgreSQL 17 to 18 data migration
+
+The current configuration uses PostgreSQL 18 and a new volume named `electronics-store-db-v18`, mounted at `/var/lib/postgresql`. Earlier versions of this project used PostgreSQL 17 and a different volume mounted at `/var/lib/postgresql/data`.
+
+Docker Compose does **not** copy database files between these volumes. Starting PostgreSQL 18 without restoring a backup creates a new, empty database. The old PostgreSQL 17 volume is not the active database volume in the new configuration.
+
+For an existing PostgreSQL 17 installation, create a logical backup **before** switching to the PostgreSQL 18 Compose configuration. The following commands assume the old PostgreSQL 17 `db` service is still running and the root `.env` file points to that installation.
+
+1. Create a custom-format backup inside the PostgreSQL 17 container and copy it to your Windows user profile:
+
+```powershell
+$backupPath = Join-Path $env:USERPROFILE "electronics-store-pg17.dump"
+
+docker compose exec -T db sh -c 'pg_dump -U "$POSTGRES_USER" -d "$POSTGRES_DB" -Fc -f /tmp/electronics-store-pg17.dump'
+if ($LASTEXITCODE -ne 0) { throw "PostgreSQL 17 backup failed." }
+
+docker compose cp db:/tmp/electronics-store-pg17.dump $backupPath
+if ($LASTEXITCODE -ne 0) { throw "Could not copy the PostgreSQL backup to the host." }
+```
+
+2. Switch to the PostgreSQL 18 configuration. Stop the old stack without deleting its volumes, then start only the new database:
+
+```powershell
+docker compose down
+docker compose up -d --wait db
+```
+
+3. Copy the backup into the PostgreSQL 18 container and restore it into the database created from `.env`:
+
+```powershell
+docker compose cp $backupPath db:/tmp/electronics-store-pg17.dump
+
+docker compose exec -T db sh -c 'pg_restore -U "$POSTGRES_USER" -d "$POSTGRES_DB" --clean --if-exists --no-owner /tmp/electronics-store-pg17.dump'
+if ($LASTEXITCODE -ne 0) { throw "PostgreSQL 18 restore failed." }
+```
+
+4. Start the complete application. The migration service will apply any migrations that are not yet present in the restored database:
+
+```powershell
+docker compose up -d --build
+docker compose ps -a
+```
+
+Keep the backup file and the old PostgreSQL 17 Docker volume until you have checked that the application data is present and the application works correctly. Product and category image volumes are separate from the database volume and are not part of this database dump.
+
+**Already started PostgreSQL 18 without making a PostgreSQL 17 backup?** Do not delete the old volume and do not mount a PostgreSQL 17 data directory directly into a PostgreSQL 18 container. The old volume must be started with a matching PostgreSQL 17 image so that a logical backup can be exported and restored into PostgreSQL 18. Do not run `docker compose down -v` or `docker volume prune` while recovering old data.
 
 ### Useful Docker commands
 
@@ -303,17 +350,19 @@ Then open `http://<COMPUTER-IP>:4200` on the other device and allow inbound TCP 
 
 ## Build and tests
 
+Run backend commands from the repository root.
+
 Build the backend:
 
 ```powershell
-dotnet build .\ElectronicsStoreApi.slnx --configuration Release
+dotnet build .\\ElectronicsStoreApi.slnx --configuration Release
 ```
 
 ### Backend tests
 
-The complete backend test suite includes four tests that run against a real PostgreSQL database. They require the `ELECTRONICS_STORE_TEST_CONNECTION` environment variable. Use a dedicated test database; do not point this variable at the database containing your application data.
+The complete backend test suite includes four tests that run against a real PostgreSQL database. They require the `ELECTRONICS_STORE_TEST_CONNECTION` environment variable. Use a dedicated test database; never point this variable at the database containing your application data.
 
-Start the PostgreSQL service:
+Start PostgreSQL and wait for its health check:
 
 ```powershell
 docker compose up -d --wait db
@@ -336,16 +385,17 @@ $env:ELECTRONICS_STORE_TEST_CONNECTION = "Host=localhost;Port=5435;Database=elec
 The environment variable is session-specific. Repeat the assignment in each new PowerShell window before running the full test suite:
 
 ```powershell
-dotnet test .\ElectronicsStoreApi.slnx --configuration Release
+dotnet test .\\ElectronicsStoreApi.slnx --configuration Release
 ```
 
 The PostgreSQL-backed tests create their schema in `electronics_store_tests`. Their data is isolated from the application's configured database.
 
+### Angular frontend build and tests
 
-Build the Angular frontend:
+Run the following commands from the `FrontendAngular` directory:
 
 ```powershell
-Set-Location .\FrontendAngular
+Set-Location .\\FrontendAngular
 npm.cmd ci
 npm.cmd run build
 ```
@@ -356,16 +406,26 @@ Run Angular unit tests once, without entering watch mode:
 npm.cmd test -- --watch=false
 ```
 
+The Angular unit-test command is available locally. The current GitHub Actions workflow runs the .NET tests and builds the Docker images (which also builds the Angular production bundle); it does not currently execute Angular unit tests.
 
-Format Angular source files with the repository's Prettier configuration:
+### Formatting
+
+Format C# files from the repository root:
+
+```powershell
+dotnet format whitespace .\\ElectronicsStoreApi.slnx
+```
+
+Check C# formatting without changing files:
+
+```powershell
+dotnet format whitespace .\\ElectronicsStoreApi.slnx --verify-no-changes
+```
+
+From `FrontendAngular`, format Angular source files and check formatting:
 
 ```powershell
 npm.cmd run format
-```
-
-Check formatting without changing files:
-
-```powershell
 npm.cmd run format:check
 ```
 
