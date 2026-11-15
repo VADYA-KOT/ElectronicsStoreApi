@@ -355,7 +355,7 @@ Run backend commands from the repository root.
 Build the backend:
 
 ```powershell
-dotnet build .\\ElectronicsStoreApi.slnx --configuration Release
+dotnet build .\ElectronicsStoreApi.slnx --configuration Release
 ```
 
 ### Backend tests
@@ -385,7 +385,7 @@ $env:ELECTRONICS_STORE_TEST_CONNECTION = "Host=localhost;Port=5435;Database=elec
 The environment variable is session-specific. Repeat the assignment in each new PowerShell window before running the full test suite:
 
 ```powershell
-dotnet test .\\ElectronicsStoreApi.slnx --configuration Release
+dotnet test .\ElectronicsStoreApi.slnx --configuration Release
 ```
 
 The PostgreSQL-backed tests create their schema in `electronics_store_tests`. Their data is isolated from the application's configured database.
@@ -395,7 +395,7 @@ The PostgreSQL-backed tests create their schema in `electronics_store_tests`. Th
 Run the following commands from the `FrontendAngular` directory:
 
 ```powershell
-Set-Location .\\FrontendAngular
+Set-Location .\FrontendAngular
 npm.cmd ci
 npm.cmd run build
 ```
@@ -413,13 +413,13 @@ The Angular unit-test command is available locally. The current GitHub Actions w
 Format C# files from the repository root:
 
 ```powershell
-dotnet format whitespace .\\ElectronicsStoreApi.slnx
+dotnet format whitespace .\ElectronicsStoreApi.slnx
 ```
 
 Check C# formatting without changing files:
 
 ```powershell
-dotnet format whitespace .\\ElectronicsStoreApi.slnx --verify-no-changes
+dotnet format whitespace .\ElectronicsStoreApi.slnx --verify-no-changes
 ```
 
 From `FrontendAngular`, format Angular source files and check formatting:
