@@ -1,59 +1,65 @@
-# ElectronicsStoreFrontend
+# Angular frontend
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.2.6.
+This directory contains the active frontend for the Electronics Store application.
 
-## Development server
+The application uses Angular 22 and TypeScript. In the Docker deployment, Angular is built as a static production bundle and served by the ASP.NET Core API from its `wwwroot` directory. A separate frontend container is not required.
 
-To start a local development server, run:
+## Requirements
 
-```bash
-ng serve
+- Node.js 26.x
+- npm 11.x
+
+See the [Angular version compatibility guide](https://angular.dev/reference/versions) for supported Node.js versions.
+
+## Local development
+
+Start the ASP.NET Core API separately using the HTTP launch profile. The API listens at `http://localhost:5248`.
+
+Install dependencies and start Angular:
+
+```powershell
+npm.cmd ci
+npm.cmd start
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+Open [http://localhost:4200](http://localhost:4200).
 
-## Code scaffolding
+The development server uses `proxy.conf.json` to forward `/api` and `/uploads` requests to the local API. The frontend therefore uses relative API paths in both development and Docker deployments.
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+To make the development server accessible from other devices on the same local network:
 
-```bash
-ng generate component component-name
+```powershell
+npm.cmd start -- --host 0.0.0.0
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+Open `http://<COMPUTER-IP>:4200` from the other device. The API requests continue to pass through the Angular development proxy.
 
-```bash
-ng generate --help
+## Build
+
+Create an optimized production build:
+
+```powershell
+npm.cmd run build
 ```
 
-## Building
+The browser bundle is written to:
 
-To build the project run:
-
-```bash
-ng build
+```text
+dist/electronics-store-frontend/browser/
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+The root Dockerfile copies this directory into the ASP.NET Core image as `wwwroot`.
 
-## Running unit tests
+## Formatting
 
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+Format Angular source files:
 
-```bash
-ng test
+```powershell
+npm.cmd run format
 ```
 
-## Running end-to-end tests
+Check formatting without modifying files:
 
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
+```powershell
+npm.cmd run format:check
 ```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
