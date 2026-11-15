@@ -320,7 +320,7 @@ Check formatting without changing files:
 npm.cmd run format:check
 ```
 
-The current GitHub Actions workflow validates the .NET solution and its tests. The Angular build is available as a separate local command.
+GitHub Actions validates the .NET solution and its tests, checks the Docker Compose configuration, and builds both Docker targets. The Docker build includes the optimized Angular production bundle.
 
 ## API endpoints
 
