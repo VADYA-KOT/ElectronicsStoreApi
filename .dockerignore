@@ -1,8 +1,16 @@
 **/bin/
 **/obj/
 **/TestResults/
+**/node_modules/
+**/dist/
+**/.angular/
+**/coverage/
+**/ProductImages/
+**/CategoryImages/
+
 .vs/
+.vscode/
 .git/
 
 .env
-*.env
+.env.*
