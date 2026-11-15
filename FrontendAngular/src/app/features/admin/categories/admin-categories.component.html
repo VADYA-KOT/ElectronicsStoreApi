@@ -1,36 +1,20 @@
 <div class="admin-products-page">
-
   <!-- HEADER -->
   <header class="admin-header">
-    <a class="admin-brand" routerLink="/">
-      Electronics Store
-    </a>
+    <a class="admin-brand" routerLink="/"> Electronics Store </a>
 
     <div class="admin-header-right">
       <span class="admin-role">ADMIN PANEL</span>
 
-      <a
-        class="admin-back-link"
-        routerLink="/admin/products"
-      >
-        Управление товарами
-      </a>
+      <a class="admin-back-link" routerLink="/admin/products"> Управление товарами </a>
 
-      <a
-        class="admin-back-link"
-        routerLink="/admin/orders"
-      >
-        Управление заказами
-      </a>
+      <a class="admin-back-link" routerLink="/admin/orders"> Управление заказами </a>
 
-      <a class="admin-back-link" routerLink="/">
-        ← Вернуться в магазин
-      </a>
+      <a class="admin-back-link" routerLink="/"> ← Вернуться в магазин </a>
     </div>
   </header>
 
   <main class="admin-content">
-
     <!-- PAGE TITLE -->
     <section class="admin-page-title">
       <div>
@@ -38,9 +22,7 @@
 
         <h1>Управление категориями</h1>
 
-        <p>
-          Создание категорий, управление изображениями и характеристиками.
-        </p>
+        <p>Создание категорий, управление изображениями и характеристиками.</p>
       </div>
 
       <div class="admin-title-actions">
@@ -53,11 +35,7 @@
           ↻ Обновить
         </button>
 
-        <button
-          class="add-product-button"
-          type="button"
-          (click)="openCreateForm()"
-        >
+        <button class="add-product-button" type="button" (click)="openCreateForm()">
           + Добавить категорию
         </button>
       </div>
@@ -74,11 +52,7 @@
       <div class="admin-error-message" role="alert">
         <span>{{ errorMessage() }}</span>
 
-        <button
-          type="button"
-          class="retry-button"
-          (click)="loadCategories()"
-        >
+        <button type="button" class="retry-button" (click)="loadCategories()">
           Обновить список
         </button>
       </div>
@@ -86,23 +60,13 @@
 
     <!-- CATEGORY FORM -->
     @if (showForm()) {
-      <section
-        class="admin-category-form"
-        #categoryFormSection
-      >
-
+      <section class="admin-category-form" #categoryFormSection>
         <div class="form-header">
           <div>
-            <span class="admin-eyebrow">
-              CATEGORY EDITOR
-            </span>
+            <span class="admin-eyebrow"> CATEGORY EDITOR </span>
 
             <h2>
-              {{
-                editingCategory()
-                  ? 'Редактирование категории'
-                  : 'Новая категория'
-              }}
+              {{ editingCategory() ? 'Редактирование категории' : 'Новая категория' }}
             </h2>
           </div>
 
@@ -118,9 +82,7 @@
         </div>
 
         <form (ngSubmit)="saveCategory()">
-
           <div class="category-form-grid">
-
             <!-- CATEGORY NAME -->
             <label class="form-field">
               <span>Название категории *</span>
@@ -136,18 +98,14 @@
                 required
               />
 
-              <small>
-                От 2 до 100 символов.
-              </small>
+              <small> От 2 до 100 символов. </small>
             </label>
 
             <!-- CATEGORY IMAGE -->
             <div class="form-field form-field-wide">
-
               <span>Изображение категории</span>
 
               <div class="image-upload-area">
-
                 <div class="image-preview">
                   @if (getFormImageUrl()) {
                     <img
@@ -163,7 +121,6 @@
                 </div>
 
                 <div class="image-upload-controls">
-
                   <label class="image-select-button">
                     Выбрать изображение
 
@@ -185,34 +142,25 @@
                     </button>
                   }
 
-                  <p>
-                    JPEG, PNG или WebP. Максимальный размер — 5 МБ.
-                  </p>
+                  <p>JPEG, PNG или WebP. Максимальный размер — 5 МБ.</p>
 
                   @if (selectedImage()) {
-                    <small class="selected-file-name">
-                      Выбрано: {{ selectedImage()!.name }}
-                    </small>
+                    <small class="selected-file-name"> Выбрано: {{ selectedImage()!.name }} </small>
                   }
-
                 </div>
-
               </div>
-
             </div>
-
           </div>
 
           @if (editingCategory()?.productCount; as productCount) {
             <div class="category-products-note">
               К этой категории привязано товаров:
-              <strong>{{ productCount }}</strong>.
-              Изменение названия и изображения не затронет эти товары.
+              <strong>{{ productCount }}</strong
+              >. Изменение названия и изображения не затронет эти товары.
             </div>
           }
 
           <div class="form-actions">
-
             <button
               class="form-cancel-button"
               type="button"
@@ -222,11 +170,7 @@
               Отмена
             </button>
 
-            <button
-              class="form-submit-button"
-              type="submit"
-              [disabled]="isSaving()"
-            >
+            <button class="form-submit-button" type="submit" [disabled]="isSaving()">
               @if (isSaving()) {
                 Сохранение...
               } @else if (editingCategory()) {
@@ -235,11 +179,8 @@
                 Создать категорию
               }
             </button>
-
           </div>
-
         </form>
-
       </section>
     }
 
@@ -264,15 +205,9 @@
       <section class="admin-empty">
         <h2>Категорий пока нет</h2>
 
-        <p>
-          Создайте первую категорию, чтобы организовать каталог товаров.
-        </p>
+        <p>Создайте первую категорию, чтобы организовать каталог товаров.</p>
 
-        <button
-          type="button"
-          class="add-product-button"
-          (click)="openCreateForm()"
-        >
+        <button type="button" class="add-product-button" (click)="openCreateForm()">
           + Добавить первую категорию
         </button>
       </section>
@@ -281,37 +216,24 @@
     <!-- CATEGORIES -->
     @else if (!errorMessage()) {
       <section class="admin-categories-grid">
-
         @for (category of categories(); track category.id) {
           <article class="admin-category-card">
-
             <!-- IMAGE -->
             <div class="admin-category-image">
-
               @if (getCategoryImage(category)) {
-                <img
-                  [src]="getCategoryImage(category)!"
-                  [alt]="category.name"
-                  loading="lazy"
-                />
+                <img [src]="getCategoryImage(category)!" [alt]="category.name" loading="lazy" />
               } @else {
                 <div class="category-no-image">
                   <span>Нет изображения</span>
                 </div>
               }
 
-              <span class="category-id">
-                №{{ category.id }}
-              </span>
-
+              <span class="category-id"> №{{ category.id }} </span>
             </div>
 
             <!-- INFORMATION -->
             <div class="admin-category-information">
-
-              <span class="admin-eyebrow">
-                CATEGORY
-              </span>
+              <span class="admin-eyebrow"> CATEGORY </span>
 
               <h2>{{ category.name }}</h2>
 
@@ -327,23 +249,18 @@
                   Для удаления сначала освободите категорию от товаров.
                 </p>
               } @else {
-                <p class="category-delete-hint">
-                  Категорию можно удалить.
-                </p>
+                <p class="category-delete-hint">Категорию можно удалить.</p>
               }
-
             </div>
 
             <!-- CATEGORY ACTIONS -->
             <div class="admin-category-actions">
-
               <button
                 type="button"
                 class="product-edit-button"
                 (click)="openEditForm(category)"
                 [disabled]="
-                  deletingCategoryId() === category.id ||
-                  deletingImageCategoryId() === category.id
+                  deletingCategoryId() === category.id || deletingImageCategoryId() === category.id
                 "
               >
                 Редактировать
@@ -388,33 +305,23 @@
                   Удалить категорию
                 }
               </button>
-
             </div>
 
             <!-- SPECIFICATIONS MANAGEMENT -->
             <section class="admin-category-specifications">
-
               <button
                 type="button"
                 class="specifications-toggle-button"
-                [class.expanded]="
-                  expandedSpecificationCategoryId() === category.id
-                "
-                [disabled]="
-                  deletingCategoryId() === category.id
-                "
-                [attr.aria-expanded]="
-                  expandedSpecificationCategoryId() === category.id
-                "
+                [class.expanded]="expandedSpecificationCategoryId() === category.id"
+                [disabled]="deletingCategoryId() === category.id"
+                [attr.aria-expanded]="expandedSpecificationCategoryId() === category.id"
                 (click)="toggleCategorySpecifications(category)"
               >
                 <span class="specifications-toggle-text">
                   <strong>Характеристики</strong>
 
                   <small>
-                    {{
-                      getCategorySpecifications(category.id).length
-                    }}
+                    {{ getCategorySpecifications(category.id).length }}
                     {{
                       getCategorySpecifications(category.id).length === 1
                         ? 'характеристика'
@@ -429,31 +336,21 @@
               </button>
 
               @if (expandedSpecificationCategoryId() === category.id) {
-
                 <div class="specifications-panel">
-
                   <!-- SPECIFICATIONS LOADING -->
-                  @if (
-                    loadingSpecificationsCategoryId() === category.id
-                  ) {
+                  @if (loadingSpecificationsCategoryId() === category.id) {
                     <div class="specifications-loading">
                       <div class="admin-spinner"></div>
                       <span>Загрузка характеристик...</span>
                     </div>
-                  }
-
-                  @else {
-
+                  } @else {
                     <!-- SPECIFICATIONS EMPTY -->
-                    @if (
-                      getCategorySpecifications(category.id).length === 0
-                    ) {
+                    @if (getCategorySpecifications(category.id).length === 0) {
                       <div class="specifications-empty">
                         <strong>Характеристики не заданы</strong>
 
                         <p>
-                          Добавьте характеристики, которые будут доступны
-                          товарам этой категории.
+                          Добавьте характеристики, которые будут доступны товарам этой категории.
                         </p>
                       </div>
                     }
@@ -461,15 +358,12 @@
                     <!-- SPECIFICATIONS LIST -->
                     @else {
                       <div class="specifications-list">
-
                         @for (
                           specification of getCategorySpecifications(category.id);
                           track specification.id
                         ) {
                           <article class="specification-item">
-
                             <div class="specification-information">
-
                               <strong>
                                 {{ specification.name }}
                               </strong>
@@ -487,24 +381,16 @@
                               <span class="specification-sort-order">
                                 Порядок: {{ specification.sortOrder }}
                               </span>
-
                             </div>
 
                             <div class="specification-actions">
-
                               <button
                                 type="button"
                                 class="specification-edit-button"
                                 [disabled]="
-                                  isSavingSpecification() ||
-                                  deletingSpecificationId() !== null
+                                  isSavingSpecification() || deletingSpecificationId() !== null
                                 "
-                                (click)="
-                                  openEditSpecificationForm(
-                                    category,
-                                    specification
-                                  )
-                                "
+                                (click)="openEditSpecificationForm(category, specification)"
                               >
                                 Изменить
                               </button>
@@ -513,33 +399,21 @@
                                 type="button"
                                 class="specification-delete-button"
                                 [disabled]="
-                                  deletingSpecificationId() !== null ||
-                                  isSavingSpecification()
+                                  deletingSpecificationId() !== null || isSavingSpecification()
                                 "
-                                (click)="
-                                  deleteCategorySpecification(
-                                    category,
-                                    specification
-                                  )
-                                "
+                                (click)="deleteCategorySpecification(category, specification)"
                               >
-                                @if (
-                                  deletingSpecificationId() === specification.id
-                                ) {
+                                @if (deletingSpecificationId() === specification.id) {
                                   Удаление...
                                 } @else {
                                   Удалить
                                 }
                               </button>
-
                             </div>
-
                           </article>
                         }
-
                       </div>
                     }
-
                   }
 
                   <!-- ADD SPECIFICATION -->
@@ -547,9 +421,7 @@
                     <button
                       type="button"
                       class="add-specification-button"
-                      [disabled]="
-                        loadingSpecificationsCategoryId() === category.id
-                      "
+                      [disabled]="loadingSpecificationsCategoryId() === category.id"
                       (click)="openCreateSpecificationForm(category)"
                     >
                       + Добавить характеристику
@@ -557,17 +429,11 @@
                   }
 
                   <!-- SPECIFICATION FORM -->
-                  @if (
-                    showSpecificationForm() &&
-                    specificationCategoryId() === category.id
-                  ) {
+                  @if (showSpecificationForm() && specificationCategoryId() === category.id) {
                     <div class="specification-form">
-
                       <div class="specification-form-header">
                         <div>
-                          <span class="admin-eyebrow">
-                            SPECIFICATION EDITOR
-                          </span>
+                          <span class="admin-eyebrow"> SPECIFICATION EDITOR </span>
 
                           <h3>
                             {{
@@ -593,9 +459,7 @@
                         #specificationFormElement="ngForm"
                         (ngSubmit)="saveCategorySpecification()"
                       >
-
                         <div class="specification-form-grid">
-
                           <!-- CODE -->
                           <label class="form-field">
                             <span>Системный код *</span>
@@ -611,9 +475,7 @@
                               required
                             />
 
-                            <small>
-                              Латинские буквы, цифры, дефис и подчёркивание.
-                            </small>
+                            <small> Латинские буквы, цифры, дефис и подчёркивание. </small>
                           </label>
 
                           <!-- NAME -->
@@ -643,9 +505,7 @@
                               maxlength="30"
                             />
 
-                            <small>
-                              Необязательно. Например: ГБ, дюйм, МГц.
-                            </small>
+                            <small> Необязательно. Например: ГБ, дюйм, МГц. </small>
                           </label>
 
                           <!-- SORT ORDER -->
@@ -661,15 +521,11 @@
                               required
                             />
 
-                            <small>
-                              Чем меньше число, тем выше характеристика в списке.
-                            </small>
+                            <small> Чем меньше число, тем выше характеристика в списке. </small>
                           </label>
-
                         </div>
 
                         <div class="specification-form-actions">
-
                           <button
                             type="button"
                             class="form-cancel-button"
@@ -692,25 +548,16 @@
                               Добавить характеристику
                             }
                           </button>
-
                         </div>
-
                       </form>
-
                     </div>
                   }
-
                 </div>
-
               }
-
             </section>
-
           </article>
         }
-
       </section>
     }
-
   </main>
 </div>

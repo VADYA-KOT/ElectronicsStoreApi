@@ -1,19 +1,8 @@
-import {
-  Component,
-  OnInit,
-  computed,
-  inject,
-  signal
-} from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 
-import {
-  HttpErrorResponse
-} from '@angular/common/http';
+import { HttpErrorResponse } from '@angular/common/http';
 
-import {
-  Router,
-  RouterLink
-} from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 
 import { OrderResponse } from '../../../core/models/order.model';
 
@@ -21,19 +10,14 @@ import { OrderApiService } from '../../../core/services/order-api.service';
 
 import { AuthService } from '../../../core/services/auth.service';
 
-type OrderStatus =
-  | 'Pending'
-  | 'Processing'
-  | 'Shipped'
-  | 'Completed'
-  | 'Cancelled';
+type OrderStatus = 'Pending' | 'Processing' | 'Shipped' | 'Completed' | 'Cancelled';
 
 @Component({
   selector: 'app-admin-orders',
   standalone: true,
   imports: [RouterLink],
   templateUrl: './admin-orders.component.html',
-  styleUrl: './admin-orders.component.css'
+  styleUrl: './admin-orders.component.css',
 })
 export class AdminOrdersComponent implements OnInit {
   private readonly orderApiService = inject(OrderApiService);
@@ -60,14 +44,11 @@ export class AdminOrdersComponent implements OnInit {
       return this.orders();
     }
 
-    return this.orders().filter(
-      order => order.status === filter
-    );
+    return this.orders().filter((order) => order.status === filter);
   });
 
   ngOnInit(): void {
-    if (!this.authService.isAuthenticated ||
-        !this.authService.isAdmin) {
+    if (!this.authService.isAuthenticated || !this.authService.isAdmin) {
       void this.router.navigate(['/']);
       return;
     }
@@ -81,7 +62,7 @@ export class AdminOrdersComponent implements OnInit {
     this.errorMessage.set(null);
 
     this.orderApiService.getAllForAdmin().subscribe({
-      next: orders => {
+      next: (orders) => {
         this.orders.set(orders);
         this.isLoading.set(false);
       },
@@ -89,23 +70,18 @@ export class AdminOrdersComponent implements OnInit {
       error: (error: unknown) => {
         this.isLoading.set(false);
 
-        if (
-          error instanceof HttpErrorResponse &&
-          error.status === 401
-        ) {
+        if (error instanceof HttpErrorResponse && error.status === 401) {
           void this.router.navigate(['/auth'], {
             queryParams: {
-              returnUrl: '/admin/orders'
-            }
+              returnUrl: '/admin/orders',
+            },
           });
 
           return;
         }
 
-        this.errorMessage.set(
-          this.getErrorMessage(error)
-        );
-      }
+        this.errorMessage.set(this.getErrorMessage(error));
+      },
     });
   }
 
@@ -117,15 +93,12 @@ export class AdminOrdersComponent implements OnInit {
   }
 
   // Выбор нового статуса заказа.
-  protected onStatusSelectionChange(
-    orderId: number,
-    event: Event
-  ): void {
+  protected onStatusSelectionChange(orderId: number, event: Event): void {
     const value = (event.target as HTMLSelectElement).value;
 
-    this.selectedStatuses.update(current => ({
+    this.selectedStatuses.update((current) => ({
       ...current,
-      [orderId]: value
+      [orderId]: value,
     }));
   }
 
@@ -152,9 +125,7 @@ export class AdminOrdersComponent implements OnInit {
 
     if (
       !newStatus ||
-      !this.getAvailableStatuses(order.status).includes(
-        newStatus as OrderStatus
-      ) ||
+      !this.getAvailableStatuses(order.status).includes(newStatus as OrderStatus) ||
       this.isUpdating(order.id)
     ) {
       return;
@@ -165,27 +136,20 @@ export class AdminOrdersComponent implements OnInit {
 
     this.setUpdating(order.id, true);
 
-    this.orderApiService.updateOrderStatus(
-      order.id,
-      { status: newStatus }
-    ).subscribe({
-      next: updatedOrder => {
-        this.orders.update(current =>
-          current.map(item =>
-            item.id === updatedOrder.id
-              ? updatedOrder
-              : item
-          )
+    this.orderApiService.updateOrderStatus(order.id, { status: newStatus }).subscribe({
+      next: (updatedOrder) => {
+        this.orders.update((current) =>
+          current.map((item) => (item.id === updatedOrder.id ? updatedOrder : item)),
         );
 
-        this.selectedStatuses.update(current => {
+        this.selectedStatuses.update((current) => {
           const updated = { ...current };
           delete updated[order.id];
           return updated;
         });
 
         this.successMessage.set(
-          `Заказ №${updatedOrder.id}: статус изменён на «${this.getStatusLabel(updatedOrder.status)}».`
+          `Заказ №${updatedOrder.id}: статус изменён на «${this.getStatusLabel(updatedOrder.status)}».`,
         );
 
         this.setUpdating(order.id, false);
@@ -194,23 +158,18 @@ export class AdminOrdersComponent implements OnInit {
       error: (error: unknown) => {
         this.setUpdating(order.id, false);
 
-        if (
-          error instanceof HttpErrorResponse &&
-          error.status === 401
-        ) {
+        if (error instanceof HttpErrorResponse && error.status === 401) {
           void this.router.navigate(['/auth'], {
             queryParams: {
-              returnUrl: '/admin/orders'
-            }
+              returnUrl: '/admin/orders',
+            },
           });
 
           return;
         }
 
-        this.errorMessage.set(
-          this.getErrorMessage(error)
-        );
-      }
+        this.errorMessage.set(this.getErrorMessage(error));
+      },
     });
   }
 
@@ -219,11 +178,8 @@ export class AdminOrdersComponent implements OnInit {
     return this.updatingOrderIds().has(orderId);
   }
 
-  private setUpdating(
-    orderId: number,
-    updating: boolean
-  ): void {
-    this.updatingOrderIds.update(current => {
+  private setUpdating(orderId: number, updating: boolean): void {
+    this.updatingOrderIds.update((current) => {
       const updated = new Set(current);
 
       if (updating) {
@@ -295,7 +251,7 @@ export class AdminOrdersComponent implements OnInit {
       month: 'long',
       year: 'numeric',
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
     }).format(date);
   }
 
@@ -303,7 +259,7 @@ export class AdminOrdersComponent implements OnInit {
   protected formatPrice(price: number): string {
     return new Intl.NumberFormat('ru-RU', {
       style: 'currency',
-      currency: 'BYN'
+      currency: 'BYN',
     }).format(price);
   }
 
@@ -330,13 +286,13 @@ export class AdminOrdersComponent implements OnInit {
     }
 
     if (error.status === 409) {
-      return this.getServerMessage(error.error) ??
-        'Изменение невозможно. Возможно, заказ уже изменён.';
+      return (
+        this.getServerMessage(error.error) ?? 'Изменение невозможно. Возможно, заказ уже изменён.'
+      );
     }
 
     if (error.status === 400) {
-      return this.getServerMessage(error.error) ??
-        'Сервер отклонил запрос.';
+      return this.getServerMessage(error.error) ?? 'Сервер отклонил запрос.';
     }
 
     if (error.status >= 500) {
@@ -353,9 +309,7 @@ export class AdminOrdersComponent implements OnInit {
 
     const response = body as Record<string, unknown>;
 
-    const message = response['message'] ??
-      response['detail'] ??
-      response['title'];
+    const message = response['message'] ?? response['detail'] ?? response['title'];
 
     return typeof message === 'string' ? message : null;
   }

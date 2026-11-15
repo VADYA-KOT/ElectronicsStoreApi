@@ -1,4 +1,3 @@
-
 export interface ProductSpecification {
   categorySpecificationId: number;
   code: string;

@@ -1,28 +1,19 @@
-
 <div class="product-details-page">
-
-  <a class="back-link" routerLink="/">
-    ← Вернуться в каталог
-  </a>
+  <a class="back-link" routerLink="/"> ← Вернуться в каталог </a>
 
   @if (isLoading()) {
     <div class="details-state">
-      <div class="loading-message">
-        Загружаем информацию о товаре...
-      </div>
+      <div class="loading-message">Загружаем информацию о товаре...</div>
     </div>
   } @else if (errorMessage()) {
     <div class="details-state">
       <div class="error-message">
         <p>{{ errorMessage() }}</p>
 
-        <a class="back-button" routerLink="/">
-          Вернуться в каталог
-        </a>
+        <a class="back-button" routerLink="/"> Вернуться в каталог </a>
       </div>
     </div>
   } @else if (product(); as item) {
-
     <!-- BREADCRUMBS -->
     <nav class="breadcrumbs" aria-label="Навигация">
       <a routerLink="/">Главная</a>
@@ -34,24 +25,17 @@
 
     <!-- PRODUCT INFORMATION -->
     <section class="product-detail-card">
-
       <!-- IMAGE -->
       <div class="detail-image-panel">
         @if (item.imageUrl) {
-          <img
-            [src]="getImageUrl(item.imageUrl) ?? ''"
-            [alt]="item.name"
-          />
+          <img [src]="getImageUrl(item.imageUrl) ?? ''" [alt]="item.name" />
         } @else {
-          <div class="detail-image-placeholder">
-            Фотография товара скоро появится
-          </div>
+          <div class="detail-image-placeholder">Фотография товара скоро появится</div>
         }
       </div>
 
       <!-- MAIN INFORMATION -->
       <div class="detail-information">
-
         <span class="detail-category">
           {{ item.categoryName ?? 'Без категории' }}
         </span>
@@ -63,10 +47,7 @@
             {{ formatPrice(item.price) }}
           </strong>
 
-          @if (
-            item.oldPrice !== null &&
-            item.oldPrice > item.price
-          ) {
+          @if (item.oldPrice !== null && item.oldPrice > item.price) {
             <span class="detail-old-price">
               {{ formatPrice(item.oldPrice) }}
             </span>
@@ -74,13 +55,9 @@
         </div>
 
         @if (item.quantity > 0) {
-          <div class="detail-stock available">
-            В наличии: {{ item.quantity }} шт.
-          </div>
+          <div class="detail-stock available">В наличии: {{ item.quantity }} шт.</div>
         } @else {
-          <div class="detail-stock unavailable">
-            Нет в наличии
-          </div>
+          <div class="detail-stock unavailable">Нет в наличии</div>
         }
 
         <!-- ADD TO CART -->
@@ -108,15 +85,11 @@
           @if (item.description) {
             <p>{{ item.description }}</p>
           } @else {
-            <p class="muted-text">
-              Описание товара пока не добавлено.
-            </p>
+            <p class="muted-text">Описание товара пока не добавлено.</p>
           }
         </div>
 
-        <a class="back-button" routerLink="/">
-          Вернуться к покупкам
-        </a>
+        <a class="back-button" routerLink="/"> Вернуться к покупкам </a>
       </div>
     </section>
 
@@ -147,9 +120,7 @@
           </table>
         </div>
       } @else {
-        <p class="muted-text">
-          Характеристики для этого товара пока не добавлены.
-        </p>
+        <p class="muted-text">Характеристики для этого товара пока не добавлены.</p>
       }
     </section>
   }

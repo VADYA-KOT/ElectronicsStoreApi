@@ -1,4 +1,3 @@
-
 :host {
   display: block;
 }
@@ -51,12 +50,7 @@
   gap: 22px;
   padding: 13px 25px;
 
-  background: linear-gradient(
-    110deg,
-    #101820 0%,
-    #17212f 65%,
-    #1d3043 100%
-  );
+  background: linear-gradient(110deg, #101820 0%, #17212f 65%, #1d3043 100%);
 
   border: 1px solid rgba(255, 255, 255, 0.07);
   border-radius: var(--radius-large);
@@ -210,18 +204,8 @@
   overflow: hidden;
 
   background:
-    radial-gradient(
-      ellipse at 75% 100%,
-      rgba(32, 184, 178, 0.18),
-      transparent 48%
-    ),
-    linear-gradient(
-      112deg,
-      #173b62 0%,
-      #1b4d78 38%,
-      #1d5a8c 70%,
-      #1768a8 100%
-    );
+    radial-gradient(ellipse at 75% 100%, rgba(32, 184, 178, 0.18), transparent 48%),
+    linear-gradient(112deg, #173b62 0%, #1b4d78 38%, #1d5a8c 70%, #1768a8 100%);
 
   border: 1px solid rgba(255, 255, 255, 0.09);
   border-radius: 25px;
@@ -229,33 +213,25 @@
 }
 
 .hero::before {
-  content: "";
+  content: '';
   position: absolute;
   z-index: 0;
   inset: 0;
   pointer-events: none;
 
   background:
-    radial-gradient(
-      circle at 85% 25%,
-      rgba(32, 184, 178, 0.17),
-      transparent 28%
-    ),
-    radial-gradient(
-      circle at 64% 90%,
-      rgba(59, 130, 246, 0.17),
-      transparent 34%
-    );
+    radial-gradient(circle at 85% 25%, rgba(32, 184, 178, 0.17), transparent 28%),
+    radial-gradient(circle at 64% 90%, rgba(59, 130, 246, 0.17), transparent 34%);
 }
 
 .hero::after {
-  content: "";
+  content: '';
   position: absolute;
   z-index: 1;
   inset: 0;
   pointer-events: none;
 
-  background-image: url("/images/electronics_banner.png");
+  background-image: url('/images/electronics_banner.png');
   background-repeat: no-repeat;
   background-position: right center;
   background-size: auto 100%;
@@ -304,7 +280,7 @@
 }
 
 .hero-label::before {
-  content: "";
+  content: '';
   width: 25px;
   height: 3px;
   border-radius: var(--radius-round);
@@ -426,7 +402,7 @@
 
 .hero-decoration::before,
 .hero-decoration::after {
-  content: "";
+  content: '';
   position: absolute;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 50%;
@@ -681,11 +657,7 @@
   overflow: hidden;
   border-radius: var(--radius-medium);
   background:
-    radial-gradient(
-      circle at 50% 50%,
-      rgba(32, 184, 178, 0.13),
-      transparent 66%
-    ),
+    radial-gradient(circle at 50% 50%, rgba(32, 184, 178, 0.13), transparent 66%),
     var(--color-surface-secondary);
 }
 
@@ -748,32 +720,18 @@
   border-radius: var(--radius-xl);
 
   background:
-    radial-gradient(
-      circle at 90% 25%,
-      rgba(80, 231, 217, 0.28),
-      transparent 26%
-    ),
-    linear-gradient(
-      110deg,
-      #174a9b 0%,
-      #1768e8 52%,
-      #159b97 100%
-    );
+    radial-gradient(circle at 90% 25%, rgba(80, 231, 217, 0.28), transparent 26%),
+    linear-gradient(110deg, #174a9b 0%, #1768e8 52%, #159b97 100%);
 
   box-shadow: 0 12px 30px rgba(23, 104, 232, 0.16);
 }
 
 .catalog-promo::before {
-  content: "";
+  content: '';
   position: absolute;
   z-index: 0;
   inset: 0;
-  background:
-    radial-gradient(
-      circle at 80% 110%,
-      rgba(255, 255, 255, 0.15),
-      transparent 32%
-    );
+  background: radial-gradient(circle at 80% 110%, rgba(255, 255, 255, 0.15), transparent 32%);
 }
 
 .promo-content {
@@ -851,7 +809,7 @@
 
 .promo-visual::before,
 .promo-visual::after {
-  content: "";
+  content: '';
   position: absolute;
   border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 50%;
@@ -1295,11 +1253,7 @@
   padding: 16px;
   overflow: hidden;
   background:
-    radial-gradient(
-      ellipse at center,
-      rgba(32, 184, 178, 0.055),
-      transparent 70%
-    ),
+    radial-gradient(ellipse at center, rgba(32, 184, 178, 0.055), transparent 70%),
     var(--color-surface-secondary);
   border-bottom: 1px solid var(--color-border);
 }
@@ -1778,13 +1732,7 @@
   gap: 20px;
   padding: 25px 28px;
   border-bottom: 1px solid var(--color-border);
-  background:
-    radial-gradient(
-      circle at 90% 0%,
-      rgba(32, 184, 178, 0.08),
-      transparent 35%
-    ),
-    white;
+  background: radial-gradient(circle at 90% 0%, rgba(32, 184, 178, 0.08), transparent 35%), white;
 }
 
 .comparison-header h2 {
@@ -2747,7 +2695,6 @@
   }
 }
 
-
 /* ========================================
    HERO — СОГЛАСОВАНИЕ С ФОНОМ ИЛЛЮСТРАЦИИ
    Переопределения для главного баннера
@@ -2755,18 +2702,8 @@
 
 .hero {
   background:
-    radial-gradient(
-      ellipse at 76% 15%,
-      rgba(255, 255, 255, 0.28),
-      transparent 38%
-    ),
-    linear-gradient(
-      112deg,
-      #c4d9fa 0%,
-      #bfd8fc 32%,
-      #a9caf5 67%,
-      #85b5ef 100%
-    );
+    radial-gradient(ellipse at 76% 15%, rgba(255, 255, 255, 0.28), transparent 38%),
+    linear-gradient(112deg, #c4d9fa 0%, #bfd8fc 32%, #a9caf5 67%, #85b5ef 100%);
 
   border-color: rgba(80, 130, 190, 0.18);
   box-shadow: 0 13px 35px rgba(35, 83, 145, 0.12);
@@ -2776,23 +2713,15 @@
   z-index: 0;
 
   background:
-    radial-gradient(
-      circle at 85% 25%,
-      rgba(32, 184, 178, 0.12),
-      transparent 28%
-    ),
-    linear-gradient(
-      110deg,
-      rgba(255, 255, 255, 0.12),
-      transparent 72%
-    );
+    radial-gradient(circle at 85% 25%, rgba(32, 184, 178, 0.12), transparent 28%),
+    linear-gradient(110deg, rgba(255, 255, 255, 0.12), transparent 72%);
 }
 
 .hero::after {
   z-index: 1;
   opacity: 1;
 
-  background-image: url("/images/electronics_banner.png");
+  background-image: url('/images/electronics_banner.png');
   background-repeat: no-repeat;
   background-position: right center;
   background-size: auto 100%;
@@ -2802,7 +2731,7 @@
     transparent 0%,
     transparent 35%,
     rgba(0, 0, 0, 0.12) 44%,
-    rgba(0, 0, 0, 0.40) 56%,
+    rgba(0, 0, 0, 0.4) 56%,
     rgba(0, 0, 0, 0.78) 72%,
     #000 88%
   );
@@ -2812,7 +2741,7 @@
     transparent 0%,
     transparent 35%,
     rgba(0, 0, 0, 0.12) 44%,
-    rgba(0, 0, 0, 0.40) 56%,
+    rgba(0, 0, 0, 0.4) 56%,
     rgba(0, 0, 0, 0.78) 72%,
     #000 88%
   );

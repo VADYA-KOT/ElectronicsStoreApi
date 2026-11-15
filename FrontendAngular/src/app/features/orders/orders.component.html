@@ -1,18 +1,12 @@
 <div class="orders-page">
-
   <!-- HEADER -->
   <header class="orders-header">
-    <a class="orders-brand" routerLink="/">
-      Electronics Store
-    </a>
+    <a class="orders-brand" routerLink="/"> Electronics Store </a>
 
-    <a class="back-to-store" routerLink="/">
-      ← Вернуться в магазин
-    </a>
+    <a class="back-to-store" routerLink="/"> ← Вернуться в магазин </a>
   </header>
 
   <main class="orders-content">
-
     <!-- PAGE TITLE -->
     <section class="orders-title">
       <div>
@@ -22,9 +16,7 @@
       </div>
 
       @if (orders().length > 0) {
-        <span class="orders-total-count">
-          Заказов: {{ orders().length }}
-        </span>
+        <span class="orders-total-count"> Заказов: {{ orders().length }} </span>
       }
     </section>
 
@@ -43,11 +35,7 @@
 
         <p>{{ errorMessage() }}</p>
 
-        <button
-          class="orders-primary-button"
-          type="button"
-          (click)="retry()"
-        >
+        <button class="orders-primary-button" type="button" (click)="retry()">
           Повторить попытку
         </button>
       </section>
@@ -68,32 +56,26 @@
             stroke-linejoin="round"
             aria-hidden="true"
           >
-            <path d="M6 2h9l5 5v15H6z"/>
-            <path d="M14 2v6h6"/>
-            <path d="M9 13h8"/>
-            <path d="M9 17h8"/>
+            <path d="M6 2h9l5 5v15H6z" />
+            <path d="M14 2v6h6" />
+            <path d="M9 13h8" />
+            <path d="M9 17h8" />
           </svg>
         </div>
 
         <h2>У вас пока нет заказов</h2>
 
-        <p>
-          Здесь будут отображаться ваши покупки после оформления заказа.
-        </p>
+        <p>Здесь будут отображаться ваши покупки после оформления заказа.</p>
 
-        <a class="orders-primary-button" routerLink="/">
-          Перейти в каталог
-        </a>
+        <a class="orders-primary-button" routerLink="/"> Перейти в каталог </a>
       </section>
     }
 
     <!-- ORDERS LIST -->
     @else {
       <section class="orders-list">
-
         @for (order of orders(); track order.id) {
           <article class="order-card">
-
             <!-- ORDER HEADER -->
             <button
               class="order-card-header"
@@ -102,9 +84,7 @@
               (click)="toggleOrder(order.id)"
             >
               <div class="order-main-information">
-                <span class="order-number">
-                  Заказ №{{ order.id }}
-                </span>
+                <span class="order-number"> Заказ №{{ order.id }} </span>
 
                 <span class="order-date">
                   {{ formatDate(order.createdAtUtc) }}
@@ -143,30 +123,18 @@
             <!-- ORDER DETAILS -->
             @if (isExpanded(order.id)) {
               <div class="order-details">
-
                 <div class="order-items-heading">
                   <h3>Состав заказа</h3>
 
-                  <span>
-                    Позиций: {{ order.items.length }}
-                  </span>
+                  <span> Позиций: {{ order.items.length }} </span>
                 </div>
 
                 <div class="order-items-list">
-
                   @for (item of order.items; track $index) {
                     <div class="order-item">
-
                       <div class="order-item-information">
-
                         @if (item.productId !== null) {
-                          <a
-                            class="order-item-name"
-                            [routerLink]="[
-                              '/products',
-                              item.productId
-                            ]"
-                          >
+                          <a class="order-item-name" [routerLink]="['/products', item.productId]">
                             {{ item.productName }}
                           </a>
                         } @else {
@@ -174,24 +142,19 @@
                             {{ item.productName }}
                           </span>
 
-                          <span class="deleted-product-label">
-                            Товар удалён из каталога
-                          </span>
+                          <span class="deleted-product-label"> Товар удалён из каталога </span>
                         }
 
                         <span class="order-item-price">
-                          {{ formatPrice(item.unitPrice) }} ×
-                          {{ item.quantity }} шт.
+                          {{ formatPrice(item.unitPrice) }} × {{ item.quantity }} шт.
                         </span>
                       </div>
 
                       <strong class="order-item-total">
                         {{ formatPrice(item.lineTotal) }}
                       </strong>
-
                     </div>
                   }
-
                 </div>
 
                 <div class="order-details-footer">
@@ -201,21 +164,15 @@
                     {{ formatPrice(order.totalAmount) }}
                   </strong>
                 </div>
-
               </div>
             }
-
           </article>
         }
-
       </section>
     }
 
     <div class="orders-bottom-link">
-      <a routerLink="/">
-        ← Вернуться в каталог
-      </a>
+      <a routerLink="/"> ← Вернуться в каталог </a>
     </div>
-
   </main>
 </div>

@@ -1,4 +1,3 @@
-
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
@@ -28,7 +27,7 @@ export interface SaveCategorySpecificationRequest {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class CategoryService {
   private readonly http = inject(HttpClient);
@@ -39,42 +38,27 @@ export class CategoryService {
 
   // Получение всех категорий.
   getCategories(): Observable<Category[]> {
-    return this.http.get<Category[]>(
-      `${API_BASE_URL}/api/categories`
-    );
+    return this.http.get<Category[]>(`${API_BASE_URL}/api/categories`);
   }
 
   // Получение категории по ID.
   getCategoryById(id: number): Observable<Category> {
-    return this.http.get<Category>(
-      `${API_BASE_URL}/api/categories/${id}`
-    );
+    return this.http.get<Category>(`${API_BASE_URL}/api/categories/${id}`);
   }
 
   // Создание категории.
   createCategory(name: string): Observable<Category> {
-    return this.http.post<Category>(
-      `${API_BASE_URL}/api/categories`,
-      { name }
-    );
+    return this.http.post<Category>(`${API_BASE_URL}/api/categories`, { name });
   }
 
   // Изменение названия категории.
-  updateCategory(
-    id: number,
-    name: string
-  ): Observable<Category> {
-    return this.http.put<Category>(
-      `${API_BASE_URL}/api/categories/${id}`,
-      { name }
-    );
+  updateCategory(id: number, name: string): Observable<Category> {
+    return this.http.put<Category>(`${API_BASE_URL}/api/categories/${id}`, { name });
   }
 
   // Удаление категории.
   deleteCategory(id: number): Observable<void> {
-    return this.http.delete<void>(
-      `${API_BASE_URL}/api/categories/${id}`
-    );
+    return this.http.delete<void>(`${API_BASE_URL}/api/categories/${id}`);
   }
 
   // ================================================
@@ -82,25 +66,20 @@ export class CategoryService {
   // ================================================
 
   // Загрузка или замена фотографии категории.
-  uploadCategoryImage(
-    categoryId: number,
-    file: File
-  ): Observable<CategoryImageUploadResponse> {
+  uploadCategoryImage(categoryId: number, file: File): Observable<CategoryImageUploadResponse> {
     const formData = new FormData();
 
     formData.append('file', file);
 
     return this.http.post<CategoryImageUploadResponse>(
       `${API_BASE_URL}/api/categories/${categoryId}/image`,
-      formData
+      formData,
     );
   }
 
   // Удаление фотографии категории.
   deleteCategoryImage(categoryId: number): Observable<void> {
-    return this.http.delete<void>(
-      `${API_BASE_URL}/api/categories/${categoryId}/image`
-    );
+    return this.http.delete<void>(`${API_BASE_URL}/api/categories/${categoryId}/image`);
   }
 
   // ================================================
@@ -108,22 +87,20 @@ export class CategoryService {
   // ================================================
 
   // Получение шаблонов характеристик категории.
-  getCategorySpecifications(
-    categoryId: number
-  ): Observable<CategorySpecification[]> {
+  getCategorySpecifications(categoryId: number): Observable<CategorySpecification[]> {
     return this.http.get<CategorySpecification[]>(
-      `${API_BASE_URL}/api/categories/${categoryId}/specifications`
+      `${API_BASE_URL}/api/categories/${categoryId}/specifications`,
     );
   }
 
   // Создание характеристики категории.
   createCategorySpecification(
     categoryId: number,
-    request: SaveCategorySpecificationRequest
+    request: SaveCategorySpecificationRequest,
   ): Observable<CategorySpecification> {
     return this.http.post<CategorySpecification>(
       `${API_BASE_URL}/api/categories/${categoryId}/specifications`,
-      request
+      request,
     );
   }
 
@@ -131,21 +108,18 @@ export class CategoryService {
   updateCategorySpecification(
     categoryId: number,
     specificationId: number,
-    request: SaveCategorySpecificationRequest
+    request: SaveCategorySpecificationRequest,
   ): Observable<CategorySpecification> {
     return this.http.put<CategorySpecification>(
       `${API_BASE_URL}/api/categories/${categoryId}/specifications/${specificationId}`,
-      request
+      request,
     );
   }
 
   // Удаление характеристики категории.
-  deleteCategorySpecification(
-    categoryId: number,
-    specificationId: number
-  ): Observable<void> {
+  deleteCategorySpecification(categoryId: number, specificationId: number): Observable<void> {
     return this.http.delete<void>(
-      `${API_BASE_URL}/api/categories/${categoryId}/specifications/${specificationId}`
+      `${API_BASE_URL}/api/categories/${categoryId}/specifications/${specificationId}`,
     );
   }
 }

@@ -1,4 +1,4 @@
-﻿using ElectronicsStoreApi.Models;
+using ElectronicsStoreApi.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace ElectronicsStoreApi.Data;

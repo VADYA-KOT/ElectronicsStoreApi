@@ -1,33 +1,10 @@
+import { Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
 
-import {
-  Component,
-  DestroyRef,
-  OnInit,
-  computed,
-  inject,
-  signal
-} from '@angular/core';
-
-import {
-  NavigationEnd,
-  Router,
-  RouterLink,
-  RouterOutlet
-} from '@angular/router';
+import { NavigationEnd, Router, RouterLink, RouterOutlet } from '@angular/router';
 
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
-import {
-  EMPTY,
-  Subject,
-  catchError,
-  filter,
-  finalize,
-  of,
-  switchMap,
-  tap,
-  timer
-} from 'rxjs';
+import { EMPTY, Subject, catchError, filter, finalize, of, switchMap, tap, timer } from 'rxjs';
 
 import { Category } from './core/models/category.model';
 import { Product } from './core/models/product.model';
@@ -37,12 +14,7 @@ import { ProductService } from './core/services/product.service';
 import { CartService } from './core/services/cart.service';
 import { AuthService } from './core/services/auth.service';
 
-type SortOption =
-  | 'newest'
-  | 'name-asc'
-  | 'price-asc'
-  | 'price-desc'
-  | 'quantity-desc';
+type SortOption = 'newest' | 'name-asc' | 'price-asc' | 'price-desc' | 'quantity-desc';
 
 interface ProductLoadRequest {
   page: number;
@@ -85,9 +57,7 @@ export class App implements OnInit {
   // PAGE
   // ========================================
 
-  protected readonly isHomePage = signal(
-    this.isHomeUrl(this.router.url)
-  );
+  protected readonly isHomePage = signal(this.isHomeUrl(this.router.url));
 
   // ========================================
   // STORE DATA
@@ -126,15 +96,16 @@ export class App implements OnInit {
 
   protected readonly filterErrorMessage = signal<string | null>(null);
 
-  protected readonly hasActiveFilters = computed(() =>
-    this.searchQuery().trim() !== '' ||
-    this.selectedCategory() !== null ||
-    this.minPriceInput().trim() !== '' ||
-    this.maxPriceInput().trim() !== '' ||
-    this.appliedMinPrice() !== null ||
-    this.appliedMaxPrice() !== null ||
-    this.sortOption() !== 'newest' ||
-    this.inStockOnly()
+  protected readonly hasActiveFilters = computed(
+    () =>
+      this.searchQuery().trim() !== '' ||
+      this.selectedCategory() !== null ||
+      this.minPriceInput().trim() !== '' ||
+      this.maxPriceInput().trim() !== '' ||
+      this.appliedMinPrice() !== null ||
+      this.appliedMaxPrice() !== null ||
+      this.sortOption() !== 'newest' ||
+      this.inStockOnly(),
   );
 
   private readonly pageSize = 12;
@@ -146,34 +117,24 @@ export class App implements OnInit {
   protected readonly visibleCategories = computed(() => {
     const categories = this.categories();
 
-    return this.categoriesExpanded()
-      ? categories
-      : categories.slice(0, 4);
+    return this.categoriesExpanded() ? categories : categories.slice(0, 4);
   });
 
   protected readonly selectedCategoryName = computed(() => {
     const categoryId = this.selectedCategory();
 
-    return this.categories().find(
-      category => category.id === categoryId
-    )?.name ?? null;
+    return this.categories().find((category) => category.id === categoryId)?.name ?? null;
   });
 
   // ========================================
   // CART AND AUTHENTICATION
   // ========================================
 
-  protected readonly cartCount = computed(
-    () => this.cartService.totalQuantity()
-  );
+  protected readonly cartCount = computed(() => this.cartService.totalQuantity());
 
-  protected readonly isAuthenticated = computed(
-    () => this.authService.isAuthenticated
-  );
+  protected readonly isAuthenticated = computed(() => this.authService.isAuthenticated);
 
-  protected readonly isAdmin = computed(
-    () => this.authService.isAdmin
-  );
+  protected readonly isAdmin = computed(() => this.authService.isAdmin);
 
   // ========================================
   // PAGINATION
@@ -188,22 +149,13 @@ export class App implements OnInit {
     const current = this.currentPage();
 
     if (total <= 7) {
-      return Array.from(
-        { length: total },
-        (_, index) => ({
-          type: 'page' as const,
-          value: index + 1
-        })
-      );
+      return Array.from({ length: total }, (_, index) => ({
+        type: 'page' as const,
+        value: index + 1,
+      }));
     }
 
-    const pageNumbers = new Set<number>([
-      1,
-      total,
-      current - 1,
-      current,
-      current + 1
-    ]);
+    const pageNumbers = new Set<number>([1, total, current - 1, current, current + 1]);
 
     if (current <= 4) {
       pageNumbers.add(2);
@@ -220,7 +172,7 @@ export class App implements OnInit {
     }
 
     const sortedPages = [...pageNumbers]
-      .filter(page => page >= 1 && page <= total)
+      .filter((page) => page >= 1 && page <= total)
       .sort((a, b) => a - b);
 
     const result: PaginationItem[] = [];
@@ -231,13 +183,13 @@ export class App implements OnInit {
       if (previousPage > 0 && page - previousPage > 1) {
         result.push({
           type: 'ellipsis',
-          key: `ellipsis-${previousPage}-${page}`
+          key: `ellipsis-${previousPage}-${page}`,
         });
       }
 
       result.push({
         type: 'page',
-        value: page
+        value: page,
       });
 
       previousPage = page;
@@ -256,56 +208,50 @@ export class App implements OnInit {
 
   protected readonly comparisonMessage = signal<string | null>(null);
 
-  protected readonly comparisonCount = computed(
-    () => this.comparedProducts().length
-  );
+  protected readonly comparisonCount = computed(() => this.comparedProducts().length);
 
-  protected readonly comparisonSpecificationRows =
-    computed<ComparisonSpecificationRow[]>(() => {
-      const products = this.comparedProducts();
+  protected readonly comparisonSpecificationRows = computed<ComparisonSpecificationRow[]>(() => {
+    const products = this.comparedProducts();
 
-      const rows = new Map<
-        string,
-        {
-          name: string;
-          values: Map<number, string>;
+    const rows = new Map<
+      string,
+      {
+        name: string;
+        values: Map<number, string>;
+      }
+    >();
+
+    products.forEach((product, productIndex) => {
+      for (const specification of product.specifications ?? []) {
+        const key = (
+          specification.code || String(specification.categorySpecificationId)
+        ).toLowerCase();
+
+        let row = rows.get(key);
+
+        if (!row) {
+          row = {
+            name: specification.name,
+            values: new Map<number, string>(),
+          };
+
+          rows.set(key, row);
         }
-      >();
 
-      products.forEach((product, productIndex) => {
-        for (const specification of product.specifications ?? []) {
-          const key = (
-            specification.code ||
-            String(specification.categorySpecificationId)
-          ).toLowerCase();
+        const value = specification.unit
+          ? `${specification.value} ${specification.unit}`
+          : specification.value;
 
-          let row = rows.get(key);
-
-          if (!row) {
-            row = {
-              name: specification.name,
-              values: new Map<number, string>()
-            };
-
-            rows.set(key, row);
-          }
-
-          const value = specification.unit
-            ? `${specification.value} ${specification.unit}`
-            : specification.value;
-
-          row.values.set(productIndex, value);
-        }
-      });
-
-      return [...rows.entries()].map(([key, row]) => ({
-        key,
-        name: row.name,
-        values: products.map(
-          (_, index) => row.values.get(index) ?? '—'
-        )
-      }));
+        row.values.set(productIndex, value);
+      }
     });
+
+    return [...rows.entries()].map(([key, row]) => ({
+      key,
+      name: row.name,
+      values: products.map((_, index) => row.values.get(index) ?? '—'),
+    }));
+  });
 
   // ========================================
   // VISIBLE PRODUCTS
@@ -322,16 +268,11 @@ export class App implements OnInit {
   ngOnInit(): void {
     this.router.events
       .pipe(
-        filter(
-          (event): event is NavigationEnd =>
-            event instanceof NavigationEnd
-        ),
-        takeUntilDestroyed(this.destroyRef)
+        filter((event): event is NavigationEnd => event instanceof NavigationEnd),
+        takeUntilDestroyed(this.destroyRef),
       )
-      .subscribe(event => {
-        this.isHomePage.set(
-          this.isHomeUrl(event.urlAfterRedirects)
-        );
+      .subscribe((event) => {
+        this.isHomePage.set(this.isHomeUrl(event.urlAfterRedirects));
       });
 
     this.productRequests$
@@ -340,9 +281,7 @@ export class App implements OnInit {
           this.isLoading.set(true);
           this.errorMessage.set(null);
 
-          const delay$ = debounce
-            ? timer(350)
-            : of(0);
+          const delay$ = debounce ? timer(350) : of(0);
 
           return delay$.pipe(
             switchMap(() =>
@@ -355,11 +294,11 @@ export class App implements OnInit {
                 pageSize: this.pageSize,
                 sortBy: this.getSortBy(),
                 descending: this.isDescending(),
-                inStockOnly: this.inStockOnly()
-              })
+                inStockOnly: this.inStockOnly(),
+              }),
             ),
 
-            tap(response => {
+            tap((response) => {
               this.products.set(response.items);
 
               this.currentPage.set(response.page);
@@ -371,7 +310,7 @@ export class App implements OnInit {
               console.error('Ошибка загрузки товаров:', error);
 
               this.errorMessage.set(
-                'Не удалось загрузить товары. Проверьте соединение с сервером.'
+                'Не удалось загрузить товары. Проверьте соединение с сервером.',
               );
 
               return EMPTY;
@@ -379,11 +318,11 @@ export class App implements OnInit {
 
             finalize(() => {
               this.isLoading.set(false);
-            })
+            }),
           );
         }),
 
-        takeUntilDestroyed(this.destroyRef)
+        takeUntilDestroyed(this.destroyRef),
       )
       .subscribe();
 
@@ -402,19 +341,18 @@ export class App implements OnInit {
   // ========================================
 
   protected toggleCategories(): void {
-    this.categoriesExpanded.update(
-      expanded => !expanded
-    );
+    this.categoriesExpanded.update((expanded) => !expanded);
   }
 
   protected loadCategories(): void {
     this.isCategoriesLoading.set(true);
     this.categoriesErrorMessage.set(null);
 
-    this.categoryService.getCategories()
+    this.categoryService
+      .getCategories()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: categories => {
+        next: (categories) => {
           this.categories.set(categories);
           this.isCategoriesLoading.set(false);
         },
@@ -423,11 +361,11 @@ export class App implements OnInit {
           console.error('Ошибка загрузки категорий:', error);
 
           this.categoriesErrorMessage.set(
-            'Не удалось загрузить категории. Проверьте соединение с сервером.'
+            'Не удалось загрузить категории. Проверьте соединение с сервером.',
           );
 
           this.isCategoriesLoading.set(false);
-        }
+        },
       });
   }
 
@@ -437,70 +375,45 @@ export class App implements OnInit {
 
     document.getElementById('products')?.scrollIntoView({
       behavior: 'smooth',
-      block: 'start'
+      block: 'start',
     });
   }
 
   // Получение изображения непосредственно из категории.
   protected getCategoryImage(categoryId: number): string | null {
-    const category = this.categories().find(
-      item => item.id === categoryId
-    );
+    const category = this.categories().find((item) => item.id === categoryId);
 
-    return category
-      ? this.getImageUrl(category.imageUrl)
-      : null;
+    return category ? this.getImageUrl(category.imageUrl) : null;
   }
 
   protected getCategoryIcon(categoryName: string): string {
     const name = categoryName.toLowerCase();
 
-    if (
-      name.includes('смартфон') ||
-      name.includes('телефон') ||
-      name.includes('мобильн')
-    ) {
+    if (name.includes('смартфон') || name.includes('телефон') || name.includes('мобильн')) {
       return '📱';
     }
 
-    if (
-      name.includes('ноутбук') ||
-      name.includes('компьютер') ||
-      name.includes('пк')
-    ) {
+    if (name.includes('ноутбук') || name.includes('компьютер') || name.includes('пк')) {
       return '💻';
     }
 
-    if (
-      name.includes('планшет')
-    ) {
+    if (name.includes('планшет')) {
       return '▣';
     }
 
-    if (
-      name.includes('наушник') ||
-      name.includes('аудио') ||
-      name.includes('звук')
-    ) {
+    if (name.includes('наушник') || name.includes('аудио') || name.includes('звук')) {
       return '♫';
     }
 
-    if (
-      name.includes('телевизор') ||
-      name.includes('монитор')
-    ) {
+    if (name.includes('телевизор') || name.includes('монитор')) {
       return '▣';
     }
 
-    if (
-      name.includes('аксессуар')
-    ) {
+    if (name.includes('аксессуар')) {
       return '⌁';
     }
 
-    if (
-      name.includes('бытов')
-    ) {
+    if (name.includes('бытов')) {
       return '⌂';
     }
 
@@ -511,13 +424,10 @@ export class App implements OnInit {
   // PRODUCTS
   // ========================================
 
-  protected loadProducts(
-    page: number,
-    debounce: boolean = false
-  ): void {
+  protected loadProducts(page: number, debounce: boolean = false): void {
     this.productRequests$.next({
       page,
-      debounce
+      debounce,
     });
   }
 
@@ -541,9 +451,7 @@ export class App implements OnInit {
   private isDescending(): boolean {
     const option = this.sortOption();
 
-    return option === 'newest' ||
-      option === 'price-desc' ||
-      option === 'quantity-desc';
+    return option === 'newest' || option === 'price-desc' || option === 'quantity-desc';
   }
 
   // ========================================
@@ -562,15 +470,11 @@ export class App implements OnInit {
   // ========================================
 
   protected onMinPriceChange(event: Event): void {
-    this.minPriceInput.set(
-      (event.target as HTMLInputElement).value
-    );
+    this.minPriceInput.set((event.target as HTMLInputElement).value);
   }
 
   protected onMaxPriceChange(event: Event): void {
-    this.maxPriceInput.set(
-      (event.target as HTMLInputElement).value
-    );
+    this.maxPriceInput.set((event.target as HTMLInputElement).value);
   }
 
   protected applyPriceFilter(): void {
@@ -579,42 +483,22 @@ export class App implements OnInit {
     const minText = this.minPriceInput().trim();
     const maxText = this.maxPriceInput().trim();
 
-    const minPrice = minText === ''
-      ? null
-      : Number(minText);
+    const minPrice = minText === '' ? null : Number(minText);
 
-    const maxPrice = maxText === ''
-      ? null
-      : Number(maxText);
+    const maxPrice = maxText === '' ? null : Number(maxText);
 
-    if (
-      minPrice !== null &&
-      (!Number.isFinite(minPrice) || minPrice < 0)
-    ) {
-      this.filterErrorMessage.set(
-        'Минимальная цена должна быть неотрицательным числом.'
-      );
+    if (minPrice !== null && (!Number.isFinite(minPrice) || minPrice < 0)) {
+      this.filterErrorMessage.set('Минимальная цена должна быть неотрицательным числом.');
       return;
     }
 
-    if (
-      maxPrice !== null &&
-      (!Number.isFinite(maxPrice) || maxPrice < 0)
-    ) {
-      this.filterErrorMessage.set(
-        'Максимальная цена должна быть неотрицательным числом.'
-      );
+    if (maxPrice !== null && (!Number.isFinite(maxPrice) || maxPrice < 0)) {
+      this.filterErrorMessage.set('Максимальная цена должна быть неотрицательным числом.');
       return;
     }
 
-    if (
-      minPrice !== null &&
-      maxPrice !== null &&
-      minPrice > maxPrice
-    ) {
-      this.filterErrorMessage.set(
-        'Минимальная цена не может быть выше максимальной.'
-      );
+    if (minPrice !== null && maxPrice !== null && minPrice > maxPrice) {
+      this.filterErrorMessage.set('Минимальная цена не может быть выше максимальной.');
       return;
     }
 
@@ -629,16 +513,14 @@ export class App implements OnInit {
   // ========================================
 
   protected onSortChange(event: Event): void {
-    const value = (
-      event.target as HTMLSelectElement
-    ).value as SortOption;
+    const value = (event.target as HTMLSelectElement).value as SortOption;
 
     const allowedOptions: SortOption[] = [
       'newest',
       'name-asc',
       'price-asc',
       'price-desc',
-      'quantity-desc'
+      'quantity-desc',
     ];
 
     if (!allowedOptions.includes(value)) {
@@ -683,11 +565,7 @@ export class App implements OnInit {
   // ========================================
 
   protected goToPage(page: number): void {
-    if (
-      page < 1 ||
-      page > this.totalPages() ||
-      page === this.currentPage()
-    ) {
+    if (page < 1 || page > this.totalPages() || page === this.currentPage()) {
       return;
     }
 
@@ -695,7 +573,7 @@ export class App implements OnInit {
 
     document.getElementById('products')?.scrollIntoView({
       behavior: 'smooth',
-      block: 'start'
+      block: 'start',
     });
   }
 
@@ -712,17 +590,11 @@ export class App implements OnInit {
   }
 
   protected getDiscountPercent(product: Product): number {
-    if (
-      product.oldPrice === null ||
-      product.oldPrice <= product.price ||
-      product.oldPrice <= 0
-    ) {
+    if (product.oldPrice === null || product.oldPrice <= product.price || product.oldPrice <= 0) {
       return 0;
     }
 
-    return Math.round(
-      ((product.oldPrice - product.price) / product.oldPrice) * 100
-    );
+    return Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100);
   }
 
   // ========================================
@@ -730,22 +602,16 @@ export class App implements OnInit {
   // ========================================
 
   protected isCompared(productId: number): boolean {
-    return this.comparedProducts().some(
-      product => product.id === productId
-    );
+    return this.comparedProducts().some((product) => product.id === productId);
   }
 
   protected toggleComparison(product: Product): void {
     const current = this.comparedProducts();
 
-    const existingIndex = current.findIndex(
-      item => item.id === product.id
-    );
+    const existingIndex = current.findIndex((item) => item.id === product.id);
 
     if (existingIndex >= 0) {
-      this.comparedProducts.update(items =>
-        items.filter(item => item.id !== product.id)
-      );
+      this.comparedProducts.update((items) => items.filter((item) => item.id !== product.id));
 
       this.comparisonMessage.set(null);
 
@@ -757,34 +623,22 @@ export class App implements OnInit {
     }
 
     if (current.length >= 4) {
-      this.comparisonMessage.set(
-        'Можно сравнить не более четырёх товаров одновременно.'
-      );
+      this.comparisonMessage.set('Можно сравнить не более четырёх товаров одновременно.');
       return;
     }
 
-    if (
-      current.length > 0 &&
-      current[0].categoryId !== product.categoryId
-    ) {
-      this.comparisonMessage.set(
-        'Для корректного сравнения выберите товары одной категории.'
-      );
+    if (current.length > 0 && current[0].categoryId !== product.categoryId) {
+      this.comparisonMessage.set('Для корректного сравнения выберите товары одной категории.');
       return;
     }
 
-    this.comparedProducts.update(items => [
-      ...items,
-      product
-    ]);
+    this.comparedProducts.update((items) => [...items, product]);
 
     this.comparisonMessage.set(null);
   }
 
   protected removeComparedProduct(productId: number): void {
-    this.comparedProducts.update(items =>
-      items.filter(product => product.id !== productId)
-    );
+    this.comparedProducts.update((items) => items.filter((product) => product.id !== productId));
 
     if (this.comparedProducts().length < 2) {
       this.comparisonOpen.set(false);
@@ -801,9 +655,7 @@ export class App implements OnInit {
 
   protected openComparison(): void {
     if (this.comparedProducts().length < 2) {
-      this.comparisonMessage.set(
-        'Добавьте минимум два товара для сравнения.'
-      );
+      this.comparisonMessage.set('Добавьте минимум два товара для сравнения.');
       return;
     }
 
@@ -831,7 +683,7 @@ export class App implements OnInit {
   protected formatPrice(price: number): string {
     return new Intl.NumberFormat('ru-RU', {
       style: 'currency',
-      currency: 'BYN'
+      currency: 'BYN',
     }).format(price);
   }
 

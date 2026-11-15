@@ -1,10 +1,4 @@
-
-import {
-  Component,
-  OnInit,
-  inject,
-  signal
-} from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 
 import { DatePipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -16,12 +10,9 @@ import { UserProfileResponse } from '../../core/models/user-profile.model';
 @Component({
   selector: 'app-account',
   standalone: true,
-  imports: [
-    DatePipe,
-    RouterLink
-  ],
+  imports: [DatePipe, RouterLink],
   templateUrl: './account.component.html',
-  styleUrl: './account.component.css'
+  styleUrl: './account.component.css',
 })
 export class AccountComponent implements OnInit {
   private readonly authService = inject(AuthService);
@@ -53,7 +44,7 @@ export class AccountComponent implements OnInit {
     this.errorMessage.set(null);
 
     this.authService.getCurrentProfile().subscribe({
-      next: profile => {
+      next: (profile) => {
         this.profile.set(profile);
         this.isLoading.set(false);
       },
@@ -61,28 +52,22 @@ export class AccountComponent implements OnInit {
       error: (error: unknown) => {
         this.isLoading.set(false);
 
-        if (
-          error instanceof HttpErrorResponse &&
-          error.status === 401
-        ) {
+        if (error instanceof HttpErrorResponse && error.status === 401) {
           this.authService.logout();
 
           void this.router.navigate(['/auth'], {
             queryParams: {
-              returnUrl: '/account'
-            }
+              returnUrl: '/account',
+            },
           });
 
           return;
         }
 
         this.errorMessage.set(
-          this.getApiErrorMessage(
-            error,
-            'Не удалось загрузить профиль пользователя.'
-          )
+          this.getApiErrorMessage(error, 'Не удалось загрузить профиль пользователя.'),
         );
-      }
+      },
     });
   }
 
@@ -125,76 +110,57 @@ export class AccountComponent implements OnInit {
     const confirmNewPassword = this.confirmNewPassword();
 
     if (!currentPassword) {
-      this.passwordErrorMessage.set(
-        'Введите текущий пароль.'
-      );
+      this.passwordErrorMessage.set('Введите текущий пароль.');
       return;
     }
 
     if (newPassword.length < 12) {
-      this.passwordErrorMessage.set(
-        'Новый пароль должен содержать не менее 12 символов.'
-      );
+      this.passwordErrorMessage.set('Новый пароль должен содержать не менее 12 символов.');
       return;
     }
 
     if (newPassword.length > 128) {
-      this.passwordErrorMessage.set(
-        'Новый пароль не должен превышать 128 символов.'
-      );
+      this.passwordErrorMessage.set('Новый пароль не должен превышать 128 символов.');
       return;
     }
 
     if (newPassword !== confirmNewPassword) {
-      this.passwordErrorMessage.set(
-        'Новые пароли не совпадают.'
-      );
+      this.passwordErrorMessage.set('Новые пароли не совпадают.');
       return;
     }
 
     this.isChangingPassword.set(true);
 
-    this.authService.changePassword(
-      currentPassword,
-      newPassword
-    ).subscribe({
-      next: response => {
+    this.authService.changePassword(currentPassword, newPassword).subscribe({
+      next: (response) => {
         this.isChangingPassword.set(false);
 
         this.currentPassword.set('');
         this.newPassword.set('');
         this.confirmNewPassword.set('');
 
-        this.passwordSuccessMessage.set(
-          response.message || 'Пароль успешно изменён.'
-        );
+        this.passwordSuccessMessage.set(response.message || 'Пароль успешно изменён.');
       },
 
       error: (error: unknown) => {
         this.isChangingPassword.set(false);
 
-        if (
-          error instanceof HttpErrorResponse &&
-          error.status === 401
-        ) {
+        if (error instanceof HttpErrorResponse && error.status === 401) {
           this.authService.logout();
 
           void this.router.navigate(['/auth'], {
             queryParams: {
-              returnUrl: '/account'
-            }
+              returnUrl: '/account',
+            },
           });
 
           return;
         }
 
         this.passwordErrorMessage.set(
-          this.getApiErrorMessage(
-            error,
-            'Не удалось изменить пароль.'
-          )
+          this.getApiErrorMessage(error, 'Не удалось изменить пароль.'),
         );
-      }
+      },
     });
   }
 
@@ -212,10 +178,7 @@ export class AccountComponent implements OnInit {
   }
 
   // Обработка ошибок API.
-  private getApiErrorMessage(
-    error: unknown,
-    fallback: string
-  ): string {
+  private getApiErrorMessage(error: unknown, fallback: string): string {
     if (error instanceof HttpErrorResponse) {
       if (error.status === 0) {
         return 'Не удалось связаться с сервером.';

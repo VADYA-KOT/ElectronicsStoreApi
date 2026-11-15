@@ -1,4 +1,4 @@
-﻿using ElectronicsStoreApi.Data;
+using ElectronicsStoreApi.Data;
 using ElectronicsStoreApi.DTOs.Requests;
 using ElectronicsStoreApi.Models;
 using ElectronicsStoreApi.Services;

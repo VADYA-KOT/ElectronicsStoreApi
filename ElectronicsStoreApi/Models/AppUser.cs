@@ -1,4 +1,4 @@
-﻿namespace ElectronicsStoreApi.Models;
+namespace ElectronicsStoreApi.Models;
 
 public class AppUser
 {

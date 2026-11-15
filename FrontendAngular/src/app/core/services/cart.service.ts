@@ -1,11 +1,4 @@
-
-import {
-  Injectable,
-  computed,
-  effect,
-  inject,
-  signal
-} from '@angular/core';
+import { Injectable, computed, effect, inject, signal } from '@angular/core';
 
 import { Product } from '../models/product.model';
 import { CartItem } from '../models/cart-item.model';
@@ -17,19 +10,15 @@ const GUEST_CART_STORAGE_KEY = `${CART_STORAGE_KEY}:guest`;
 const USER_CART_STORAGE_PREFIX = `${CART_STORAGE_KEY}:user:`;
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class CartService {
   private readonly authService = inject(AuthService);
 
   // Текущий ключ хранения корзины.
-  private activeStorageKey = this.getStorageKey(
-    this.authService.currentUserId()
-  );
+  private activeStorageKey = this.getStorageKey(this.authService.currentUserId());
 
-  private readonly itemsState = signal<CartItem[]>(
-    this.readFromStorage(this.activeStorageKey)
-  );
+  private readonly itemsState = signal<CartItem[]>(this.readFromStorage(this.activeStorageKey));
 
   constructor() {
     // Автоматическое переключение корзины при смене аккаунта.
@@ -44,9 +33,7 @@ export class CartService {
 
       this.activeStorageKey = newStorageKey;
 
-      this.itemsState.set(
-        this.readFromStorage(newStorageKey)
-      );
+      this.itemsState.set(this.readFromStorage(newStorageKey));
     });
   }
 
@@ -54,18 +41,12 @@ export class CartService {
 
   // Общее количество единиц товаров.
   readonly totalQuantity = computed(() =>
-    this.itemsState().reduce(
-      (total, item) => total + item.quantity,
-      0
-    )
+    this.itemsState().reduce((total, item) => total + item.quantity, 0),
   );
 
   // Общая стоимость корзины.
   readonly totalPrice = computed(() =>
-    this.itemsState().reduce(
-      (total, item) => total + item.product.price * item.quantity,
-      0
-    )
+    this.itemsState().reduce((total, item) => total + item.product.price * item.quantity, 0),
   );
 
   // Добавление товара или увеличение его количества.
@@ -76,10 +57,8 @@ export class CartService {
 
     let added = false;
 
-    this.itemsState.update(items => {
-      const existingItem = items.find(
-        item => item.product.id === product.id
-      );
+    this.itemsState.update((items) => {
+      const existingItem = items.find((item) => item.product.id === product.id);
 
       if (existingItem) {
         // Нельзя превысить доступный остаток.
@@ -89,13 +68,13 @@ export class CartService {
 
         added = true;
 
-        return items.map(item =>
+        return items.map((item) =>
           item.product.id === product.id
             ? {
                 product,
-                quantity: item.quantity + 1
+                quantity: item.quantity + 1,
               }
-            : item
+            : item,
         );
       }
 
@@ -105,8 +84,8 @@ export class CartService {
         ...items,
         {
           product,
-          quantity: 1
-        }
+          quantity: 1,
+        },
       ];
     });
 
@@ -128,21 +107,19 @@ export class CartService {
       return;
     }
 
-    this.itemsState.update(items =>
-      items.map(item => {
+    this.itemsState.update((items) =>
+      items.map((item) => {
         if (item.product.id !== productId) {
           return item;
         }
 
-        const maximumQuantity = item.product.quantity > 0
-          ? item.product.quantity
-          : item.quantity;
+        const maximumQuantity = item.product.quantity > 0 ? item.product.quantity : item.quantity;
 
         return {
           ...item,
-          quantity: Math.min(quantity, maximumQuantity)
+          quantity: Math.min(quantity, maximumQuantity),
         };
-      })
+      }),
     );
 
     this.saveToStorage();
@@ -150,9 +127,7 @@ export class CartService {
 
   // Удаление отдельного товара.
   removeItem(productId: number): void {
-    this.itemsState.update(items =>
-      items.filter(item => item.product.id !== productId)
-    );
+    this.itemsState.update((items) => items.filter((item) => item.product.id !== productId));
 
     this.saveToStorage();
   }
@@ -175,10 +150,7 @@ export class CartService {
   // Сохранение корзины в localStorage.
   private saveToStorage(): void {
     try {
-      localStorage.setItem(
-        this.activeStorageKey,
-        JSON.stringify(this.itemsState())
-      );
+      localStorage.setItem(this.activeStorageKey, JSON.stringify(this.itemsState()));
     } catch (error: unknown) {
       console.error('Не удалось сохранить корзину:', error);
     }
@@ -217,9 +189,7 @@ export class CartService {
         return [];
       }
 
-      return parsed.filter(
-        (item): item is CartItem => this.isValidCartItem(item)
-      );
+      return parsed.filter((item): item is CartItem => this.isValidCartItem(item));
     } catch (error: unknown) {
       console.error('Не удалось загрузить корзину:', error);
       return [];

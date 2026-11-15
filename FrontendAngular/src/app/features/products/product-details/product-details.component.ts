@@ -1,23 +1,10 @@
-
-import {
-  Component,
-  DestroyRef,
-  OnInit,
-  inject,
-  signal
-} from '@angular/core';
+import { Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
 
 import { HttpErrorResponse } from '@angular/common/http';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
-import {
-  EMPTY,
-  catchError,
-  finalize,
-  switchMap,
-  tap
-} from 'rxjs';
+import { EMPTY, catchError, finalize, switchMap, tap } from 'rxjs';
 
 import { Product } from '../../../core/models/product.model';
 import { ProductService } from '../../../core/services/product.service';
@@ -28,7 +15,7 @@ import { CartService } from '../../../core/services/cart.service';
   standalone: true,
   imports: [RouterLink],
   templateUrl: './product-details.component.html',
-  styleUrl: './product-details.component.css'
+  styleUrl: './product-details.component.css',
 })
 export class ProductDetailsComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
@@ -45,7 +32,7 @@ export class ProductDetailsComponent implements OnInit {
   ngOnInit(): void {
     this.route.paramMap
       .pipe(
-        switchMap(params => {
+        switchMap((params) => {
           const id = Number(params.get('id'));
 
           this.product.set(null);
@@ -54,9 +41,7 @@ export class ProductDetailsComponent implements OnInit {
           this.isLoading.set(true);
 
           if (!Number.isSafeInteger(id) || id <= 0) {
-            this.errorMessage.set(
-              'Указан некорректный идентификатор товара.'
-            );
+            this.errorMessage.set('Указан некорректный идентификатор товара.');
 
             this.isLoading.set(false);
 
@@ -64,23 +49,18 @@ export class ProductDetailsComponent implements OnInit {
           }
 
           return this.productService.getProductById(id).pipe(
-            tap(product => {
+            tap((product) => {
               this.product.set(product);
             }),
 
             catchError((error: unknown) => {
               console.error('Ошибка загрузки товара:', error);
 
-              if (
-                error instanceof HttpErrorResponse &&
-                error.status === 404
-              ) {
-                this.errorMessage.set(
-                  'Товар не найден. Возможно, он был удалён.'
-                );
+              if (error instanceof HttpErrorResponse && error.status === 404) {
+                this.errorMessage.set('Товар не найден. Возможно, он был удалён.');
               } else {
                 this.errorMessage.set(
-                  'Не удалось загрузить товар. Проверьте соединение с сервером.'
+                  'Не удалось загрузить товар. Проверьте соединение с сервером.',
                 );
               }
 
@@ -89,11 +69,11 @@ export class ProductDetailsComponent implements OnInit {
 
             finalize(() => {
               this.isLoading.set(false);
-            })
+            }),
           );
         }),
 
-        takeUntilDestroyed(this.destroyRef)
+        takeUntilDestroyed(this.destroyRef),
       )
       .subscribe();
   }
@@ -111,14 +91,14 @@ export class ProductDetailsComponent implements OnInit {
     this.cartMessage.set(
       added
         ? 'Товар добавлен в корзину.'
-        : 'Достигнуто максимальное доступное количество этого товара.'
+        : 'Достигнуто максимальное доступное количество этого товара.',
     );
   }
 
   protected formatPrice(price: number): string {
     return new Intl.NumberFormat('ru-RU', {
       style: 'currency',
-      currency: 'BYN'
+      currency: 'BYN',
     }).format(price);
   }
 

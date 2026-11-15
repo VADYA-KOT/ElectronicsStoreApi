@@ -1,18 +1,8 @@
-import {
-  Component,
-  OnInit,
-  inject,
-  signal
-} from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 
-import {
-  HttpErrorResponse
-} from '@angular/common/http';
+import { HttpErrorResponse } from '@angular/common/http';
 
-import {
-  Router,
-  RouterLink
-} from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 
 import { OrderResponse } from '../../core/models/order.model';
 import { AuthService } from '../../core/services/auth.service';
@@ -23,7 +13,7 @@ import { OrderApiService } from '../../core/services/order-api.service';
   standalone: true,
   imports: [RouterLink],
   templateUrl: './orders.component.html',
-  styleUrl: './orders.component.css'
+  styleUrl: './orders.component.css',
 })
 export class OrdersComponent implements OnInit {
   private readonly orderApiService = inject(OrderApiService);
@@ -35,17 +25,15 @@ export class OrdersComponent implements OnInit {
   protected readonly isLoading = signal(false);
   protected readonly errorMessage = signal<string | null>(null);
 
-  protected readonly expandedOrderIds = signal<Set<number>>(
-    new Set()
-  );
+  protected readonly expandedOrderIds = signal<Set<number>>(new Set());
 
   ngOnInit(): void {
     // Проверяем авторизацию перед загрузкой истории.
     if (!this.authService.isAuthenticated) {
       void this.router.navigate(['/auth'], {
         queryParams: {
-          returnUrl: '/orders'
-        }
+          returnUrl: '/orders',
+        },
       });
 
       return;
@@ -60,7 +48,7 @@ export class OrdersComponent implements OnInit {
     this.errorMessage.set(null);
 
     this.orderApiService.getMyOrders().subscribe({
-      next: orders => {
+      next: (orders) => {
         this.orders.set(orders);
         this.isLoading.set(false);
       },
@@ -68,14 +56,11 @@ export class OrdersComponent implements OnInit {
       error: (error: unknown) => {
         this.isLoading.set(false);
 
-        if (
-          error instanceof HttpErrorResponse &&
-          error.status === 401
-        ) {
+        if (error instanceof HttpErrorResponse && error.status === 401) {
           void this.router.navigate(['/auth'], {
             queryParams: {
-              returnUrl: '/orders'
-            }
+              returnUrl: '/orders',
+            },
           });
 
           return;
@@ -83,10 +68,8 @@ export class OrdersComponent implements OnInit {
 
         console.error('Ошибка загрузки истории заказов:', error);
 
-        this.errorMessage.set(
-          this.getErrorMessage(error)
-        );
-      }
+        this.errorMessage.set(this.getErrorMessage(error));
+      },
     });
   }
 
@@ -97,7 +80,7 @@ export class OrdersComponent implements OnInit {
 
   // Открытие или закрытие состава заказа.
   protected toggleOrder(orderId: number): void {
-    this.expandedOrderIds.update(current => {
+    this.expandedOrderIds.update((current) => {
       const updated = new Set(current);
 
       if (updated.has(orderId)) {
@@ -173,7 +156,7 @@ export class OrdersComponent implements OnInit {
       month: 'long',
       year: 'numeric',
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
     }).format(date);
   }
 
@@ -181,7 +164,7 @@ export class OrdersComponent implements OnInit {
   protected formatPrice(price: number): string {
     return new Intl.NumberFormat('ru-RU', {
       style: 'currency',
-      currency: 'BYN'
+      currency: 'BYN',
     }).format(price);
   }
 

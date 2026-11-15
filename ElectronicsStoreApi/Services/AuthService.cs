@@ -1,4 +1,4 @@
-﻿using System.IdentityModel.Tokens.Jwt;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using ElectronicsStoreApi.Data;
 using ElectronicsStoreApi.DTOs.Requests;
