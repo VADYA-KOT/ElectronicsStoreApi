@@ -145,7 +145,7 @@ The migration service is expected to exit with code `0` after applying pending m
 Open:
 
 - Storefront: [http://localhost:8081](http://localhost:8081)
-- API: [http://localhost:8081/api](http://localhost:8081/api)
+- Example API endpoint: [http://localhost:8081/api/products](http://localhost:8081/api/products)
 
 The Docker Compose API container uses the Production environment. Swagger is therefore disabled in this configuration.
 
@@ -284,7 +284,7 @@ To make the Angular development server reachable from other devices on the same 
 npm.cmd start -- --host 0.0.0.0
 ```
 
-Then open `http://<COMPUTER-IP>:4200` on the other device and allow inbound TCP port `4200) in Windows Firewall if required. The local API remains behind the Angular proxy.
+Then open `http://<COMPUTER-IP>:4200` on the other device and allow inbound TCP port `4200` in Windows Firewall if required. The local API remains behind the Angular proxy.
 
 ## Build and tests
 
